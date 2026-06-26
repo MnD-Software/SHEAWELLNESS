@@ -1,0 +1,27 @@
+Act as a Principal Full-Stack Software Architect and Lead Product Designer. I want to build a self-hosted, scalable, multi-tenant e-commerce platform designed to function and look exactly like Shopify. Give me a complete technical blueprint, architectural breakdown, and boilerplate code strategies to achieve this.
+
+Your response must cover the following four dimensions in deep, production-ready detail:
+
+1. HIGH-LEVEL MULTI-TENANT ARCHITECTURE
+- Recommend a modern tech stack (e.g., Next.js, Node.js/Go, PostgreSQL, Redis) optimized for low latency and high traffic.
+- Explain the best data isolation strategy for merchants (e.g., shared database with tenant_id indexing vs. database-per-tenant) to ensure security and speed.
+- Detail the custom domain mapping system (how ://myplatform.com maps to customdomain.com via reverse proxy or DNS).
+
+2. DATABASE SCHEMA (PostgreSQL Blueprint)
+Provide SQL DDL schemas for the core entities, incorporating multi-tenancy:
+- tenants / stores (id, name, domain, status)
+- products (id, store_id, title, description, price, inventory_qty)
+- orders (id, store_id, customer_id, total_price, payment_status, fulfillment_status)
+- customers (id, store_id, email, password_hash)
+
+3. SHOPIFY-STYLE ADMIN DASHBOARD UI (React & Tailwind CSS)
+Provide a complete, production-ready React component using Tailwind CSS that builds the Shopify Admin interface. It must include:
+- A sticky left-hand sidebar matching Shopify's layout: Home, Orders, Products, Customers, Analytics, Marketing, Discounts, Online Store, and Settings.
+- Visual styling adhering strictly to Shopify's Polaris design system: stark white backgrounds, muted gray borders (#E3E3E3), sharp typography, dark gray text, and the signature Shopify green (#008060) for primary actionable buttons.
+- A central dashboard workspace featuring a top search bar, an interactive "Products Table" with filtering, and 4 metric cards (Sales, Orders, Conversion Rate, Sessions).
+
+4. DYNAMIC THEME ENGINE CONCEPT
+- Detail how to build a layout engine inspired by Shopify sections/blocks. 
+- Provide an example JSON schema showing how a merchant’s homepage layout (e.g., Header, Hero Banner, Featured Collection, Footer) is saved in the database, and explain how the frontend should dynamically parse and render this JSON into HTML.
+
+Deliver highly structured, clean code blocks and step-by-step implementation instructions.
