@@ -1,3 +1,4 @@
+import { sheaBrand } from "@/lib/shea-content";
 import type { PlatformSnapshot } from "@/lib/types";
 
 export const platformSnapshot: PlatformSnapshot = {
@@ -9,27 +10,7 @@ export const platformSnapshot: PlatformSnapshot = {
       status: "active",
       platformDomain: "shea-wellness.myplatform.local",
       customDomain: null,
-      currency: "USD",
-      plan: "enterprise"
-    },
-    {
-      id: "store_shea_wholesale",
-      name: "Shea Wellness Wholesale",
-      slug: "shea-wholesale",
-      status: "active",
-      platformDomain: "shea-wholesale.myplatform.local",
-      customDomain: null,
-      currency: "USD",
-      plan: "scale"
-    },
-    {
-      id: "store_shea_spa",
-      name: "Shea Wellness Spa Supply",
-      slug: "shea-spa",
-      status: "active",
-      platformDomain: "shea-spa.myplatform.local",
-      customDomain: null,
-      currency: "USD",
+      currency: "KES",
       plan: "enterprise"
     }
   ],
@@ -40,54 +21,137 @@ export const platformSnapshot: PlatformSnapshot = {
     status: "active",
     platformDomain: "shea-wellness.myplatform.local",
     customDomain: null,
-    currency: "USD",
+    currency: "KES",
     plan: "enterprise"
   },
   metrics: [
-    { label: "Gross sales", value: "$486,920", detail: "+18.4% from wellness retail and spa supply", trend: "up" },
-    { label: "Orders", value: "12,248", detail: "218 wholesale and retail orders awaiting fulfillment", trend: "up" },
-    { label: "Conversion", value: "5.8%", detail: "+0.7 point lift from product education and checkout", trend: "up" },
+    { label: "Gross sales", value: "KSh 48.6M", detail: "+18.4% from retail, spa, and distributor orders", trend: "up" },
+    { label: "Orders", value: "12,248", detail: "218 retail and wholesale orders awaiting fulfillment", trend: "up" },
+    { label: "Wholesale leads", value: "142", detail: "Retail partners, spas, and distributors in review", trend: "up" },
     { label: "Mobile sessions", value: "71%", detail: "Strong discovery from organic beauty shoppers", trend: "flat" }
   ],
   products: [
     {
-      id: "prod_body_butter",
+      id: "prod_pure_raw",
+      storeId: "store_shea",
+      title: "Pure & Raw Shea Butter",
+      description: "Unfragranced raw shea butter for body, face, and hair.",
+      category: "Body Care",
+      badge: "Pure & Raw",
+      imageUrl: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+      imagePosition: "50% 48%",
+      rating: 4.9,
+      reviewCount: 214,
+      colors: ["Pure Raw"],
+      sizes: ["100g", "250g", "500g"],
+      material: "Raw Shea Butter",
+      deliveryBadge: "Body, face and hair",
+      price: 2000,
+      inventoryQty: 156,
+      status: "active",
+      channel: "both",
+      sales: 390
+    },
+    {
+      id: "prod_lavender",
       storeId: "store_shea",
       title: "Lavender Shea Body Butter Infusion",
-      description: "Premium whipped Nailotica shea butter for deep hydration, dry skin repair, and a calm evening ritual.",
+      description: "A calming shea butter infusion for dry, sensitive, and irritated skin.",
       category: "Body Care",
       badge: "Best seller",
-      imageUrl: "/assets/shea-body-butter.png",
-      imagePosition: "50% 50%",
-      compareAtPrice: 30,
+      imageUrl: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+      imagePosition: "50% 48%",
       rating: 4.9,
       reviewCount: 286,
-      colors: ["Pure Raw", "Lavender", "Lemongrass", "Vanilla-Mint"],
+      colors: ["Lavender", "Pure Raw", "Lemongrass", "Vanilla-Mint"],
       sizes: ["100g", "250g", "500g"],
-      material: "Pure Nailotica shea butter, lavender essential oil, vitamin E",
-      deliveryBadge: "Deep hydration",
-      price: 24,
+      material: "Raw Shea Butter, Lavender Essential Oil, Vitamin E",
+      deliveryBadge: "Calms irritated skin",
+      price: 2400,
       inventoryQty: 148,
       status: "active",
       channel: "both",
       sales: 420
     },
     {
+      id: "prod_lemongrass",
+      storeId: "store_shea",
+      title: "Lemongrass Shea Body Butter Infusion",
+      description: "A fresh botanical butter for daily body and face moisture.",
+      category: "Body Care",
+      badge: "Fresh ritual",
+      imageUrl: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+      imagePosition: "50% 50%",
+      rating: 4.8,
+      reviewCount: 177,
+      colors: ["Lemongrass", "Lavender", "Grapefruit"],
+      sizes: ["100g", "250g", "500g"],
+      material: "Raw Shea Butter, Lemongrass Essential Oil, Vitamin E",
+      deliveryBadge: "Daily glow",
+      price: 2400,
+      inventoryQty: 104,
+      status: "active",
+      channel: "both",
+      sales: 318
+    },
+    {
+      id: "prod_vanilla_mint",
+      storeId: "store_shea",
+      title: "Vanilla-Mint Shea Body Butter Infusion",
+      description: "A cooling and comforting butter for body and face.",
+      category: "Body Care",
+      badge: "Comfort blend",
+      imageUrl: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
+      imagePosition: "50% 52%",
+      rating: 4.8,
+      reviewCount: 144,
+      colors: ["Vanilla-Mint", "Pure Raw", "Grapefruit"],
+      sizes: ["100g", "250g", "500g"],
+      material: "Raw Shea Butter, Vanilla, Mint Oil, Vitamin E",
+      deliveryBadge: "Soft skin finish",
+      price: 2400,
+      inventoryQty: 91,
+      status: "active",
+      channel: "both",
+      sales: 276
+    },
+    {
+      id: "prod_grapefruit",
+      storeId: "store_shea",
+      title: "Grapefruit Shea Body Butter Infusion",
+      description: "A bright citrus butter for body and face care.",
+      category: "Body Care",
+      badge: "Citrus glow",
+      imageUrl: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
+      imagePosition: "50% 50%",
+      rating: 4.7,
+      reviewCount: 121,
+      colors: ["Grapefruit", "Lavender", "Lemongrass"],
+      sizes: ["100g", "250g", "500g"],
+      material: "Raw Shea Butter, Grapefruit Essential Oil, Vitamin E",
+      deliveryBadge: "Bright citrus scent",
+      price: 2400,
+      inventoryQty: 83,
+      status: "active",
+      channel: "both",
+      sales: 250
+    },
+    {
       id: "prod_black_soap",
       storeId: "store_shea",
       title: "African Liquid Black Soap Body & Face Wash",
-      description: "A handmade cleansing ritual that gently detoxes, supports acne-prone skin, and helps even skin tone.",
+      description: "Handmade black soap wash rooted in raw African heritage.",
       category: "Face Care",
       badge: "Handmade",
       imageUrl: "/assets/shea-black-soap.png",
       imagePosition: "50% 50%",
       rating: 4.8,
       reviewCount: 174,
-      colors: ["Original", "Tea Tree", "Eucalyptus"],
-      sizes: ["250ml", "500ml", "Spa refill"],
-      material: "Raw African black soap, shea butter, botanical extracts",
+      colors: ["Original", "Lavender & Clove", "Body Wash"],
+      sizes: ["150ml", "250ml", "500ml", "Spa refill"],
+      material: "African Black Soap, Shea Butter, Botanical Extracts",
       deliveryBadge: "Gentle detox",
-      price: 18,
+      price: 1800,
       inventoryQty: 96,
       status: "active",
       channel: "both",
@@ -96,30 +160,50 @@ export const platformSnapshot: PlatformSnapshot = {
     {
       id: "prod_chebe_serum",
       storeId: "store_shea",
-      title: "Chebe Hair Serum with Karkar Oil",
-      description: "A rich hair growth serum designed for length retention, stronger strands, shine, and reduced breakage.",
+      title: "Chebe Hair Growth Serum with Karkar Oil",
+      description: "A nourishing serum for protective styles, length retention, and scalp care.",
       category: "Hair Care",
       badge: "Hair growth",
       imageUrl: "/assets/shea-chebe-haircare.png",
       imagePosition: "50% 50%",
-      compareAtPrice: 28,
       rating: 4.7,
       reviewCount: 132,
       colors: ["Chebe Serum", "Chebe Butter", "Growth Duo"],
       sizes: ["50ml", "100ml", "Duo kit"],
-      material: "Chebe powder, Karkar oil, shea butter, natural oils",
+      material: "Chebe Powder, Karkar Oil, Natural Oils",
       deliveryBadge: "Length retention",
-      price: 22,
+      price: 2200,
       inventoryQty: 64,
       status: "low_stock",
       channel: "both",
       sales: 261
     },
     {
+      id: "prod_chebe_butter",
+      storeId: "store_shea",
+      title: "Chebe Hair Butter",
+      description: "Rich hair butter for nourishment, shine, and breakage prevention.",
+      category: "Hair Care",
+      badge: "Breakage care",
+      imageUrl: "/assets/shea-chebe-haircare.png",
+      imagePosition: "50% 50%",
+      rating: 4.8,
+      reviewCount: 116,
+      colors: ["Chebe Butter", "Growth Duo"],
+      sizes: ["100g", "250g"],
+      material: "Shea Butter, Chebe, Natural Oils",
+      deliveryBadge: "Shine and nourishment",
+      price: 2100,
+      inventoryQty: 78,
+      status: "active",
+      channel: "both",
+      sales: 224
+    },
+    {
       id: "prod_essential_oils",
       storeId: "store_shea",
-      title: "Essential Oils & Aromatherapy Kit",
-      description: "Lavender, lemongrass, tea tree, eucalyptus, peppermint, and rosemary oils for relaxation and focus.",
+      title: "Essential Oils & Wellness Kit",
+      description: "Lavender, lemongrass, tea tree, eucalyptus, peppermint, rosemary, sweet orange, and vanilla oils.",
       category: "Essential Oils",
       badge: "Wellness ritual",
       imageUrl: "/assets/shea-essential-oils.png",
@@ -127,20 +211,41 @@ export const platformSnapshot: PlatformSnapshot = {
       rating: 4.8,
       reviewCount: 118,
       colors: ["Lavender", "Lemongrass", "Tea Tree", "Peppermint"],
-      sizes: ["Single oil", "6-oil set", "Humidifier bundle"],
-      material: "Pure essential oils and aromatherapy humidifier accessories",
+      sizes: ["Single oil", "6-oil set", "Wholesale pack"],
+      material: "Pure essential oils",
       deliveryBadge: "Sleep and focus",
-      price: 32,
+      price: 3200,
       inventoryQty: 73,
       status: "active",
       channel: "online",
       sales: 198
     },
     {
+      id: "prod_aromatherapy",
+      storeId: "store_shea",
+      title: "Aromatherapy Humidifier Bundle",
+      description: "A diffuser-ready wellness bundle for essential oil rituals.",
+      category: "Aromatherapy",
+      badge: "Spa ambience",
+      imageUrl: "/assets/shea-essential-oils.png",
+      imagePosition: "50% 50%",
+      rating: 4.7,
+      reviewCount: 74,
+      colors: ["White", "Natural", "Spa bundle"],
+      sizes: ["Single unit", "Spa bundle"],
+      material: "Aromatherapy humidifier with essential oil compatibility",
+      deliveryBadge: "Relaxation setup",
+      price: 4200,
+      inventoryQty: 38,
+      status: "active",
+      channel: "online",
+      sales: 142
+    },
+    {
       id: "prod_spa_essentials",
       storeId: "store_shea",
       title: "Professional Spa Essentials Kit",
-      description: "Export-ready spa supplies for salons, wellness spas, and distributors, including massage oils and disposables.",
+      description: "Export-ready spa supplies including massage oils, bed sheets, disposable wear, and salon equipment.",
       category: "Spa Essentials",
       badge: "Wholesale ready",
       imageUrl: "/assets/shea-hero.png",
@@ -149,13 +254,55 @@ export const platformSnapshot: PlatformSnapshot = {
       reviewCount: 94,
       colors: ["Massage Oil", "Bed Sheets", "Disposable Wear", "Salon Kit"],
       sizes: ["Starter", "Salon", "Distributor"],
-      material: "Massage oils, disposable massage bed sheets, disposable pants and bras",
+      material: "Massage oils, disposable massage bed sheets, disposable pants and bras, salon equipment",
       deliveryBadge: "Export packaging",
-      price: 48,
+      price: 4800,
       inventoryQty: 52,
       status: "active",
       channel: "both",
       sales: 176
+    },
+    {
+      id: "prod_gift_set",
+      storeId: "store_shea",
+      title: "Shea Wellness Gift Set",
+      description: "A curated body butter, black soap, and essential oil set for self-care gifting.",
+      category: "Gift Sets",
+      badge: "Gift-ready",
+      imageUrl: "/assets/sheawellness/grapefruit-shea-butter-lid.jpeg",
+      imagePosition: "50% 48%",
+      rating: 4.9,
+      reviewCount: 88,
+      colors: ["Glow Set", "Calm Set", "Corporate Set"],
+      sizes: ["Mini set", "Signature set", "Corporate pack"],
+      material: "Shea Body Butter, African Black Soap, Essential Oil",
+      deliveryBadge: "Retail bundle",
+      price: 5800,
+      inventoryQty: 46,
+      status: "active",
+      channel: "both",
+      sales: 154
+    },
+    {
+      id: "prod_distributor_offer",
+      storeId: "store_shea",
+      title: "Distributor Starter Offer",
+      description: "A wholesale-friendly introduction to Shea Wellness best sellers.",
+      category: "Offers",
+      badge: "Retail partner",
+      imageUrl: "/assets/sheawellness/lavender-shea-butter-lid.jpeg",
+      imagePosition: "50% 50%",
+      rating: 4.8,
+      reviewCount: 52,
+      colors: ["Starter", "Growth", "Distributor"],
+      sizes: ["Starter", "Growth", "Distributor"],
+      material: "Assorted Shea Wellness products",
+      deliveryBadge: "Catalogue request",
+      price: 12000,
+      inventoryQty: 25,
+      status: "active",
+      channel: "both",
+      sales: 86
     }
   ],
   orders: [
@@ -164,7 +311,7 @@ export const platformSnapshot: PlatformSnapshot = {
       storeId: "store_shea",
       orderNumber: "#1089",
       customerName: "Amina Mwangi",
-      totalPrice: 132,
+      totalPrice: 13200,
       paymentStatus: "paid",
       fulfillmentStatus: "unfulfilled",
       placedAt: "2026-06-24T07:42:00.000Z"
@@ -174,7 +321,7 @@ export const platformSnapshot: PlatformSnapshot = {
       storeId: "store_shea",
       orderNumber: "#1088",
       customerName: "Nia Wellness Spa",
-      totalPrice: 384,
+      totalPrice: 38400,
       paymentStatus: "paid",
       fulfillmentStatus: "partial",
       placedAt: "2026-06-24T06:19:00.000Z"
@@ -184,7 +331,7 @@ export const platformSnapshot: PlatformSnapshot = {
       storeId: "store_shea",
       orderNumber: "#1087",
       customerName: "Organic Beauty Store",
-      totalPrice: 524,
+      totalPrice: 52400,
       paymentStatus: "pending",
       fulfillmentStatus: "on_hold",
       placedAt: "2026-06-23T18:06:00.000Z"
@@ -207,7 +354,7 @@ export const platformSnapshot: PlatformSnapshot = {
       email: "orders@niawellness.example",
       lifetimeValue: 6120,
       orders: 24,
-      segment: "Wholesale"
+      segment: "Wholesale spa"
     },
     {
       id: "cust_beauty",
@@ -225,19 +372,19 @@ export const platformSnapshot: PlatformSnapshot = {
       {
         type: "header",
         settings: {
-          brand: "Shea Wellness LTD",
+          brand: sheaBrand.name,
           nav: ["Body Care", "Face Care", "Hair Care", "Wholesale"],
-          announcement: "100% natural ingredients. Ethically sourced African shea. Export-ready quality."
+          announcement: sheaBrand.promises.join(" | ")
         }
       },
       {
         type: "hero",
         settings: {
-          headline: "Pure Nailotica Shea. Modern Wellness.",
-          body: "Premium handcrafted shea butter skincare and wellness products made from ethically sourced African shea.",
+          headline: sheaBrand.headline,
+          body: sheaBrand.summary,
           cta: "Shop Products",
           secondaryCta: "Become a Distributor",
-          mediaUrl: "/assets/shea-hero.png",
+          mediaUrl: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
           imageTone: "evergreen"
         }
       },
@@ -246,11 +393,11 @@ export const platformSnapshot: PlatformSnapshot = {
         settings: {
           title: "Shop Shea Wellness rituals",
           categories: [
-            { label: "Body Care", detail: "Shea body butter infusions for daily hydration" },
+            { label: "Body Care", detail: "Pure & Raw, Lavender, Lemongrass, Vanilla-Mint, Grapefruit" },
             { label: "Face Care", detail: "African liquid black soap for gentle detox" },
-            { label: "Hair Care", detail: "Chebe serum and butter for stronger strands" },
-            { label: "Essential Oils", detail: "Aromatherapy oils for sleep, focus, and skincare" },
-            { label: "Spa Essentials", detail: "Professional salon and wellness supplies" }
+            { label: "Hair Care", detail: "Chebe serum, Chebe butter, and black soap shampoo" },
+            { label: "Essential Oils", detail: "Lavender, lemongrass, tea tree, eucalyptus, peppermint, rosemary, sweet orange, vanilla" },
+            { label: "Spa Essentials", detail: "Massage oils, disposables, and professional salon equipment" }
           ]
         }
       },
@@ -259,7 +406,7 @@ export const platformSnapshot: PlatformSnapshot = {
         settings: {
           title: "Premium handcrafted wellness",
           subtitle: "Natural, ethical, and export-ready skincare for shoppers, spas, and distributors.",
-          productIds: ["prod_body_butter", "prod_black_soap", "prod_chebe_serum", "prod_essential_oils", "prod_spa_essentials"]
+          productIds: ["prod_pure_raw", "prod_lavender", "prod_lemongrass", "prod_black_soap", "prod_chebe_serum"]
         }
       },
       {
@@ -274,13 +421,13 @@ export const platformSnapshot: PlatformSnapshot = {
       {
         type: "trust_bar",
         settings: {
-          items: ["100% natural ingredients", "Ethically sourced shea butter", "Export-ready quality"]
+          items: sheaBrand.promises
         }
       },
       {
         type: "footer",
         settings: {
-          text: "Shea Wellness LTD - Unga House, 1st Floor, Westlands, Nairobi. sheabutterwellness@gmail.com | +254729621930"
+          text: `${sheaBrand.name} - ${sheaBrand.address}. ${sheaBrand.email} | ${sheaBrand.phone}`
         }
       }
     ]

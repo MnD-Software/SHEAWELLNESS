@@ -8,30 +8,47 @@ import {
   CreditCard,
   Eye,
   Grid2X2,
-  Heart,
   Home,
   Minus,
   Plus,
   RotateCcw,
-  Search,
   ShieldCheck,
   ShoppingCart,
   SlidersHorizontal,
   Star,
   Truck,
-  UserRound,
   X
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { formatMoney } from "@/lib/format";
+import { categoryToSlug } from "@/lib/product-routing";
+import { sheaVideos } from "@/lib/shea-content";
+import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import type { Product, Store } from "@/lib/types";
 
 type CartLine = {
   product: Product;
   quantity: number;
-  color: string;
   size: string;
+};
+
+type StoredCartLine = {
+  productId: string;
+  title: string;
+  imageUrl: string;
+  price: number;
+  size: string;
+  quantity: number;
+};
+
+type ProductReview = {
+  source?: string;
+  productId: string;
+  name: string;
+  rating: number;
+  body: string;
+  createdAt: string;
 };
 
 type CheckoutStep = "information" | "delivery" | "payment" | "review" | "success";
@@ -56,29 +73,136 @@ const defaultForm: CheckoutForm = {
   paymentMethod: "card"
 };
 
-export function CommerceStorefront({ store, products }: { store: Store; products: Product[] }) {
-  const liveProducts = products.filter((product) => product.status === "active" || product.status === "low_stock");
+const concernCards = [
+  {
+    title: "Dry & flaky skin",
+    body: "Rich shea moisture for daily body comfort.",
+    image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+    href: "/shop?search=raw"
+  },
+  {
+    title: "Sensitive skin comfort",
+    body: "Lavender and gentle butter routines for calm-feeling skin.",
+    image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+    href: "/shop?search=lavender"
+  },
+  {
+    title: "Fresh body glow",
+    body: "Citrus and lemongrass infusions for a clean daily ritual.",
+    image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+    href: "/shop?search=lemongrass"
+  },
+  {
+    title: "Face care routine",
+    body: "Black soap cleansers and botanical face care paths.",
+    image: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
+    href: "/shop?search=face"
+  },
+  {
+    title: "Hair & scalp moisture",
+    body: "Shea-led moisture rituals for scalp, edges, and hair.",
+    image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
+    href: "/shop?search=hair"
+  },
+  {
+    title: "Spa supply",
+    body: "Wholesale-ready shea products for treatment rooms and retail shelves.",
+    image: "/assets/sheawellness/lavender-shea-butter-back.jpeg",
+    href: "/wholesale"
+  }
+];
+
+const comparisonRows = [
+  ["100% natural positioning", true, false],
+  ["Ethically sourced African shea", true, false],
+  ["Paraben and sulfate free", true, false],
+  ["Wholesale and export-ready packaging", true, false],
+  ["Handcrafted skincare catalogue", true, false]
+] as const;
+
+export function CommerceStorefront({
+  store,
+  products,
+  initialSearch = "",
+  featuredProductLimit
+}: {
+  store: Store;
+  products: Product[];
+  initialSearch?: string;
+  featuredProductLimit?: number;
+}) {
+  const [catalogProducts, setCatalogProducts] = useState(products);
+  const liveProducts = catalogProducts.filter((product) => product.status === "active" || product.status === "low_stock");
   const categories = ["All", ...Array.from(new Set(liveProducts.map((product) => product.category)))];
   const [activeCategory, setActiveCategory] = useState("All");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialSearch);
   const [sort, setSort] = useState("featured");
   const [cart, setCart] = useState<CartLine[]>([]);
+  const [cartHydrated, setCartHydrated] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("information");
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(defaultForm);
   const [orderNumber, setOrderNumber] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
+  const [reviews, setReviews] = useState<ProductReview[]>([]);
 
   const heroProducts = liveProducts.slice(0, 5);
   const heroProduct = heroProducts[heroIndex] ?? liveProducts[0];
-  const navItems = ["Body Care", "Face Care", "Hair Care", "Wholesale"];
 
   function moveHero(direction: 1 | -1) {
     if (heroProducts.length < 2) return;
     setHeroIndex((index) => (index + direction + heroProducts.length) % heroProducts.length);
   }
+
+  useEffect(() => {
+    const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
+    if (!savedProducts) return;
+
+    try {
+      const parsedProducts = JSON.parse(savedProducts) as Product[];
+      if (Array.isArray(parsedProducts) && parsedProducts.length) {
+        setCatalogProducts(parsedProducts);
+      }
+    } catch {
+      setCatalogProducts(products);
+    }
+  }, [products]);
+
+  useEffect(() => {
+    const savedCart = window.localStorage.getItem("sheaWellnessCart");
+    if (!savedCart) {
+      setCartHydrated(true);
+      return;
+    }
+
+    try {
+      const parsedCart = JSON.parse(savedCart) as StoredCartLine[];
+      const nextCart = parsedCart
+        .map((line) => {
+          const product = catalogProducts.find((item) => item.id === line.productId);
+          return product ? { product, size: line.size, quantity: line.quantity } : null;
+        })
+        .filter((line): line is CartLine => Boolean(line));
+      setCart(nextCart);
+    } catch {
+      setCart([]);
+    } finally {
+      setCartHydrated(true);
+    }
+  }, [catalogProducts]);
+
+  useEffect(() => {
+    if (!cartHydrated) return;
+    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(cart.map((line) => ({
+      productId: line.product.id,
+      title: line.product.title,
+      imageUrl: line.product.imageUrl,
+      price: line.product.price,
+      size: line.size,
+      quantity: line.quantity
+    } satisfies StoredCartLine))));
+  }, [cart, cartHydrated]);
 
   useEffect(() => {
     if (heroProducts.length < 2) return;
@@ -87,6 +211,13 @@ export function CommerceStorefront({ store, products }: { store: Store; products
     }, 5200);
     return () => window.clearInterval(timer);
   }, [heroProducts.length]);
+
+  useEffect(() => {
+    const savedReviews = window.localStorage.getItem("sheaWellnessReviews");
+    if (savedReviews) {
+      setReviews(JSON.parse(savedReviews) as ProductReview[]);
+    }
+  }, []);
 
   const filteredProducts = useMemo(() => {
     const nextProducts = liveProducts.filter((product) => {
@@ -105,16 +236,19 @@ export function CommerceStorefront({ store, products }: { store: Store; products
   }, [activeCategory, liveProducts, query, sort]);
 
   const subtotal = cart.reduce((total, line) => total + line.product.price * line.quantity, 0);
-  const shipping = subtotal > 150 || subtotal === 0 ? 0 : checkoutForm.deliveryMethod === "express" ? 18 : 8;
-  const tax = subtotal * 0.0825;
+  const shipping = subtotal > 15000 || subtotal === 0 ? 0 : checkoutForm.deliveryMethod === "express" ? 900 : 450;
+  const tax = subtotal * 0.16;
   const total = subtotal + shipping + tax;
   const cartCount = cart.reduce((totalQuantity, line) => totalQuantity + line.quantity, 0);
+  const isHomePage = Boolean(featuredProductLimit);
+  const isShopPage = !isHomePage;
+  const displayedProducts = featuredProductLimit ? filteredProducts.slice(0, featuredProductLimit) : filteredProducts;
 
-  function addToCart(product: Product, quantity = 1, color = product.colors[0], size = product.sizes[0]) {
+  function addToCart(product: Product, quantity = 1, size = product.sizes[0]) {
     setCart((lines) => {
-      const existingIndex = lines.findIndex((line) => line.product.id === product.id && line.color === color && line.size === size);
+      const existingIndex = lines.findIndex((line) => line.product.id === product.id && line.size === size);
       if (existingIndex === -1) {
-        return [...lines, { product, quantity, color, size }];
+        return [...lines, { product, quantity, size }];
       }
       return lines.map((line, index) => (index === existingIndex ? { ...line, quantity: line.quantity + quantity } : line));
     });
@@ -138,7 +272,6 @@ export function CommerceStorefront({ store, products }: { store: Store; products
           productId: line.product.id,
           title: line.product.title,
           quantity: line.quantity,
-          color: line.color,
           size: line.size,
           unitPrice: line.product.price
         })),
@@ -147,171 +280,120 @@ export function CommerceStorefront({ store, products }: { store: Store; products
     });
 
     const payload = (await response.json()) as { data?: { orderNumber: string } };
-    setOrderNumber(payload.data?.orderNumber ?? `SHEA-${Date.now().toString().slice(-6)}`);
+    const nextOrderNumber = payload.data?.orderNumber ?? `SHEA-${Date.now().toString().slice(-6)}`;
+    const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as unknown[];
+    window.localStorage.setItem("sheaWellnessOrders", JSON.stringify([
+      {
+        source: "shea_storefront_checkout",
+        orderNumber: nextOrderNumber,
+        customerName: checkoutForm.fullName,
+        customerEmail: checkoutForm.email,
+        itemCount: cart.reduce((count, line) => count + line.quantity, 0),
+        totalPrice: total,
+        createdAt: new Date().toISOString(),
+        paymentStatus: "authorized",
+        fulfillmentStatus: "unfulfilled"
+      },
+      ...savedOrders
+    ]));
+    setOrderNumber(nextOrderNumber);
     setCheckoutStep("success");
     setCart([]);
   }
 
+  function getProductReviews(productId: string) {
+    return reviews.filter((review) => review.productId === productId);
+  }
+
   return (
     <main className="commerce-site">
-      <header className="commerce-header">
-        <div className="commerce-promo">100% natural ingredients. Ethically sourced African shea. Export-ready quality.</div>
-        <div className="commerce-nav">
-          <a className="commerce-logo" href="#top" aria-label={`${store.name} home`}>
-            {store.name}
-          </a>
-          <nav aria-label="Store navigation">
-            {navItems.map((item) => (
-              <a href={item === "Wholesale" ? "#wholesale" : "#products"} key={item}>
-                {item}
-              </a>
-            ))}
-          </nav>
-          <div className="commerce-nav-actions-main">
-            <button type="button" aria-label="Search products">
-              <Search size={18} />
-            </button>
-            <button type="button" aria-label="View account">
-              <UserRound size={18} />
-            </button>
-            <button type="button" aria-label="Wishlist">
-              <Heart size={18} />
-            </button>
-          </div>
-          <button type="button" className="commerce-cart-button" onClick={() => setCartOpen(true)}>
-            <ShoppingCart size={18} />
-            Cart
-            <span>{cartCount}</span>
-          </button>
-        </div>
-      </header>
+      <SheaGlobalHeader cartCount={cartCount} onCartOpen={() => setCartOpen(true)} searchValue={query} onSearchChange={setQuery} />
 
-      <section className="commerce-hero" id="top">
-        <div className="commerce-hero-card" aria-label="Featured product carousel">
-          {heroProduct ? (
-            <img src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
-          ) : (
-            <img src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" />
-          )}
-          <div className="commerce-hero-overlay" />
-
-          <div className="commerce-hero-copy">
-            <span>{heroProduct?.category ?? "Pure Nailotica Shea"}</span>
-            <h1>{heroProduct?.title ?? "Modern wellness essentials"}</h1>
-            <div className="commerce-hero-actions">
+      {isHomePage ? (
+        <>
+          <section className="commerce-hero" id="top">
+            <div className="commerce-hero-card" aria-label="Featured product carousel">
               {heroProduct ? (
-                <button type="button" onClick={() => addToCart(heroProduct)}>
-                  Shop Product
-                </button>
-              ) : null}
-              <button type="button" className="ghost" onClick={() => {
-                if (heroProduct) setSelectedProduct(heroProduct);
-              }}>
-                View Details
+                <img src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
+              ) : (
+                <img src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" />
+              )}
+              <div className="commerce-hero-overlay" />
+
+              <div className="commerce-hero-copy">
+                <span>{heroProduct?.category ?? "Pure Nailotica Shea"}</span>
+                <h1>{heroProduct?.title ?? "Modern wellness essentials"}</h1>
+                <div className="commerce-hero-actions">
+                  {heroProduct ? <button type="button" onClick={() => addToCart(heroProduct)}>Shop Product</button> : null}
+                  {heroProduct ? <a className="ghost" href={`/products/${encodeURIComponent(heroProduct.id)}`}>View Details</a> : null}
+                </div>
+              </div>
+
+              <button type="button" className="commerce-carousel-arrow previous" onClick={() => moveHero(-1)} aria-label="Previous product">
+                <ArrowLeft size={20} />
               </button>
+              <button type="button" className="commerce-carousel-arrow next" onClick={() => moveHero(1)} aria-label="Next product">
+                <ArrowRight size={20} />
+              </button>
+
+              <div className="commerce-carousel-dots" aria-label="Choose featured product">
+                {heroProducts.map((product, index) => (
+                  <button
+                    type="button"
+                    key={product.id}
+                    className={clsx(heroIndex === index && "active")}
+                    onClick={() => setHeroIndex(index)}
+                    aria-label={`Show ${product.title}`}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div className="commerce-hero-meta">
-            <strong>{formatMoney(heroProduct?.price ?? 0, store.currency)}</strong>
-            <span><Star size={14} fill="currentColor" /> {heroProduct?.rating ?? 4.9}</span>
-          </div>
+          <section className="commerce-service-strip" aria-label="Store benefits">
+            <span><Truck size={18} /> Export-ready packaging</span>
+            <span><RotateCcw size={18} /> Wholesale support</span>
+            <span><ShieldCheck size={18} /> Paraben and sulfate free</span>
+            <span><Star size={18} /> Handmade wellness products</span>
+          </section>
 
-          <button type="button" className="commerce-carousel-arrow previous" onClick={() => moveHero(-1)} aria-label="Previous product">
-            <ArrowLeft size={20} />
-          </button>
-          <button type="button" className="commerce-carousel-arrow next" onClick={() => moveHero(1)} aria-label="Next product">
-            <ArrowRight size={20} />
-          </button>
+          <section className="commerce-video-section" id="product-films">
+            <div className="commerce-section-title split">
+              <div>
+                <span>Product films</span>
+                <h2>Real Shea Wellness product videos.</h2>
+                <p className="commerce-shop-intro">Inspect product texture, packaging, and retail presentation in motion.</p>
+              </div>
+              <a href="/catalogue">View media catalogue <ArrowRight size={17} /></a>
+            </div>
+            <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
+              {sheaVideos.slice(0, 4).map((video) => (
+                <article key={video.src}>
+                  <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
+                  <strong>{video.title}</strong>
+                </article>
+              ))}
+            </div>
+          </section>
+        </>
+      ) : null}
 
-          <div className="commerce-carousel-dots" aria-label="Choose featured product">
-            {heroProducts.map((product, index) => (
-              <button
-                type="button"
-                key={product.id}
-                className={clsx(heroIndex === index && "active")}
-                onClick={() => setHeroIndex(index)}
-                aria-label={`Show ${product.title}`}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="commerce-carousel-rail" aria-label="Featured product thumbnails">
-          {heroProducts.map((product, index) => (
-            <button
-              type="button"
-              key={product.id}
-              className={clsx(heroIndex === index && "active")}
-              onClick={() => setHeroIndex(index)}
-            >
-              <img src={product.imageUrl} alt="" style={{ objectPosition: product.imagePosition }} />
-              <span>{product.category}</span>
-              <strong>{product.title}</strong>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="commerce-service-strip" aria-label="Store benefits">
-        <span><Truck size={18} /> Export-ready packaging</span>
-        <span><RotateCcw size={18} /> Wholesale support</span>
-        <span><ShieldCheck size={18} /> Paraben and sulfate free</span>
-        <span><Star size={18} /> Handmade wellness products</span>
-      </section>
-
-      <section className="commerce-categories" id="collections">
-        <div className="commerce-section-title">
-          <span>Collections</span>
-          <h2>Shop Shea Wellness rituals.</h2>
-        </div>
-        <div className="commerce-category-grid">
-          {categories.slice(1).map((category) => (
-            <button type="button" key={category} onClick={() => setActiveCategory(category)}>
-              <img
-                src={liveProducts.find((product) => product.category === category)?.imageUrl ?? "/assets/shea-hero.png"}
-                alt=""
-                style={{ objectPosition: liveProducts.find((product) => product.category === category)?.imagePosition ?? "50% 50%" }}
-              />
-              <i />
-              <span>{category}</span>
-              <strong>{liveProducts.filter((product) => product.category === category).length} products</strong>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="commerce-feature-band">
-        <article>
-          <span>Pure Nailotica Shea</span>
-          <h2>Modern skincare rooted in African wellness heritage.</h2>
-          <p>Clean, ethical, and sustainable formulations for daily body care, face care, hair growth rituals, aromatherapy, and professional spa supply.</p>
-          <a href="#products">Shop products <ArrowRight size={17} /></a>
-        </article>
-        <div className="commerce-feature-mosaic">
-          {liveProducts.slice(0, 4).map((product) => (
-            <button type="button" key={product.id} onClick={() => setSelectedProduct(product)}>
-              <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
-              <span>{product.title}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="commerce-products-section" id="products">
+      <section className={clsx("commerce-products-section", isShopPage && "shop-only")} id="products">
         <div className="commerce-section-title split">
           <div>
-            <span>Shop</span>
-            <h2>Shop natural skincare and wellness.</h2>
+            <span>{isHomePage ? "Products" : "Catalogue"}</span>
+            <h2>{isHomePage ? "Featured products." : "All Shea Wellness products."}</h2>
             <p className="commerce-shop-intro">
-              Premium handcrafted shea butter products with quick view, variants, reviews, delivery confidence, and clear cart actions.
+              {isHomePage
+                ? "A focused preview of the retail catalogue. Visit the shop for every product and category."
+                : "Browse every active product in the Shea Wellness catalogue."}
             </p>
           </div>
           <div className="commerce-controls">
-            <label>
-              <Search size={17} />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search catalog" />
-            </label>
-            <label>
+            {isHomePage ? (
+              <a className="commerce-full-shop-link" href="/shop">View full shop <ArrowRight size={17} /></a>
+            ) : (
+              <label>
               <SlidersHorizontal size={17} />
               <select value={sort} onChange={(event) => setSort(event.target.value)}>
                 <option value="featured">Featured</option>
@@ -320,66 +402,133 @@ export function CommerceStorefront({ store, products }: { store: Store; products
                 <option value="price-high">Price high to low</option>
               </select>
               <ChevronDown size={16} />
-            </label>
+              </label>
+            )}
           </div>
         </div>
 
-        <div className="commerce-filter-row">
+        {isShopPage ? (
+        <div className="commerce-filter-row commerce-category-nav">
           {categories.map((category) => (
-            <button
-              type="button"
+            <a
               key={category}
               className={clsx(activeCategory === category && "active")}
+              href={category === "All" ? "/shop" : `/collections/${categoryToSlug(category)}`}
               onClick={() => setActiveCategory(category)}
             >
               {category}
-            </button>
+            </a>
           ))}
         </div>
+        ) : null}
 
         <div className="commerce-product-grid">
-          {filteredProducts.map((product) => (
+          {displayedProducts.map((product) => {
+            const productReviews = getProductReviews(product.id);
+            const reviewCount = productReviews.length;
+            const averageRating = reviewCount
+              ? productReviews.reduce((totalRating, review) => totalRating + review.rating, 0) / reviewCount
+              : 0;
+            return (
             <article className="commerce-product-card" key={product.id}>
-              <button type="button" className="commerce-product-image" onClick={() => setSelectedProduct(product)}>
-                <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
-                <span>{product.badge}</span>
-                <b>Quick view</b>
-              </button>
+              <a className="commerce-product-image" href={`/products/${encodeURIComponent(product.id)}`}>
+                <img src={product.imageUrl} alt={product.title} loading="lazy" style={{ objectPosition: product.imagePosition }} />
+                <b>View product</b>
+              </a>
               <div className="commerce-product-body">
                 <div>
-                  <div className="commerce-card-kicker">
-                    <small>{product.category}</small>
-                    <em>{product.deliveryBadge}</em>
-                  </div>
                   <strong>{product.title}</strong>
                   <p>{product.description}</p>
                 </div>
                 <div className="commerce-rating">
-                  <span><Star size={14} fill="currentColor" /> {product.rating}</span>
-                  <small>{product.reviewCount} reviews</small>
-                </div>
-                <div className="commerce-swatch-row" aria-label={`${product.title} colors`}>
-                  {product.colors.slice(0, 4).map((color) => (
-                    <span key={color} title={color} />
-                  ))}
-                  <small>{product.colors.length} colors</small>
+                  <span><Star size={14} fill="currentColor" /> {reviewCount ? averageRating.toFixed(1) : "New"}</span>
+                  <small>{reviewCount ? `${reviewCount} customer reviews` : "Be first to review"}</small>
                 </div>
                 <div className="commerce-price-row">
                   <span>{formatMoney(product.price, store.currency)}</span>
-                  {product.compareAtPrice ? <del>{formatMoney(product.compareAtPrice, store.currency)}</del> : null}
                 </div>
                 <div className="commerce-card-actions">
                   <button type="button" onClick={() => addToCart(product)}>
                     <ShoppingCart size={17} />
                     Add
                   </button>
-                  <button type="button" className="secondary" onClick={() => setSelectedProduct(product)}>
+                  <a className="secondary" href={`/products/${encodeURIComponent(product.id)}`}>
                     <Eye size={17} />
                     View
-                  </button>
+                  </a>
+                  <a className="secondary review" href={`/products/${encodeURIComponent(product.id)}#reviews`}>
+                    <Star size={17} />
+                    Review
+                  </a>
                 </div>
               </div>
             </article>
+          );
+          })}
+        </div>
+      </section>
+
+      {isHomePage ? (
+      <>
+      <section className="commerce-concerns-section" id="skin-concerns">
+        <div className="commerce-section-title split">
+          <div>
+            <span>Shop by concern</span>
+            <h2>Find a Shea Wellness ritual by skin and care need.</h2>
+          </div>
+          <p className="commerce-shop-intro">A cleaner path for customers who do not know the exact product name yet.</p>
+        </div>
+        <div className="commerce-concern-grid">
+          {concernCards.map((concern) => (
+            <a href={concern.href} key={concern.title}>
+              <img src={concern.image} alt="" loading="lazy" />
+              <i />
+              <strong>{concern.title}</strong>
+              <span>{concern.body}</span>
+              <b>Explore collection</b>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="commerce-seen-strip" aria-label="Shea Wellness credibility">
+        <span>As trusted by</span>
+        <div className="commerce-marquee-viewport">
+          <div className="commerce-marquee-track">
+            {["KAM Expo", "Nairobi retail", "Organic beauty stores", "Wellness spas", "Wholesale buyers", "Natural skincare buyers"].map((item) => (
+              <strong key={item}>{item}</strong>
+            ))}
+            {["KAM Expo", "Nairobi retail", "Organic beauty stores", "Wellness spas", "Wholesale buyers", "Natural skincare buyers"].map((item) => (
+              <strong key={`${item}-repeat`} aria-hidden="true">{item}</strong>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="commerce-guarantee-strip" aria-label="Store assurances">
+        <span><CheckCircle2 size={19} /> Natural ingredients</span>
+        <span><CheckCircle2 size={19} /> Ethical African shea</span>
+        <span><CheckCircle2 size={19} /> Export-ready quality</span>
+      </section>
+
+      <section className="commerce-comparison-section">
+        <div className="commerce-comparison-copy">
+          <span>Compare</span>
+          <h2>Shea Wellness versus generic skincare.</h2>
+          <p>Clear reasons to choose a focused African shea wellness brand over mass-market body creams.</p>
+        </div>
+        <div className="commerce-comparison-table" role="table" aria-label="Shea Wellness comparison">
+          <div role="row">
+            <strong role="columnheader">Standard</strong>
+            <strong role="columnheader">Shea Wellness</strong>
+            <strong role="columnheader">Generic cream</strong>
+          </div>
+          {comparisonRows.map(([label, shea, generic]) => (
+            <div role="row" key={label}>
+              <span role="cell">{label}</span>
+              <span role="cell">{shea ? <CheckCircle2 size={21} /> : <X size={21} />}</span>
+              <span role="cell">{generic ? <CheckCircle2 size={21} /> : <X size={21} />}</span>
+            </div>
           ))}
         </div>
       </section>
@@ -415,37 +564,50 @@ export function CommerceStorefront({ store, products }: { store: Store; products
       </section>
 
       <section className="commerce-newsletter">
+        <figure className="commerce-newsletter-media">
+          <img src="/assets/sheawellness/grapefruit-shea-butter-front.jpeg" alt="Shea Wellness grapefruit body and face butter" />
+        </figure>
         <div>
           <span>Wellness education</span>
           <h2>Get skincare rituals, distributor updates, and product launches.</h2>
+          <p>Join the Shea Wellness list for new butter infusions, wholesale availability, and skincare education rooted in natural African shea.</p>
         </div>
         <form onSubmit={(event) => event.preventDefault()}>
           <input type="email" placeholder="Email address" aria-label="Email address" />
           <button type="button">Join</button>
         </form>
       </section>
+      </>
+      ) : null}
 
       <footer className="commerce-footer">
-        <div>
+        <div className="commerce-footer-brand">
           <strong>{store.name}</strong>
           <p>Premium handcrafted shea butter skincare and wellness products made from ethically sourced African shea.</p>
+          <small>Unga House, 1st Floor, Westlands, Nairobi</small>
         </div>
         <div>
           <span>Shop</span>
-          <a href="#products">Products</a>
-          <a href="#collections">Collections</a>
+          <a href="/shop">Shop products</a>
+          <a href="/products">Product guide</a>
+          <a href="/catalogue">Media catalogue</a>
         </div>
         <div>
-          <span>Support</span>
+          <span>Company</span>
+          <a href="/about">About</a>
+          <a href="/sustainability">Sustainability</a>
+          <a href="/quality">Quality</a>
+        </div>
+        <div>
+          <span>Contact</span>
           <a href="mailto:sheabutterwellness@gmail.com">Email</a>
           <a href="tel:+254729621930">+254729621930</a>
         </div>
-        <small>Unga House, 1st Floor, Westlands, Nairobi</small>
       </footer>
 
       <nav className="commerce-mobile-tabs" aria-label="Mobile storefront navigation">
         <a href="#top"><Home size={20} /><span>Home</span></a>
-        <a href="#collections"><Grid2X2 size={20} /><span>Shop</span></a>
+        <a href="/shop"><Grid2X2 size={20} /><span>Shop</span></a>
         <button type="button" onClick={() => setCartOpen(true)}>
           <ShoppingCart size={20} />
           <span>Cart</span>
@@ -470,18 +632,6 @@ export function CommerceStorefront({ store, products }: { store: Store; products
           setCheckoutStep("information");
         }}
       />
-
-      {selectedProduct ? (
-        <ProductModal
-          product={selectedProduct}
-          currency={store.currency}
-          onClose={() => setSelectedProduct(null)}
-          onAdd={(product, color, size) => {
-            addToCart(product, 1, color, size);
-            setSelectedProduct(null);
-          }}
-        />
-      ) : null}
 
       {checkoutOpen ? (
         <CheckoutFlow
@@ -535,11 +685,11 @@ function CartDrawer({
       <div className="commerce-cart-lines">
         {cart.length === 0 ? <p>Your cart is ready for Shea Wellness products.</p> : null}
         {cart.map((line, index) => (
-          <article key={`${line.product.id}-${line.color}-${line.size}`}>
+          <article key={`${line.product.id}-${line.size}`}>
             <img src={line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
             <div>
               <strong>{line.product.title}</strong>
-              <span>{line.color} / {line.size}</span>
+              <span>{line.size}</span>
               <b>{formatMoney(line.product.price, currency)}</b>
               <div className="commerce-qty">
                 <button type="button" onClick={() => onUpdate(index, line.quantity - 1)}><Minus size={14} /></button>
@@ -562,16 +712,52 @@ function CartDrawer({
 function ProductModal({
   product,
   currency,
+  focusReview,
   onClose,
+  reviews,
+  onReviewSubmit,
   onAdd
 }: {
   product: Product;
   currency: string;
+  focusReview: boolean;
   onClose: () => void;
-  onAdd: (product: Product, color: string, size: string) => void;
+  reviews: ProductReview[];
+  onReviewSubmit: (review: ProductReview) => void;
+  onAdd: (product: Product, size: string) => void;
 }) {
-  const [color, setColor] = useState(product.colors[0]);
   const [size, setSize] = useState(product.sizes[0]);
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewBody, setReviewBody] = useState("");
+  const reviewFormRef = useRef<HTMLFormElement | null>(null);
+  const averageRating = reviews.length
+    ? reviews.reduce((totalRating, review) => totalRating + review.rating, 0) / reviews.length
+    : 0;
+
+  function submitProductReview(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!reviewName.trim() || !reviewBody.trim()) return;
+    onReviewSubmit({
+      productId: product.id,
+      source: "shea_storefront_review",
+      name: reviewName.trim(),
+      rating: reviewRating,
+      body: reviewBody.trim(),
+      createdAt: new Date().toISOString()
+    });
+    setReviewName("");
+    setReviewRating(5);
+    setReviewBody("");
+  }
+
+  useEffect(() => {
+    if (!focusReview) return;
+    window.setTimeout(() => {
+      reviewFormRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      reviewFormRef.current?.querySelector("input")?.focus();
+    }, 120);
+  }, [focusReview]);
 
   return (
     <div className="commerce-modal-backdrop">
@@ -583,11 +769,10 @@ function ProductModal({
           <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
         </div>
         <div className="commerce-modal-copy">
-          <span>{product.badge}</span>
           <h2>{product.title}</h2>
           <div className="commerce-rating">
-            <span><Star size={14} fill="currentColor" /> {product.rating}</span>
-            <small>{product.reviewCount} verified reviews</small>
+            <span><Star size={14} fill="currentColor" /> {reviews.length ? averageRating.toFixed(1) : "New"}</span>
+            <small>{reviews.length ? `${reviews.length} customer reviews` : "No customer reviews yet"}</small>
           </div>
           <p>{product.description}</p>
           <dl>
@@ -596,12 +781,6 @@ function ProductModal({
             <div><dt>Care</dt><dd>Store in a cool, dry place away from direct sunlight</dd></div>
           </dl>
           <fieldset>
-            <legend>Color</legend>
-            {product.colors.map((item) => (
-              <button type="button" className={clsx(color === item && "active")} key={item} onClick={() => setColor(item)}>{item}</button>
-            ))}
-          </fieldset>
-          <fieldset>
             <legend>Size</legend>
             {product.sizes.map((item) => (
               <button type="button" className={clsx(size === item && "active")} key={item} onClick={() => setSize(item)}>{item}</button>
@@ -609,11 +788,35 @@ function ProductModal({
           </fieldset>
           <div className="commerce-modal-buy">
             <strong>{formatMoney(product.price, currency)}</strong>
-            <button type="button" onClick={() => onAdd(product, color, size)}>
+            <button type="button" onClick={() => onAdd(product, size)}>
               <ShoppingCart size={18} />
               Add to cart
             </button>
           </div>
+          <section className="commerce-review-panel">
+            <h3>Customer reviews</h3>
+            {reviews.length ? (
+              <div className="commerce-review-list">
+                {reviews.slice(0, 3).map((review) => (
+                  <article key={`${review.productId}-${review.createdAt}`}>
+                    <strong>{review.name}</strong>
+                    <span><Star size={13} fill="currentColor" /> {review.rating}/5</span>
+                    <p>{review.body}</p>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="commerce-review-empty">No customer reviews have been submitted for this product yet.</p>
+            )}
+            <form className="commerce-review-form" ref={reviewFormRef} onSubmit={submitProductReview}>
+              <input value={reviewName} onChange={(event) => setReviewName(event.target.value)} placeholder="Your name" aria-label="Your name" />
+              <select value={reviewRating} onChange={(event) => setReviewRating(Number(event.target.value))} aria-label="Rating">
+                {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} stars</option>)}
+              </select>
+              <textarea value={reviewBody} onChange={(event) => setReviewBody(event.target.value)} placeholder="Share your product experience" aria-label="Review" />
+              <button type="submit">Submit review</button>
+            </form>
+          </section>
         </div>
       </section>
     </div>
@@ -705,14 +908,14 @@ function CheckoutFlow({
         <aside className="commerce-checkout-summary">
           <h3>Order summary</h3>
           {cart.map((line) => (
-            <div className="commerce-summary-line" key={`${line.product.id}-${line.color}-${line.size}`}>
+            <div className="commerce-summary-line" key={`${line.product.id}-${line.size}`}>
               <span>{line.quantity}x {line.product.title}</span>
               <strong>{formatMoney(line.product.price * line.quantity, currency)}</strong>
             </div>
           ))}
           <div><span>Subtotal</span><strong>{formatMoney(subtotal, currency)}</strong></div>
           <div><span>Shipping</span><strong>{shipping === 0 ? "Free" : formatMoney(shipping, currency)}</strong></div>
-          <div><span>Estimated tax</span><strong>{formatMoney(tax, currency)}</strong></div>
+          <div><span>Estimated VAT</span><strong>{formatMoney(tax, currency)}</strong></div>
           <div className="total"><span>Total</span><strong>{formatMoney(total, currency)}</strong></div>
         </aside>
       </section>
@@ -742,8 +945,8 @@ function CheckoutDelivery({ form, setForm, currency }: { form: CheckoutForm; set
       <span>Delivery</span>
       <h2>Choose a delivery promise</h2>
       {[
-        { id: "standard", title: "Standard tracked", detail: "Retail and wellness orders", price: 8 },
-        { id: "express", title: "Express courier", detail: "Priority retail or spa replenishment", price: 18 }
+        { id: "standard", title: "Standard tracked", detail: "Retail and wellness orders", price: 450 },
+        { id: "express", title: "Express courier", detail: "Priority retail or spa replenishment", price: 900 }
       ].map((method) => (
         <button
           type="button"

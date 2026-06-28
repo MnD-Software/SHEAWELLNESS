@@ -1,4 +1,10 @@
 export function formatMoney(value: number, currency = "USD") {
+  if (currency === "KES") {
+    return `KSh ${new Intl.NumberFormat("en-KE", {
+      maximumFractionDigits: value % 1 === 0 ? 0 : 2
+    }).format(value)}`;
+  }
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency,

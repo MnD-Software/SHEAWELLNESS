@@ -1,9 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
-import { platformSnapshot } from "@/lib/platform-data";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const storeId = request.headers.get("x-tenant-id") ?? "store_urban";
-  const orders = platformSnapshot.orders.filter((order) => order.storeId === storeId);
-
-  return NextResponse.json({ data: orders });
+export async function GET() {
+  return NextResponse.json({ data: [] });
 }

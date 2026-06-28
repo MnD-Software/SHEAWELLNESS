@@ -16,7 +16,6 @@ const checkoutSchema = z.object({
       productId: z.string(),
       title: z.string(),
       quantity: z.number().int().positive(),
-      color: z.string(),
       size: z.string(),
       unitPrice: z.number().nonnegative()
     })
@@ -35,7 +34,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json({
     data: {
-      orderNumber: `URB-${suffix}`,
+      orderNumber: `SHEA-${suffix}`,
       paymentStatus: "authorized",
       fulfillmentStatus: "unfulfilled",
       customerEmail: checkout.customer.email,
