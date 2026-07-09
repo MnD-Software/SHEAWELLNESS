@@ -23,7 +23,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
-import { sheaVideos } from "@/lib/shea-content";
+import { sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import type { Product, Store } from "@/lib/types";
 
@@ -76,49 +76,99 @@ const defaultForm: CheckoutForm = {
 const concernCards = [
   {
     title: "Dry & flaky skin",
-    body: "Rich shea moisture for daily body comfort.",
+    body: "Cleanse gently, replenish lost moisture, and seal comfort into rough or flaky patches.",
     image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-    href: "/shop?search=raw"
+    href: "/shop?search=vanilla"
   },
   {
     title: "Sensitive skin comfort",
-    body: "Lavender and gentle butter routines for calm-feeling skin.",
+    body: "Barrier-first care with African black soap, lavender shea butter, and patch-test guidance.",
     image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
     href: "/shop?search=lavender"
   },
   {
     title: "Fresh body glow",
-    body: "Citrus and lemongrass infusions for a clean daily ritual.",
-    image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
-    href: "/shop?search=lemongrass"
+    body: "Refresh, moisturize, and finish with body oil for softer, naturally radiant skin.",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.29 (3).jpeg",
+    href: "/shop?search=grapefruit"
   },
   {
     title: "Face care routine",
-    body: "Black soap cleansers and botanical face care paths.",
-    image: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
+    body: "A simple three-step routine: cleanse, nourish, and protect by day; restore by night.",
+    image: "/assets/sheawellness/face-care-routine.png",
     href: "/shop?search=face"
   },
   {
     title: "Hair & scalp moisture",
-    body: "Shea-led moisture rituals for scalp, edges, and hair.",
-    image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
+    body: "Clean scalp care, castor oil moisture, and rosemary scalp-massage support.",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (1).jpeg",
     href: "/shop?search=hair"
   },
   {
-    title: "Spa supply",
-    body: "Wholesale-ready shea products for treatment rooms and retail shelves.",
+    title: "Spa essentials",
+    body: "Essential oils, diffusers, humidifiers, and treatment-room supplies for wellness spaces.",
     image: "/assets/sheawellness/lavender-shea-butter-back.jpeg",
     href: "/wholesale"
   }
 ];
 
 const comparisonRows = [
-  ["100% natural positioning", true, false],
-  ["Ethically sourced African shea", true, false],
-  ["Paraben and sulfate free", true, false],
-  ["Wholesale and export-ready packaging", true, false],
-  ["Handcrafted skincare catalogue", true, false]
+  ["100% Natural", true, false],
+  ["No Harsh Chemicals", true, false],
+  ["Supports Skin Barrier", true, false],
+  ["Suitable for Sensitive Skin", true, false],
+  ["Routine Education Included", true, false]
 ] as const;
+
+const beforeAfterSlides = [
+  {
+    title: "Shea Wellness face care routine",
+    image: "/assets/sheawellness/face-care-routine.png",
+    labels: ["Morning", "Evening"]
+  },
+  {
+    title: "Body tone progress",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.04.41.jpeg",
+    labels: ["Before", "After"]
+  },
+  {
+    title: "Skin clarity progress",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
+    labels: ["Before", "After"]
+  },
+  {
+    title: "Moisture glow progress",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.30 (3).jpeg",
+    labels: ["Before", "After"]
+  }
+];
+
+const faceRoutineSteps = [
+  {
+    title: "Morning routine",
+    promise: "Cleanse. Nourish. Protect.",
+    steps: [
+      "Cleanse with African Liquid Black Soap and lukewarm water.",
+      "Apply 2-4 drops of Rosehip Facial Oil while skin is slightly damp.",
+      "Finish with broad-spectrum sunscreen before daily sun exposure."
+    ]
+  },
+  {
+    title: "Evening routine",
+    promise: "Cleanse. Nourish. Restore.",
+    steps: [
+      "Cleanse again with African Liquid Black Soap using gentle circular motions.",
+      "Massage facial oil into clean skin and neck.",
+      "Seal dry areas with a light layer of Lavender Shea Butter where needed."
+    ]
+  }
+];
+
+const routineSupportLists = [
+  ["Suitable for", "Dry skin", "Normal skin", "Combination skin", "Mature skin", "Sensitive skin after patch test"],
+  ["What to expect", "Cleaner refreshed skin", "Better hydration", "Softer smoother feel", "Healthy natural glow", "Stronger moisture barrier"],
+  ["Best results", "Use morning and night", "Drink plenty of water", "Wear sunscreen daily", "Patch test new products"]
+];
 
 export function CommerceStorefront({
   store,
@@ -146,14 +196,30 @@ export function CommerceStorefront({
   const [orderNumber, setOrderNumber] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
 
-  const heroProducts = liveProducts.slice(0, 5);
-  const heroProduct = heroProducts[heroIndex] ?? liveProducts[0];
+  const heroSlides = mediaConfig.heroSlides.length ? mediaConfig.heroSlides : sheaDefaultMediaConfig.heroSlides;
+  const heroSlide = heroSlides[heroIndex] ?? heroSlides[0];
+  const mediaVideos = mediaConfig.videos.length ? mediaConfig.videos : sheaDefaultMediaConfig.videos;
 
   function moveHero(direction: 1 | -1) {
-    if (heroProducts.length < 2) return;
-    setHeroIndex((index) => (index + direction + heroProducts.length) % heroProducts.length);
+    if (heroSlides.length < 2) return;
+    setHeroIndex((index) => (index + direction + heroSlides.length) % heroSlides.length);
   }
+
+  useEffect(() => {
+    const savedMedia = window.localStorage.getItem("sheaWellnessMediaConfig");
+    if (!savedMedia) return;
+
+    try {
+      const parsedMedia = JSON.parse(savedMedia) as SheaMediaConfig;
+      if (Array.isArray(parsedMedia.heroSlides) && Array.isArray(parsedMedia.images) && Array.isArray(parsedMedia.videos)) {
+        setMediaConfig(parsedMedia);
+      }
+    } catch {
+      setMediaConfig(sheaDefaultMediaConfig);
+    }
+  }, []);
 
   useEffect(() => {
     const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
@@ -205,12 +271,12 @@ export function CommerceStorefront({
   }, [cart, cartHydrated]);
 
   useEffect(() => {
-    if (heroProducts.length < 2) return;
+    if (heroSlides.length < 2) return;
     const timer = window.setInterval(() => {
-      setHeroIndex((index) => (index + 1) % heroProducts.length);
+      setHeroIndex((index) => (index + 1) % heroSlides.length);
     }, 5200);
     return () => window.clearInterval(timer);
-  }, [heroProducts.length]);
+  }, [heroSlides.length]);
 
   useEffect(() => {
     const savedReviews = window.localStorage.getItem("sheaWellnessReviews");
@@ -312,22 +378,30 @@ export function CommerceStorefront({
       {isHomePage ? (
         <>
           <section className="commerce-hero" id="top">
-            <div className="commerce-hero-card" aria-label="Featured product carousel">
-              {heroProduct ? (
-                <img src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
+            <div className="commerce-hero-card" aria-label="Before and after carousel">
+              {heroSlide ? (
+                <img src={heroSlide.src} alt={heroSlide.title} style={{ objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
               ) : (
                 <img src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" />
               )}
               <div className="commerce-hero-overlay" />
 
               <div className="commerce-hero-copy">
-                <span>{heroProduct?.category ?? "Pure Nailotica Shea"}</span>
-                <h1>{heroProduct?.title ?? "Modern wellness essentials"}</h1>
+                <span>{heroSlide?.kicker ?? "Pure Nilotica Shea"}</span>
+                <h1>{heroSlide?.title ?? "Modern wellness essentials"}</h1>
+                {heroSlide?.body ? <p>{heroSlide.body}</p> : null}
                 <div className="commerce-hero-actions">
-                  {heroProduct ? <button type="button" onClick={() => addToCart(heroProduct)}>Shop Product</button> : null}
-                  {heroProduct ? <a className="ghost" href={`/products/${encodeURIComponent(heroProduct.id)}`}>View Details</a> : null}
+                  {heroSlide ? <a href={heroSlide.ctaHref}>{heroSlide.ctaLabel}</a> : null}
+                  <a className="ghost" href="/products">View product guide</a>
                 </div>
               </div>
+
+              {heroSlide ? (
+                <div className="commerce-hero-meta">
+                  <span>{heroSlide.tag}</span>
+                  <strong>Before / After</strong>
+                </div>
+              ) : null}
 
               <button type="button" className="commerce-carousel-arrow previous" onClick={() => moveHero(-1)} aria-label="Previous product">
                 <ArrowLeft size={20} />
@@ -337,13 +411,13 @@ export function CommerceStorefront({
               </button>
 
               <div className="commerce-carousel-dots" aria-label="Choose featured product">
-                {heroProducts.map((product, index) => (
+                {heroSlides.map((slide, index) => (
                   <button
                     type="button"
-                    key={product.id}
+                    key={slide.id}
                     className={clsx(heroIndex === index && "active")}
                     onClick={() => setHeroIndex(index)}
-                    aria-label={`Show ${product.title}`}
+                    aria-label={`Show ${slide.title}`}
                   />
                 ))}
               </div>
@@ -367,7 +441,7 @@ export function CommerceStorefront({
               <a href="/catalogue">View media catalogue <ArrowRight size={17} /></a>
             </div>
             <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
-              {sheaVideos.slice(0, 4).map((video) => (
+              {mediaVideos.slice(0, 4).map((video) => (
                 <article key={video.src}>
                   <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
                   <strong>{video.title}</strong>
@@ -474,7 +548,7 @@ export function CommerceStorefront({
         <div className="commerce-section-title split">
           <div>
             <span>Shop by concern</span>
-            <h2>Find a Shea Wellness ritual by skin and care need.</h2>
+            <h2>Find a Shea Wellness routine by skin and care need.</h2>
           </div>
           <p className="commerce-shop-intro">A cleaner path for customers who do not know the exact product name yet.</p>
         </div>
@@ -488,6 +562,39 @@ export function CommerceStorefront({
               <b>Explore collection</b>
             </a>
           ))}
+        </div>
+      </section>
+
+      <section className="commerce-routine-section" id="face-care-routine">
+        <figure>
+          <img src="/assets/sheawellness/face-care-routine.png" alt="Shea Wellness face care routine guide" loading="lazy" />
+        </figure>
+        <div className="commerce-routine-copy">
+          <span>Face care routine</span>
+          <h2>Nourish. Protect. Glow naturally.</h2>
+          <p>
+            Healthy, radiant skin starts with a consistent routine. Shea Wellness face care gently cleanses,
+            deeply hydrates, and supports your skin's natural barrier every morning and evening.
+          </p>
+          <div className="commerce-routine-cards">
+            {faceRoutineSteps.map((routine) => (
+              <article key={routine.title}>
+                <strong>{routine.title}</strong>
+                <small>{routine.promise}</small>
+                <ol>
+                  {routine.steps.map((step) => <li key={step}>{step}</li>)}
+                </ol>
+              </article>
+            ))}
+          </div>
+          <div className="commerce-routine-support">
+            {routineSupportLists.map(([title, ...items]) => (
+              <article key={title}>
+                <strong>{title}</strong>
+                {items.map((item) => <span key={item}><CheckCircle2 size={15} />{item}</span>)}
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -507,21 +614,46 @@ export function CommerceStorefront({
 
       <section className="commerce-guarantee-strip" aria-label="Store assurances">
         <span><CheckCircle2 size={19} /> Natural ingredients</span>
-        <span><CheckCircle2 size={19} /> Ethical African shea</span>
+        <span><CheckCircle2 size={19} /> Ethical Nilotica shea</span>
         <span><CheckCircle2 size={19} /> Export-ready quality</span>
+      </section>
+
+      <section className="commerce-before-after-section" aria-label="Before and after customer results">
+        <div className="commerce-before-after-proof">
+          <span><CheckCircle2 size={20} /> Dermatologist tested</span>
+          <span><CheckCircle2 size={20} /> Routine support</span>
+          <span><CheckCircle2 size={20} /> 100% natural</span>
+        </div>
+        <div className="commerce-before-after-head">
+          <div>
+            <span>Before and after</span>
+            <h2>Real skin routine progress.</h2>
+          </div>
+          <p>Swipe through clear transformation-style media before choosing your Shea Wellness routine.</p>
+        </div>
+        <div className="commerce-before-after-rail" aria-label="Before and after carousel">
+          {beforeAfterSlides.map((slide) => (
+            <article key={slide.title}>
+              <img src={slide.image} alt={slide.title} loading="lazy" />
+              <div>
+                {slide.labels.map((label) => <strong key={label}>{label}</strong>)}
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="commerce-comparison-section">
         <div className="commerce-comparison-copy">
           <span>Compare</span>
-          <h2>Shea Wellness versus generic skincare.</h2>
-          <p>Clear reasons to choose a focused African shea wellness brand over mass-market body creams.</p>
+          <h2>Shea Wellness versus others.</h2>
+          <p>Clear reasons to choose a focused Nilotica shea wellness brand over other skincare options.</p>
         </div>
         <div className="commerce-comparison-table" role="table" aria-label="Shea Wellness comparison">
           <div role="row">
             <strong role="columnheader">Standard</strong>
             <strong role="columnheader">Shea Wellness</strong>
-            <strong role="columnheader">Generic cream</strong>
+            <strong role="columnheader">Others</strong>
           </div>
           {comparisonRows.map(([label, shea, generic]) => (
             <div role="row" key={label}>
@@ -540,14 +672,14 @@ export function CommerceStorefront({
         </div>
         <p>
           Built for international retailers, wellness spas, organic beauty stores, and distributors who need authentic
-          African shea products with reliable fulfilment and premium product presentation.
+          Nilotica shea products with reliable fulfilment and premium product presentation.
         </p>
       </section>
 
       <section className="commerce-social-proof">
         <div className="commerce-section-title">
           <span>Why Shea Wellness</span>
-          <h2>Clean formulations, ethical sourcing, and African heritage in every ritual.</h2>
+          <h2>Clean formulations, ethical sourcing, and African heritage in every routine.</h2>
         </div>
         <div className="commerce-proof-grid">
           {[
@@ -569,8 +701,8 @@ export function CommerceStorefront({
         </figure>
         <div>
           <span>Wellness education</span>
-          <h2>Get skincare rituals, distributor updates, and product launches.</h2>
-          <p>Join the Shea Wellness list for new butter infusions, wholesale availability, and skincare education rooted in natural African shea.</p>
+          <h2>Get skincare routines, distributor updates, and product launches.</h2>
+          <p>Join the Shea Wellness list for new butter infusions, wholesale availability, and skincare education rooted in natural Nilotica shea.</p>
         </div>
         <form onSubmit={(event) => event.preventDefault()}>
           <input type="email" placeholder="Email address" aria-label="Email address" />
@@ -583,7 +715,7 @@ export function CommerceStorefront({
       <footer className="commerce-footer">
         <div className="commerce-footer-brand">
           <strong>{store.name}</strong>
-          <p>Premium handcrafted shea butter skincare and wellness products made from ethically sourced African shea.</p>
+          <p>Premium handcrafted shea butter skincare and wellness products made from ethically sourced Nilotica shea.</p>
           <small>Unga House, 1st Floor, Westlands, Nairobi</small>
         </div>
         <div>

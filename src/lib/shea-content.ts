@@ -1,13 +1,223 @@
 export const sheaBrand = {
   name: "Shea Wellness LTD",
-  headline: "Pure Nailotica Shea. Modern Wellness.",
-  summary: "Premium handcrafted shea butter skincare and wellness products made from ethically sourced African shea.",
+  headline: "Pure Nilotica Shea. Modern Wellness.",
+  summary: "Care inspired by nature. Wellness for every skin, every home, and every generation.",
   email: "sheabutterwellness@gmail.com",
   phone: "+254729621930",
   address: "Unga House, 1st Floor, Westlands, Nairobi",
-  promises: ["100% Natural Ingredients", "Ethically Sourced Shea Butter", "Handcrafted Wellness Products", "Export-Ready Quality"],
-  standards: ["Paraben-Free", "Sulfate-Free", "100% Organic", "Eco-conscious Packaging"]
+  promises: ["Natural Ingredients", "Gentle and Effective", "Nourish and Hydrate", "Healthy Glow"],
+  standards: ["Responsible sourcing", "Ethical supply chains", "Conscious production", "Thoughtful packaging"]
 };
+
+export type SheaMediaAsset = {
+  id: string;
+  title: string;
+  src: string;
+  type: "image" | "video";
+  tag: string;
+  objectPosition?: string;
+};
+
+export type SheaHeroSlide = SheaMediaAsset & {
+  kicker: string;
+  body: string;
+  ctaLabel: string;
+  ctaHref: string;
+};
+
+export type SheaMediaConfig = {
+  heroSlides: SheaHeroSlide[];
+  images: SheaMediaAsset[];
+  videos: SheaMediaAsset[];
+};
+
+const whatsappImageFiles = [
+  "WhatsApp Image 2026-07-07 at 11.44.10.jpeg",
+  "WhatsApp Image 2026-07-07 at 11.48.21 (1).jpeg",
+  "WhatsApp Image 2026-07-07 at 11.48.21 (2).jpeg",
+  "WhatsApp Image 2026-07-07 at 11.48.21.jpeg",
+  "WhatsApp Image 2026-07-08 at 11.46.26 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 11.46.26 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 11.46.26.jpeg",
+  "WhatsApp Image 2026-07-08 at 11.48.35.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.03.57.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.04.41.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.04.42 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.04.42.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.20 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.20.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.21 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.21 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.21.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.22 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.22 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.22.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.23 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.23 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.23.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.24 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.24.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.25 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.25 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.25.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.26 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.26 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.26.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.27 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.27 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.27.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.28 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.28 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.28 (3).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.28 (4).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.28.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.29 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.29 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.29 (3).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.29.jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.30 (1).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.30 (2).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.30 (3).jpeg",
+  "WhatsApp Image 2026-07-08 at 12.44.30.jpeg"
+];
+
+const whatsappVideoFiles = [
+  "WhatsApp Video 2026-07-07 at 11.44.58.mp4",
+  "WhatsApp Video 2026-07-07 at 11.44.59.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.00.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.01.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.02.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.04.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.05.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.06.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.07.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.08.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.09.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.16.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.31.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.32.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.34.mp4",
+  "WhatsApp Video 2026-07-07 at 11.45.36.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.07.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.09.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.10.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.20.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.22.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.24.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.25.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.26.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.42.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.45.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.47.mp4",
+  "WhatsApp Video 2026-07-07 at 11.46.49.mp4",
+  "WhatsApp Video 2026-07-07 at 11.47.52.mp4",
+  "WhatsApp Video 2026-07-07 at 11.47.53.mp4",
+  "WhatsApp Video 2026-07-07 at 11.47.55.mp4",
+  "WhatsApp Video 2026-07-07 at 11.48.22.mp4",
+  "WhatsApp Video 2026-07-07 at 11.48.24.mp4",
+  "WhatsApp Video 2026-07-07 at 11.48.43.mp4",
+  "WhatsApp Video 2026-07-07 at 11.48.44.mp4",
+  "WhatsApp Video 2026-07-07 at 11.48.45.mp4",
+  "WhatsApp Video 2026-07-07 at 11.48.46.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.02.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.03.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.05.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.06.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.07.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.08.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.47.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.49.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.50.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.51.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.52.mp4",
+  "WhatsApp Video 2026-07-07 at 11.49.53.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.04.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.05.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.06.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.07.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.08.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.09.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.10.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.11.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.12.mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.14 (1).mp4",
+  "WhatsApp Video 2026-07-07 at 11.50.14.mp4"
+];
+
+export const sheaHeroSlides: SheaHeroSlide[] = [
+  {
+    id: "skin_hair_face_spa",
+    title: "Skin care. Hair care. Face care. Spa essentials.",
+    kicker: "Natural wellness routines",
+    body: "Natural products for problematic skin concerns including eczema, psoriasis, hyperpigmentation, stretch marks, acne, and dark marks.",
+    src: "/assets/sheawellness/face-care-routine.png",
+    type: "image",
+    tag: "Routine Guide",
+    ctaLabel: "Shop routines",
+    ctaHref: "/shop",
+    objectPosition: "50% 50%"
+  },
+  {
+    id: "sensitive_skin_safe",
+    title: "100% natural ingredients, safe and effective for sensitive skin.",
+    kicker: "Gentle and effective",
+    body: "Cleanse without stripping, moisturize while skin is damp, and protect the skin's natural barrier with plant-based care.",
+    src: "/assets/WhatsApp Image 2026-07-08 at 12.04.41.jpeg",
+    type: "image",
+    tag: "Body Care",
+    ctaLabel: "View body care",
+    ctaHref: "/collections/body-care",
+    objectPosition: "50% 50%"
+  },
+  {
+    id: "face_care_collection",
+    title: "Nourish. Protect. Glow naturally.",
+    kicker: "Face care",
+    body: "A simple routine with African Liquid Black Soap, Rosehip Facial Oil, and Lavender Shea Butter for clean, hydrated, radiant-looking skin.",
+    src: "/assets/WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
+    type: "image",
+    tag: "Face Care",
+    ctaLabel: "Explore face care",
+    ctaHref: "/collections/face-care",
+    objectPosition: "50% 50%"
+  },
+  {
+    id: "body_glow_collection",
+    title: "Glow naturally. Nourish deeply. Shine every day.",
+    kicker: "Fresh body glow",
+    body: "African black soap, grapefruit shea butter, and soothing body oil work together to cleanse, moisturize, and seal in radiance.",
+    src: "/assets/WhatsApp Image 2026-07-08 at 12.44.30 (3).jpeg",
+    type: "image",
+    tag: "Moisture Routine",
+    ctaLabel: "Start routine",
+    ctaHref: "/shop",
+    objectPosition: "50% 50%"
+  }
+];
+
+export const sheaImageMedia: SheaMediaAsset[] = [
+  "/assets/sheawellness/face-care-routine.png",
+  "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+  "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+  "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+  "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
+  "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
+  "/assets/sheawellness/lavender-shea-butter-back.jpeg"
+].map((src, index) => ({
+  id: `product_image_${index + 1}`,
+  title: `Product image ${index + 1}`,
+  src,
+  type: "image" as const,
+  tag: "Product"
+})).concat(whatsappImageFiles.map((file, index) => ({
+  id: `campaign_image_${index + 1}`,
+  title: `Campaign image ${index + 1}`,
+  src: `/assets/${file}`,
+  type: "image" as const,
+  tag: index < 7 ? "Brand asset" : "Skin routine"
+})));
 
 export const sheaNav = [
   { label: "Home", href: "/" },
@@ -42,7 +252,7 @@ export const sheaProductCategories = [
         ingredients: ["Raw Shea Butter", "Lavender Essential Oil", "Vitamin E"],
         benefits: ["Deeply moisturizes skin", "Improves elasticity", "Calms irritated skin"],
         sizes: ["100g", "250g", "500g"],
-        usage: "Apply after bathing or before bed for a calming moisture ritual."
+        usage: "Apply after bathing or before bed for a calming moisture routine."
       },
       {
         name: "Lemongrass Shea Body Butter Infusion",
@@ -80,29 +290,38 @@ export const sheaProductCategories = [
       {
         name: "African Liquid Black Soap Body & Face Wash",
         image: "/assets/shea-black-soap.png",
-        description: "Handmade black soap wash rooted in raw African heritage.",
+        description: "Gentle daily cleanser for face and body that removes impurities without a stripped feeling.",
         ingredients: ["African Black Soap", "Shea Butter", "Botanical Extracts"],
-        benefits: ["Gentle detox", "Helps clear acne", "Supports even skin tone"],
-        sizes: ["250ml", "500ml", "Spa refill"],
-        usage: "Lather with water, massage gently, and rinse thoroughly."
+        benefits: ["Gently cleanses", "Maintains moisture balance", "Prepares skin for facial oils"],
+        sizes: ["150ml", "300ml", "500ml", "Spa refill"],
+        usage: "Use with lukewarm water, massage gently in circular motions, rinse thoroughly, and moisturize while skin is still slightly damp."
       },
       {
-        name: "African Liquid Black Soap Face Wash with Lavender and Clove Infusion",
-        image: "/assets/shea-black-soap.png",
-        description: "A targeted face wash for clean, balanced, refreshed skin.",
-        ingredients: ["African Black Soap", "Lavender", "Clove Infusion"],
-        benefits: ["Clarifies skin", "Soothes blemish-prone areas", "Refreshes without harsh stripping"],
-        sizes: ["150ml", "250ml"],
-        usage: "Use morning or evening, avoiding direct contact with eyes."
+        name: "Rosehip Facial Oil",
+        image: "/assets/sheawellness/face-care-routine.png",
+        description: "Lightweight botanical facial oil for daily moisture and a healthy-looking glow.",
+        ingredients: ["Rosehip Oil", "Botanical Oil Blend"],
+        benefits: ["Deep hydration", "Softens and smooths", "Supports the moisture barrier"],
+        sizes: ["50ml", "100ml"],
+        usage: "Apply 2-4 drops to slightly damp skin and gently press into the face and neck."
       },
       {
-        name: "African Liquid Black Soap Body Wash",
-        image: "/assets/shea-black-soap.png",
-        description: "Daily body wash for clean, naturally refreshed skin.",
-        ingredients: ["African Black Soap", "Shea Butter", "Natural Oils"],
-        benefits: ["Cleanses gently", "Supports body acne routines", "Keeps skin feeling fresh"],
-        sizes: ["250ml", "500ml"],
-        usage: "Use with hands, washcloth, or sponge and rinse well."
+        name: "Lavender Shea Butter Overnight Barrier",
+        image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+        description: "Rich overnight moisture support for dry areas on the face and neck.",
+        ingredients: ["Raw Shea Butter", "Lavender Essential Oil", "Vitamin E"],
+        benefits: ["Nourishes dry areas", "Helps reduce tightness", "Seals in moisture overnight"],
+        sizes: ["100g", "250g", "330g"],
+        usage: "Warm a very small amount between fingertips and press onto dry areas as the final evening step."
+      },
+      {
+        name: "Cucumber Mint Sunscreen SPF Gel",
+        image: "/assets/sheawellness/face-care-routine.png",
+        description: "Daily SPF step for the morning routine to help protect skin from UV exposure.",
+        ingredients: ["Cucumber", "Mint", "Broad-spectrum SPF"],
+        benefits: ["Daily protection", "Light gel finish", "Supports a healthy barrier"],
+        sizes: ["50ml"],
+        usage: "Apply as the final morning step and reapply as needed during the day."
       }
     ]
   },
@@ -136,12 +355,30 @@ export const sheaProductCategories = [
         benefits: ["Cleanses scalp", "Removes buildup", "Supports natural hair care"],
         sizes: ["250ml", "500ml"],
         usage: "Massage into wet hair and scalp, then rinse thoroughly."
+      },
+      {
+        name: "Cold Pressed Yellow Castor Oil",
+        image: "/assets/sheawellness/face-care-routine.png",
+        description: "A rich oil for dry scalp, brittle hair, protective styles, and body moisture sealing.",
+        ingredients: ["Cold Pressed Yellow Castor Oil"],
+        benefits: ["Moisturizes dry scalp", "Softens brittle hair", "Seals in moisture"],
+        sizes: ["100ml", "250ml"],
+        usage: "Massage a small amount into the scalp or apply through hair lengths and ends."
+      },
+      {
+        name: "Rosemary Essential Oil Scalp Boost",
+        image: "/assets/shea-essential-oils.png",
+        description: "A concentrated essential oil for diluted scalp massage blends.",
+        ingredients: ["Rosemary Essential Oil"],
+        benefits: ["Refreshes the scalp", "Complements hair routines", "Provides herbal aroma"],
+        sizes: ["10ml", "30ml"],
+        usage: "Dilute 2-3 drops in one tablespoon of castor oil before scalp massage."
       }
     ]
   },
   {
     name: "Essential Oils",
-    summary: "Pure oils for relaxation, sleep, focus, skincare boosts, and aromatherapy rituals.",
+    summary: "Pure oils for relaxation, sleep, focus, skincare boosts, and aromatherapy routines.",
     products: ["Lavender", "Lemongrass", "Tea Tree", "Eucalyptus", "Peppermint", "Rosemary", "Sweet Orange", "Vanilla", "Rosemary and Tea Tree"].map((oil) => ({
       name: `${oil} Essential Oil`,
       image: "/assets/shea-essential-oils.png",
@@ -154,12 +391,12 @@ export const sheaProductCategories = [
   },
   {
     name: "Aromatherapy",
-    summary: "Aromatherapy humidifiers and oil rituals for spa, home, and wellness environments.",
+    summary: "Aromatherapy humidifiers and oil routines for spa, home, and wellness environments.",
     products: [
       {
         name: "Aromatherapy Humidifier",
         image: "/assets/shea-essential-oils.png",
-        description: "A diffuser-ready wellness device for essential oil rituals.",
+        description: "A diffuser-ready wellness device for essential oil routines.",
         ingredients: ["Humidifier Device", "Essential Oil Compatibility"],
         benefits: ["Relaxation", "Sleep support", "Spa ambience"],
         sizes: ["Single unit", "Spa bundle"],
@@ -218,9 +455,9 @@ export const sheaProductCategories = [
         image: "/assets/sheawellness/grapefruit-shea-butter-lid.jpeg",
         description: "A curated set of body butter, black soap, and essential oil options.",
         ingredients: ["Shea Body Butter", "African Black Soap", "Essential Oil"],
-        benefits: ["Complete ritual", "Gift-ready", "Retail bundle"],
+        benefits: ["Complete routine", "Gift-ready", "Retail bundle"],
         sizes: ["Mini set", "Signature set", "Corporate pack"],
-        usage: "Use as a complete body, face, and aroma wellness ritual."
+        usage: "Use as a complete body, face, and aroma wellness routine."
       }
     ]
   },
@@ -273,37 +510,62 @@ export const sheaQuality = ["Organic ingredients", "Dermatologically safe", "Exp
 export const sheaSocialProof = [
   { title: "Customer Review", body: "The lavender shea butter is deeply moisturizing and smells divine." },
   { title: "KAM Changamka Festival", body: "Expo participation through the Kenya Association of Manufacturers Changamka Festival." },
-  { title: "Instagram Feed", body: "Product education, customer rituals, and behind-the-scenes wellness content." },
+  { title: "Instagram Feed", body: "Product education, customer routines, and behind-the-scenes wellness content." },
   { title: "Media Mentions", body: "Brand credibility section ready for press, expo, and retail features." }
 ];
 
-export const sheaVideos = [
+const baseSheaVideos: Array<Omit<SheaMediaAsset, "id">> = [
   {
     title: "Lavender butter texture",
     src: "/assets/sheawellness/product-video-01.mp4",
+    type: "video",
     tag: "Body Care"
   },
   {
     title: "Shea Wellness jar detail",
     src: "/assets/sheawellness/product-video-02.mp4",
+    type: "video",
     tag: "Product Detail"
   },
   {
-    title: "Infusion product ritual",
+    title: "Infusion product routine",
     src: "/assets/sheawellness/product-video-03.mp4",
-    tag: "Wellness Ritual"
+    type: "video",
+    tag: "Wellness Routine"
   },
   {
     title: "Retail product showcase",
     src: "/assets/sheawellness/product-video-04.mp4",
+    type: "video",
     tag: "Retail Ready"
   },
   {
     title: "Wholesale product media",
     src: "/assets/sheawellness/product-video-15.mp4",
+    type: "video",
     tag: "Wholesale"
   }
 ];
+
+export const sheaVideos: SheaMediaAsset[] = [
+  ...baseSheaVideos.map((video, index) => ({
+    id: `product_video_${index + 1}`,
+    ...video
+  })),
+  ...whatsappVideoFiles.map((file, index) => ({
+    id: `campaign_video_${index + 1}`,
+    title: `Campaign video ${index + 1}`,
+    src: `/assets/${file}`,
+    type: "video" as const,
+    tag: "New media"
+  }))
+];
+
+export const sheaDefaultMediaConfig: SheaMediaConfig = {
+  heroSlides: sheaHeroSlides,
+  images: sheaImageMedia,
+  videos: sheaVideos
+};
 
 export const sheaCatalogueDownload = {
   title: "Product Catalogue Download",

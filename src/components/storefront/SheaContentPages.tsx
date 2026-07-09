@@ -33,15 +33,15 @@ type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blo
 const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: string; image: string }> = {
   about: {
     eyebrow: "Our brand story",
-    title: "Clean, ethical, sustainable African wellness.",
-    body: "Shea Wellness LTD was founded to share the healing power of African shea butter and natural wellness ingredients with the world.",
+    title: "Nurturing wellness. Empowering communities. Sustaining nature.",
+    body: "Shea Wellness believes wellness is more than skincare. It is a way of living rooted in natural ingredients, local manufacturing, and community value.",
     image: "/assets/sheawellness/lavender-shea-butter-lid.jpeg"
   },
   products: {
     eyebrow: "Product catalogue",
-    title: "Body, face, hair, aroma, spa, gift, and wholesale-ready ranges.",
-    body: "Every product page includes description, key ingredients, benefits, size options, and usage guidance.",
-    image: "/assets/sheawellness/grapefruit-shea-butter-lid.jpeg"
+    title: "Skin care, hair care, face care, and spa essentials.",
+    body: "Browse Shea Wellness routines for dry skin, sensitive skin, body glow, natural face care, hair and scalp moisture, and spa environments.",
+    image: "/assets/sheawellness/face-care-routine.png"
   },
   wholesale: {
     eyebrow: "Retail partners",
@@ -57,8 +57,8 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
   },
   blog: {
     eyebrow: "Wellness journal",
-    title: "Stories, lessons, rituals, and cinematic product education.",
-    body: "A living journal for customers and wholesale buyers who want to understand how African shea, black soap, chebe, and essential oils fit into daily wellness.",
+    title: "Stories, lessons, routines, and cinematic product education.",
+    body: "A living journal for customers and wholesale buyers who want to understand how Nilotica shea, black soap, chebe, and essential oils fit into daily wellness.",
     image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg"
   },
   quality: {
@@ -124,7 +124,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
 
 const sheaEditorialStories = [
   {
-    title: "The night ritual: how lavender shea became a calm-skin staple",
+    title: "The night routine: how lavender shea became a calm-skin staple",
     category: "Skin story",
     image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
     readTime: "6 min read",
@@ -158,7 +158,7 @@ const sheaHowToLessons = [
   {
     title: "How to use body butter infusions",
     steps: ["Apply after bathing", "Start with a thin layer", "Use circular massage", "Let it absorb before dressing", "Use nightly on rough patches"],
-    note: "Lavender is ideal for a calm evening ritual; citrus blends feel brighter for daytime."
+    note: "Lavender is ideal for a calm evening routine; citrus blends feel brighter for daytime."
   },
   {
     title: "How to use African black soap",
@@ -172,6 +172,39 @@ const sheaHowToLessons = [
   }
 ];
 
+const sheaRoutineSolutions = [
+  {
+    title: "Dry and flaky skin solution",
+    body: "African Liquid Black Soap, Vanilla-Mint Shea Butter, and Soothing Body Oil help cleanse gently, replenish moisture, and seal hydration.",
+    steps: ["Cleanse with lukewarm water", "Apply butter while skin is damp", "Finish with body oil on rough patches"]
+  },
+  {
+    title: "Sensitive skin solution",
+    body: "A careful routine with African Liquid Black Soap, Lavender Shea Butter, and optional body oil after a patch test.",
+    steps: ["Avoid hot water and scrubbing", "Moisturize immediately after bathing", "Patch test products with essential oils"]
+  },
+  {
+    title: "Natural face care routine",
+    body: "A three-step morning and evening system for clean, hydrated, protected, and restored skin.",
+    steps: ["Cleanse with black soap", "Nourish with Rosehip Facial Oil", "Protect by day and restore with Lavender Shea Butter at night"]
+  },
+  {
+    title: "Fresh body glow solution",
+    body: "African Liquid Black Soap, Grapefruit Shea Butter, and Soothing Body Oil support softer, smoother, naturally radiant skin.",
+    steps: ["Refresh and purify", "Brighten and nourish", "Seal in radiance"]
+  },
+  {
+    title: "Hair and scalp moisture solution",
+    body: "Black soap cleansing, Cold Pressed Yellow Castor Oil, and diluted Rosemary Essential Oil support a clean, moisturized scalp.",
+    steps: ["Cleanse scalp on wash day", "Seal hair moisture with castor oil", "Use diluted rosemary for scalp massage"]
+  },
+  {
+    title: "SPA essentials collection",
+    body: "Essential oils, aroma diffusers, humidifiers, and spa supplies help homes, offices, salons, hotels, and wellness spaces feel calm and restored.",
+    steps: ["Diffuse oils for atmosphere", "Use humidifiers for comfort", "Request spa supplies for treatment rooms"]
+  }
+];
+
 const pageLifeCopy: Record<SheaPageKind, { title: string; body: string; image: string }> = {
   about: {
     title: "A brand built from African wellness heritage.",
@@ -179,7 +212,7 @@ const pageLifeCopy: Record<SheaPageKind, { title: string; body: string; image: s
     image: "/assets/sheawellness/grapefruit-shea-butter-lid.jpeg"
   },
   products: {
-    title: "See the texture, understand the ritual, then choose the product.",
+    title: "See the texture, understand the routine, then choose the product.",
     body: "The product experience combines real product media, ingredient clarity, and practical usage guidance.",
     image: "/assets/sheawellness/lavender-shea-butter-back.jpeg"
   },
@@ -194,7 +227,7 @@ const pageLifeCopy: Record<SheaPageKind, { title: string; body: string; image: s
     image: "/assets/sheawellness/pure-raw-shea-butter.jpeg"
   },
   blog: {
-    title: "Education turns products into rituals.",
+    title: "Education turns products into routines.",
     body: "The journal gives customers reasons to return: stories, seasonal routines, usage lessons, ingredient explainers, and product videos.",
     image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg"
   },
@@ -235,10 +268,11 @@ function AboutSections() {
       <section className="shea-split-section">
         <div>
           <span>About Shea Wellness</span>
-          <h2>Beauty should be clean, ethical, and sustainable.</h2>
+          <h2>Our journey began with a simple vision: natural care that creates shared value.</h2>
           <p>
-            At Shea Wellness, we believe beauty should be clean, ethical, and sustainable. Our mission is to empower
-            natural beauty through organic formulations that honor both your body and the planet.
+            Inspired by Africa's rich botanical heritage, Shea Wellness harnesses premium shea butter,
+            cold-pressed plant oils, and carefully selected essential oils to care for skin, hair, and
+            everyday wellbeing. Every product reflects purity, quality, and intentional craftsmanship.
           </p>
         </div>
         <div className="shea-card-grid two">
@@ -248,9 +282,9 @@ function AboutSections() {
         </div>
       </section>
       <section className="shea-card-grid three">
-        <StoryCard title="Mission" body="To create natural wellness products that nourish the body while supporting ethical African sourcing." />
-        <StoryCard title="Vision" body="To become a globally recognized African wellness brand rooted in purity and sustainability." />
-        <StoryCard title="Our story" body="Traditional African beauty wisdom meets modern wellness formulation to create nourishing skincare that is pure, effective, and sustainable." />
+        <StoryCard title="More than skincare" body="Shea Wellness connects sustainable sourcing, local manufacturing, innovation, and community empowerment." />
+        <StoryCard title="Made in Kenya" body="By manufacturing locally and sourcing high-quality natural ingredients, the brand shows that African businesses can produce world-class wellness products." />
+        <StoryCard title="Future vision" body="Growth means more jobs, stronger manufacturing, empowered entrepreneurs, and Shea Wellness products in homes, hotels, spas, retail stores, and international markets." />
       </section>
       <section className="shea-section">
         <SectionTitle label="Our values" title="Sustainability, ethical sourcing, natural wellness, and African heritage." />
@@ -268,6 +302,21 @@ function ProductsSections() {
   return (
     <>
       <VideoShowcase title="Product videos shoppers can actually see" body="Use these films for product inspection, social proof, and retail buyer confidence." />
+      <section className="shea-section">
+        <SectionTitle label="Routine solutions" title="Choose the routine that matches the customer's care need." />
+        <div className="shea-card-grid three">
+          {sheaRoutineSolutions.map((solution) => (
+            <article key={solution.title}>
+              <Sparkles size={20} />
+              <strong>{solution.title}</strong>
+              <p>{solution.body}</p>
+              <ol>
+                {solution.steps.map((step) => <li key={step}>{step}</li>)}
+              </ol>
+            </article>
+          ))}
+        </div>
+      </section>
       <section className="shea-section">
         <SectionTitle label="Our products" title="Every category from the content structure is represented." />
         <div className="shea-product-category-stack">
@@ -338,7 +387,7 @@ function SustainabilitySections() {
       <section className="shea-split-section">
         <div>
           <span>Sustainability</span>
-          <h2>Ethically sourced African shea that supports communities.</h2>
+          <h2>Ethically sourced Nilotica shea that supports communities.</h2>
           <p>
             Our shea butter is ethically sourced from African women cooperatives, empowering communities while
             preserving traditional production methods.
@@ -363,7 +412,7 @@ function BlogSections() {
           <video src={sheaVideos[2].src} muted loop autoPlay playsInline preload="metadata" />
           <div>
             <span>Cinematic feature</span>
-            <h2>The Shea Wellness ritual: cleanse, nourish, seal, and glow.</h2>
+            <h2>The Shea Wellness routine: cleanse, nourish, seal, and glow.</h2>
             <p>
               Follow the product from jar to skin: a gentle cleanse, a small amount of warmed shea, slow massage,
               and a finish that feels intentional rather than heavy. This guide helps customers understand how to use
