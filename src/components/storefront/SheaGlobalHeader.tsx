@@ -109,7 +109,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
 
   return (
     <header className="shea-nav-shell">
-      <div className="shea-nav-promo">100% natural ingredients. Ethically sourced African shea. Export-ready quality.</div>
+      <div className="shea-nav-promo">100% natural ingredients. Ethically sourced Nilotica shea. Export-ready quality.</div>
       <div className="shea-nav-bar">
         <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
           <span><Leaf size={18} /></span>
