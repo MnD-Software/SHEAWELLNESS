@@ -632,14 +632,20 @@ export function CommerceStorefront({
           <p>Swipe through clear transformation-style media before choosing your Shea Wellness routine.</p>
         </div>
         <div className="commerce-before-after-rail" aria-label="Before and after carousel">
-          {beforeAfterSlides.map((slide) => (
-            <article key={slide.title}>
-              <img src={slide.image} alt={slide.title} loading="lazy" />
-              <div>
-                {slide.labels.map((label) => <strong key={label}>{label}</strong>)}
+          <div className="commerce-before-after-track">
+            {[0, 1].map((groupIndex) => (
+              <div className="commerce-before-after-group" key={groupIndex} aria-hidden={groupIndex === 1}>
+                {beforeAfterSlides.map((slide) => (
+                  <article key={`${groupIndex}-${slide.title}`}>
+                    <img src={slide.image} alt={groupIndex === 0 ? slide.title : ""} loading="lazy" />
+                    <div>
+                      {slide.labels.map((label) => <strong key={label}>{label}</strong>)}
+                    </div>
+                  </article>
+                ))}
               </div>
-            </article>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 

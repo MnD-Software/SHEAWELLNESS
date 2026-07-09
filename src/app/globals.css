@@ -8421,16 +8421,16 @@ video {
 /* Premium newsletter band and high-contrast trust marquee */
 .commerce-newsletter {
   width: min(1680px, calc(100% - 28px));
-  min-height: clamp(320px, 31vw, 520px);
+  min-height: clamp(220px, 22vw, 340px);
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.58fr);
+  grid-template-columns: minmax(0, 0.95fr) minmax(340px, 0.48fr);
   align-items: center;
-  gap: clamp(24px, 5vw, 74px);
+  gap: clamp(18px, 3.5vw, 52px);
   margin: 18px auto 0;
-  padding: clamp(34px, 5vw, 86px) clamp(26px, 5vw, 92px);
+  padding: clamp(24px, 3.2vw, 48px) clamp(22px, 4vw, 64px);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: clamp(26px, 3vw, 46px);
+  border-radius: clamp(22px, 2.4vw, 34px);
   color: #ffffff;
   background:
     radial-gradient(circle at 92% 72%, rgba(28, 111, 86, 0.55), transparent 30%),
@@ -8449,19 +8449,19 @@ video {
 
 .commerce-newsletter span {
   color: #f4c56a;
-  font-size: clamp(13px, 1vw, 18px);
+  font-size: clamp(11px, 0.8vw, 14px);
   font-weight: 950;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .commerce-newsletter h2 {
-  max-width: 900px;
-  margin: 18px 0 0;
+  max-width: 680px;
+  margin: 12px 0 0;
   color: #ffffff;
   font-family: var(--font-display);
-  font-size: clamp(46px, 6vw, 96px);
-  line-height: 0.96;
+  font-size: clamp(34px, 4.2vw, 64px);
+  line-height: 1;
   text-wrap: balance;
 }
 
@@ -8470,12 +8470,12 @@ video {
 }
 
 .commerce-newsletter form {
-  min-height: 88px;
+  min-height: 62px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
+  gap: 8px;
+  padding: 8px;
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.1);
@@ -8488,14 +8488,14 @@ video {
 .commerce-newsletter input {
   width: 100%;
   min-width: 0;
-  height: 60px;
+  height: 46px;
   border: 0;
   outline: 0;
-  padding: 0 24px;
+  padding: 0 18px;
   color: #ffffff;
   background: transparent;
   font: inherit;
-  font-size: clamp(18px, 1.5vw, 25px);
+  font-size: clamp(15px, 1.1vw, 18px);
   font-weight: 800;
 }
 
@@ -8504,13 +8504,13 @@ video {
 }
 
 .commerce-newsletter button {
-  min-width: clamp(110px, 9vw, 150px);
-  height: 64px;
+  min-width: clamp(90px, 7vw, 118px);
+  height: 48px;
   border: 0;
   border-radius: 999px;
   color: #173c33;
   background: #ffffff;
-  font-size: clamp(18px, 1.5vw, 24px);
+  font-size: clamp(15px, 1.1vw, 18px);
   font-weight: 950;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
 }
@@ -8553,7 +8553,7 @@ video {
   .commerce-newsletter {
     grid-template-columns: 1fr;
     min-height: auto;
-    padding: 34px 20px;
+    padding: 28px 18px;
   }
 
   .commerce-newsletter form {
@@ -8564,16 +8564,16 @@ video {
 @media (max-width: 560px) {
   .commerce-newsletter {
     width: calc(100% - 12px);
-    padding: 28px 14px;
-    border-radius: 24px;
+    padding: 22px 14px;
+    border-radius: 20px;
   }
 
   .commerce-newsletter h2 {
-    font-size: clamp(42px, 13vw, 60px);
+    font-size: clamp(32px, 10vw, 46px);
   }
 
   .commerce-newsletter form {
-    min-height: 66px;
+    min-height: 58px;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: 8px;
     padding: 8px;
@@ -9740,24 +9740,38 @@ body {
 }
 
 .commerce-before-after-rail {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(310px, 30vw);
-  gap: 28px;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scroll-snap-type: inline mandatory;
+  --before-after-gap: 28px;
+  --before-after-card-width: clamp(310px, 30vw, 520px);
+  overflow: hidden;
   padding: 0 clamp(18px, 4vw, 56px) clamp(24px, 4vw, 48px);
-  scrollbar-width: thin;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+}
+
+.commerce-before-after-track {
+  width: max-content;
+  display: flex;
+  animation: beforeAfterAutoScroll 34s linear infinite;
+  will-change: transform;
+}
+
+.commerce-before-after-rail:hover .commerce-before-after-track {
+  animation-play-state: paused;
+}
+
+.commerce-before-after-group {
+  display: flex;
+  gap: var(--before-after-gap);
+  padding-right: var(--before-after-gap);
 }
 
 .commerce-before-after-rail article {
-  min-width: 0;
+  width: var(--before-after-card-width);
+  flex: 0 0 var(--before-after-card-width);
   overflow: hidden;
   border: 1px solid rgba(17, 24, 22, 0.12);
   border-radius: 8px;
   background: #f6f4ef;
-  scroll-snap-align: start;
   box-shadow: 0 18px 48px rgba(17, 24, 22, 0.12);
 }
 
@@ -9786,6 +9800,30 @@ body {
 
 .commerce-before-after-rail strong + strong {
   border-left: 1px solid rgba(17, 24, 22, 0.1);
+}
+
+@keyframes beforeAfterAutoScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .commerce-before-after-track {
+    animation: none;
+    transform: none;
+  }
+
+  .commerce-before-after-rail {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+    scrollbar-width: thin;
+  }
 }
 
 .commerce-comparison-section {
@@ -9883,7 +9921,7 @@ body {
   }
 
   .commerce-before-after-rail {
-    grid-auto-columns: minmax(260px, 78vw);
+    --before-after-card-width: min(78vw, 420px);
   }
 
   .commerce-comparison-table {
@@ -9917,7 +9955,7 @@ body {
   }
 
   .commerce-before-after-rail {
-    gap: 16px;
+    --before-after-gap: 16px;
     padding-inline: 18px;
   }
 
