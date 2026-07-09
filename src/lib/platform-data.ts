@@ -143,7 +143,7 @@ export const platformSnapshot: PlatformSnapshot = {
       description: "Gentle daily cleanser for face and body that removes impurities without a stripped feeling.",
       category: "Face Care",
       badge: "Handmade",
-      imageUrl: "/assets/shea-black-soap.png",
+      imageUrl: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
       imagePosition: "50% 50%",
       rating: 4.8,
       reviewCount: 174,

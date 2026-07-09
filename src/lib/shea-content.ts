@@ -289,7 +289,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "African Liquid Black Soap Body & Face Wash",
-        image: "/assets/shea-black-soap.png",
+        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
         description: "Gentle daily cleanser for face and body that removes impurities without a stripped feeling.",
         ingredients: ["African Black Soap", "Shea Butter", "Botanical Extracts"],
         benefits: ["Gently cleanses", "Maintains moisture balance", "Prepares skin for facial oils"],
@@ -349,7 +349,7 @@ export const sheaProductCategories = [
       },
       {
         name: "African Liquid Black Soap Shampoo",
-        image: "/assets/shea-black-soap.png",
+        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.25.jpeg",
         description: "A natural shampoo option for clean scalp and hair care routines.",
         ingredients: ["African Black Soap", "Shea Butter", "Botanical Extracts"],
         benefits: ["Cleanses scalp", "Removes buildup", "Supports natural hair care"],

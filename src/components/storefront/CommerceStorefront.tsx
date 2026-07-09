@@ -689,13 +689,15 @@ export function CommerceStorefront({
         </div>
         <div className="commerce-proof-grid">
           {[
-            ["100%", "Natural, organic product positioning with paraben-free and sulfate-free formulas."],
-            ["KAM", "Expo participation at the Changamka Festival with wellness retail visibility."],
-            ["Nairobi", "Unga House, 1st Floor, Westlands support for retail and distributor enquiries."]
-          ].map(([value, detail]) => (
+            { value: "100%", detail: "Natural, paraben-free and sulfate-free positioning." },
+            { value: "@shea", detail: "Follow @sheawellnesske for routines and product updates.", href: "https://www.instagram.com/sheawellnesske/" },
+            { value: "KAM", detail: "Expo participation with wellness retail visibility." },
+            { value: "Nairobi", detail: "Westlands support for retail and distributor enquiries." }
+          ].map(({ value, detail, href }) => (
             <article key={value}>
               <strong>{value}</strong>
               <p>{detail}</p>
+              {href ? <a href={href} target="_blank" rel="noreferrer">View Instagram</a> : null}
             </article>
           ))}
         </div>
