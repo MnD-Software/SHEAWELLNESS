@@ -115,7 +115,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       </div>
       <div className="shea-nav-bar">
         <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
-          <img src="/assets/shea-wellness-header-logo.jpeg" alt={sheaBrand.name} />
+          <img src="/assets/shea-wellness-header-wordmark.jpeg" alt={sheaBrand.name} />
         </a>
 
         <nav className="shea-nav-desktop" aria-label="Primary navigation">
