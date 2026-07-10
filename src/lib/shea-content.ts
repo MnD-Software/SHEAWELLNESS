@@ -152,7 +152,7 @@ export const sheaHeroSlides: SheaHeroSlide[] = [
     title: "Skin care. Hair care. Face care. Spa essentials.",
     kicker: "Natural wellness routines",
     body: "Natural products for problematic skin concerns including eczema, psoriasis, hyperpigmentation, stretch marks, acne, and dark marks.",
-    src: "/assets/sheawellness/face-care-routine.png",
+    src: "/assets/sheawellness/face-care-routine-hero.png",
     type: "image",
     tag: "Routine Guide",
     ctaLabel: "Shop routines",
