@@ -163,13 +163,13 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
       <section className="shea-product-description">
         <div>
           <span>Description</span>
-          <h2>How this product fits into a Shea Wellness ritual.</h2>
+          <h2>How this product fits into a Shea Wellness routine.</h2>
           <p>{product.description} Use it as part of a clean, consistent routine: cleanse gently, apply a measured amount, massage slowly, and let the skin or hair absorb before layering more product.</p>
         </div>
         <div>
           <span>Ingredients</span>
           <h2>{product.material}</h2>
-          <p>Shea Wellness products are positioned around natural ingredients, ethical African shea, and practical daily use for body, face, hair, aromatherapy, and spa care.</p>
+          <p>Shea Wellness products are positioned around natural ingredients, ethical Nilotica shea, and practical daily use for body, face, hair, aromatherapy, and spa care.</p>
         </div>
       </section>
 

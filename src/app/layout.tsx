@@ -4,8 +4,8 @@ import { SheaMotion } from "@/components/storefront/SheaMotion";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
-  title: "Shea Wellness LTD | Pure Nailotica Shea",
-  description: "Premium handcrafted shea butter skincare and wellness products made from ethically sourced African shea."
+  title: "Shea Wellness LTD | Pure Nilotica Shea",
+  description: "Premium handcrafted shea butter skincare and wellness products made from ethically sourced Nilotica shea."
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

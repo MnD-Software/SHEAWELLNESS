@@ -15,7 +15,7 @@ type SheaGlobalHeaderProps = {
 
 const shopLinks = [
   { label: "Shop all", href: "/shop", body: "All Shea Wellness products in one catalogue." },
-  { label: "Body care", href: "/collections/body-care", body: "Body butters, raw shea, and daily moisture rituals." },
+  { label: "Body care", href: "/collections/body-care", body: "Body butters, raw shea, and daily moisture routines." },
   { label: "Face care", href: "/collections/face-care", body: "Black soap cleansers and gentle botanical routines." },
   { label: "Hair care", href: "/collections/hair-care", body: "Scalp, edge, and hair moisture essentials." },
   { label: "Media catalogue", href: "/catalogue", body: "Product films, images, and brand proof." }
@@ -109,7 +109,10 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
 
   return (
     <header className="shea-nav-shell">
-      <div className="shea-nav-promo">100% natural ingredients. Ethically sourced Nilotica shea. Export-ready quality.</div>
+      <div className="shea-nav-promo">
+        <span className="promo-full">100% natural ingredients. Ethically sourced Nilotica shea. Export-ready quality.</span>
+        <span className="promo-short">100% natural. Nilotica shea. Export-ready.</span>
+      </div>
       <div className="shea-nav-bar">
         <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
           <img src="/assets/shea-wellness-header-logo.jpeg" alt={sheaBrand.name} />
@@ -123,7 +126,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
             </a>
             <div className="shea-nav-mega">
               <div className="shea-nav-mega-copy">
-                <span>Shop by ritual</span>
+                <span>Shop by routine</span>
                 <strong>Clean product paths without crowding the header.</strong>
                 <p>Browse the store by category, use case, or product media.</p>
               </div>

@@ -75,7 +75,7 @@ export function SheaAccountDashboard() {
         </article>
         <article>
           <Heart size={20} />
-          <span>Saved ritual</span>
+          <span>Saved routine</span>
           <strong>Shea care</strong>
         </article>
       </section>
@@ -149,7 +149,7 @@ export function SheaAccountDashboard() {
       <section className="shea-account-care">
         <div>
           <span>Next step</span>
-          <h2>{latestOrder ? "Track your Shea Wellness ritual" : "Start with a clean Shea Wellness routine"}</h2>
+          <h2>{latestOrder ? "Track your Shea Wellness routine" : "Start with a clean Shea Wellness routine"}</h2>
           <p>{latestOrder ? "Your latest order is now visible to the Shea Wellness admin fulfillment queue." : "Browse the full catalogue and build a cart from live storefront products."}</p>
         </div>
         <a href="/shop">Open shop</a>

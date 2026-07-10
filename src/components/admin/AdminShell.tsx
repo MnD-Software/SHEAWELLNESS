@@ -31,6 +31,7 @@ import {
   sheaBlogTopics,
   sheaBrand,
   sheaCatalogueDownload,
+  sheaDefaultMediaConfig,
   sheaProductCategories,
   sheaQuality,
   sheaSocialProof,
@@ -40,6 +41,7 @@ import {
 } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import type { PlatformSnapshot, Product, ProductStatus } from "@/lib/types";
+import type { SheaHeroSlide, SheaMediaAsset, SheaMediaConfig } from "@/lib/shea-content";
 
 const adminNav = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -93,6 +95,20 @@ type ProductFormState = {
   status: ProductStatus;
 };
 
+type MediaSection = "hero" | "images" | "videos";
+
+type MediaFormState = {
+  id: string;
+  title: string;
+  src: string;
+  tag: string;
+  kicker: string;
+  body: string;
+  ctaLabel: string;
+  ctaHref: string;
+  objectPosition: string;
+};
+
 function productToDraft(product?: Product): ProductFormState {
   return {
     id: product?.id ?? "",
@@ -110,6 +126,22 @@ function productToDraft(product?: Product): ProductFormState {
   };
 }
 
+function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
+  const heroAsset = asset as Partial<SheaHeroSlide>;
+
+  return {
+    id: asset?.id ?? "",
+    title: asset?.title ?? "",
+    src: asset?.src ?? "/assets/WhatsApp Image 2026-07-08 at 11.48.35.jpeg",
+    tag: asset?.tag ?? "Skin routine",
+    kicker: heroAsset.kicker ?? "Before and after",
+    body: heroAsset.body ?? "Show the customer care journey with real Shea Wellness media.",
+    ctaLabel: heroAsset.ctaLabel ?? "Shop routines",
+    ctaHref: heroAsset.ctaHref ?? "/shop",
+    objectPosition: asset?.objectPosition ?? "50% 50%"
+  };
+}
+
 export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [view, setView] = useState<View>("overview");
   const [query, setQuery] = useState("");
@@ -117,6 +149,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [managedProducts, setManagedProducts] = useState<Product[]>(snapshot.products);
   const [runtimeOrders, setRuntimeOrders] = useState<RuntimeOrder[]>([]);
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
+  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
   const activeStore = snapshot.activeStore;
 
   const filteredProducts = useMemo(() => {
@@ -131,8 +164,20 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   useEffect(() => {
     const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as RuntimeOrder[];
     const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as RuntimeReview[];
+    const savedMedia = window.localStorage.getItem("sheaWellnessMediaConfig");
     setRuntimeOrders(savedOrders.filter((order) => order.source === "shea_storefront_checkout"));
     setRuntimeReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
+
+    if (savedMedia) {
+      try {
+        const parsedMedia = JSON.parse(savedMedia) as SheaMediaConfig;
+        if (Array.isArray(parsedMedia.heroSlides) && Array.isArray(parsedMedia.images) && Array.isArray(parsedMedia.videos)) {
+          setMediaConfig(parsedMedia);
+        }
+      } catch {
+        setMediaConfig(sheaDefaultMediaConfig);
+      }
+    }
 
     const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
     if (!savedProducts) return;
@@ -150,6 +195,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   function saveManagedProducts(nextProducts: Product[]) {
     setManagedProducts(nextProducts);
     window.localStorage.setItem("sheaWellnessProducts", JSON.stringify(nextProducts));
+  }
+
+  function saveMediaConfig(nextMediaConfig: SheaMediaConfig) {
+    setMediaConfig(nextMediaConfig);
+    window.localStorage.setItem("sheaWellnessMediaConfig", JSON.stringify(nextMediaConfig));
   }
 
   const adminOrders = runtimeOrders;
@@ -194,14 +244,14 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
           <button type="button" onClick={() => setView("products")}><PackagePlus size={17} /> Add product</button>
         </header>
 
-        {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} setView={setView} /> : null}
+        {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} mediaConfig={mediaConfig} setView={setView} /> : null}
         {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} /> : null}
         {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} /> : null}
         {view === "reviews" ? <ReviewsView products={managedProducts} reviews={runtimeReviews} /> : null}
         {view === "wholesale" ? <WholesaleView /> : null}
         {view === "content" ? <ContentView /> : null}
         {view === "quality" ? <QualityView /> : null}
-        {view === "media" ? <MediaView /> : null}
+        {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
       </main>
       </div>
@@ -214,12 +264,14 @@ function OverviewView({
   products,
   orders,
   reviews,
+  mediaConfig,
   setView
 }: {
   snapshot: PlatformSnapshot;
   products: PlatformSnapshot["products"];
   orders: RuntimeOrder[];
   reviews: RuntimeReview[];
+  mediaConfig: SheaMediaConfig;
   setView: (view: View) => void;
 }) {
   return (
@@ -275,7 +327,7 @@ function OverviewView({
 
       <Panel title="Product films" description="Actual Shea Wellness videos are available inside the dashboard, not just the public catalogue." action={<button onClick={() => setView("media")}>Open media</button>}>
         <div className="shea-video-slider overview">
-          {sheaVideos.slice(0, 3).map((video) => (
+          {(mediaConfig.videos.length ? mediaConfig.videos : sheaVideos).slice(0, 3).map((video) => (
             <article key={video.src}>
               <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
               <span>{video.tag}</span>
@@ -589,31 +641,211 @@ function QualityView() {
   );
 }
 
-function MediaView() {
+function MediaView({
+  mediaConfig,
+  saveMediaConfig
+}: {
+  mediaConfig: SheaMediaConfig;
+  saveMediaConfig: (mediaConfig: SheaMediaConfig) => void;
+}) {
+  const [section, setSection] = useState<MediaSection>("hero");
+  const [draft, setDraft] = useState<MediaFormState>(() => mediaToDraft(mediaConfig.heroSlides[0]));
+  const [editingId, setEditingId] = useState<string | null>(mediaConfig.heroSlides[0]?.id ?? null);
+
+  const activeItems = section === "hero" ? mediaConfig.heroSlides : section === "images" ? mediaConfig.images : mediaConfig.videos;
+
+  function updateDraft(field: keyof MediaFormState, value: string) {
+    setDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function switchSection(nextSection: MediaSection) {
+    const nextItems = nextSection === "hero" ? mediaConfig.heroSlides : nextSection === "images" ? mediaConfig.images : mediaConfig.videos;
+    setSection(nextSection);
+    setEditingId(nextItems[0]?.id ?? null);
+    setDraft(mediaToDraft(nextItems[0]));
+  }
+
+  function startCreate() {
+    setEditingId(null);
+    setDraft(mediaToDraft());
+  }
+
+  function startEdit(asset: SheaMediaAsset | SheaHeroSlide) {
+    setEditingId(asset.id);
+    setDraft(mediaToDraft(asset));
+  }
+
+  function saveDraft(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const mediaId = editingId ?? `${section}_${Date.now()}`;
+
+    if (section === "hero") {
+      const nextSlide: SheaHeroSlide = {
+        id: mediaId,
+        title: draft.title.trim() || "Before and after Shea Wellness routine",
+        src: draft.src.trim(),
+        type: "image",
+        tag: draft.tag.trim() || "Before and after",
+        kicker: draft.kicker.trim() || "Before and after",
+        body: draft.body.trim(),
+        ctaLabel: draft.ctaLabel.trim() || "Shop routines",
+        ctaHref: draft.ctaHref.trim() || "/shop",
+        objectPosition: draft.objectPosition.trim() || "50% 50%"
+      };
+      const nextSlides = editingId
+        ? mediaConfig.heroSlides.map((slide) => (slide.id === editingId ? nextSlide : slide))
+        : [...mediaConfig.heroSlides, nextSlide];
+      saveMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+      setEditingId(nextSlide.id);
+      setDraft(mediaToDraft(nextSlide));
+      return;
+    }
+
+    const nextAsset: SheaMediaAsset = {
+      id: mediaId,
+      title: draft.title.trim() || (section === "images" ? "Shea Wellness image" : "Shea Wellness video"),
+      src: draft.src.trim(),
+      type: section === "images" ? "image" : "video",
+      tag: draft.tag.trim() || "Brand media",
+      objectPosition: draft.objectPosition.trim() || "50% 50%"
+    };
+    const listKey = section === "images" ? "images" : "videos";
+    const nextItems = editingId
+      ? mediaConfig[listKey].map((item) => (item.id === editingId ? nextAsset : item))
+      : [...mediaConfig[listKey], nextAsset];
+    saveMediaConfig({ ...mediaConfig, [listKey]: nextItems });
+    setEditingId(nextAsset.id);
+    setDraft(mediaToDraft(nextAsset));
+  }
+
+  function deleteMedia(mediaId: string) {
+    const confirmed = window.confirm("Remove this media entry from the Shea Wellness site?");
+    if (!confirmed) return;
+
+    if (section === "hero") {
+      const nextSlides = mediaConfig.heroSlides.filter((slide) => slide.id !== mediaId);
+      saveMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+      setEditingId(nextSlides[0]?.id ?? null);
+      setDraft(mediaToDraft(nextSlides[0]));
+      return;
+    }
+
+    const listKey = section === "images" ? "images" : "videos";
+    const nextItems = mediaConfig[listKey].filter((item) => item.id !== mediaId);
+    saveMediaConfig({ ...mediaConfig, [listKey]: nextItems });
+    setEditingId(nextItems[0]?.id ?? null);
+    setDraft(mediaToDraft(nextItems[0]));
+  }
+
+  function moveHeroSlide(mediaId: string, direction: -1 | 1) {
+    const currentIndex = mediaConfig.heroSlides.findIndex((slide) => slide.id === mediaId);
+    const nextIndex = currentIndex + direction;
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= mediaConfig.heroSlides.length) return;
+
+    const nextSlides = [...mediaConfig.heroSlides];
+    const [slide] = nextSlides.splice(currentIndex, 1);
+    nextSlides.splice(nextIndex, 0, slide);
+    saveMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+  }
+
+  function resetMedia() {
+    const confirmed = window.confirm("Reset all Shea Wellness media entries to the default site media?");
+    if (!confirmed) return;
+    saveMediaConfig(sheaDefaultMediaConfig);
+    setSection("hero");
+    setEditingId(sheaDefaultMediaConfig.heroSlides[0]?.id ?? null);
+    setDraft(mediaToDraft(sheaDefaultMediaConfig.heroSlides[0]));
+  }
+
   return (
     <section className="shea-admin-stack">
-      <AdminHeading eyebrow="Brand media" title="Product image and video library" />
-      <div className="shea-admin-media-grid">
-        {[
-          "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-          "/assets/sheawellness/lavender-shea-butter-front.jpeg",
-          "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
-          "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
-          "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
-          "/assets/sheawellness/lavender-shea-butter-back.jpeg"
-        ].map((src) => (
-          <article key={src}><img src={src} alt="" /><span>{src.split("/").pop()}</span></article>
+      <AdminHeading
+        eyebrow="Brand media"
+        title="Editable storefront media"
+        action={<button type="button" onClick={resetMedia}>Reset defaults</button>}
+      />
+      <div className="shea-admin-segments">
+        {(["hero", "images", "videos"] as MediaSection[]).map((item) => (
+          <button key={item} type="button" className={clsx(section === item && "active")} onClick={() => switchSection(item)}>
+            {item === "hero" ? "Before/after carousel" : titleCase(item)}
+          </button>
         ))}
       </div>
-      <div className="shea-video-slider">
-        {sheaVideos.map((video) => (
-          <article key={video.src}>
-            <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
-            <span>{video.tag}</span>
-            <strong>{video.title}</strong>
-          </article>
-        ))}
-      </div>
+      <section className="shea-admin-grid wide-left">
+        <Panel
+          title={section === "hero" ? "Before/after carousel" : section === "images" ? "Image library" : "Video library"}
+          description="Every entry here is editable by admin and saved for the live storefront in this browser."
+          action={<button type="button" onClick={startCreate}>Add media</button>}
+        >
+          <div className={section === "videos" ? "shea-admin-video-grid" : "shea-admin-media-grid"}>
+            {activeItems.map((asset) => (
+              <article key={asset.id}>
+                {asset.type === "video" ? (
+                  <video src={asset.src} muted loop playsInline preload="metadata" />
+                ) : (
+                  <img src={asset.src} alt={asset.title} style={{ objectPosition: asset.objectPosition ?? "50% 50%" }} />
+                )}
+                <span>{asset.tag}</span>
+                <strong>{asset.title}</strong>
+                <div className="shea-admin-table-actions">
+                  <button type="button" onClick={() => startEdit(asset)}>Edit</button>
+                  {section === "hero" ? <button type="button" onClick={() => moveHeroSlide(asset.id, -1)}>Up</button> : null}
+                  {section === "hero" ? <button type="button" onClick={() => moveHeroSlide(asset.id, 1)}>Down</button> : null}
+                  <button type="button" className="danger" onClick={() => deleteMedia(asset.id)}>Delete</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </Panel>
+        <Panel
+          title={editingId ? "Edit media" : "Add media"}
+          description="Use public paths like /assets/file.jpeg or paste a full hosted media URL."
+        >
+          <form className="shea-admin-product-form" onSubmit={saveDraft}>
+            <label>
+              Title
+              <input required value={draft.title} onChange={(event) => updateDraft("title", event.target.value)} />
+            </label>
+            <label>
+              Media URL
+              <input required value={draft.src} onChange={(event) => updateDraft("src", event.target.value)} />
+            </label>
+            <div className="shea-admin-form-row">
+              <label>
+                Tag
+                <input value={draft.tag} onChange={(event) => updateDraft("tag", event.target.value)} />
+              </label>
+              <label>
+                Object position
+                <input value={draft.objectPosition} onChange={(event) => updateDraft("objectPosition", event.target.value)} placeholder="50% 50%" />
+              </label>
+            </div>
+            {section === "hero" ? (
+              <>
+                <label>
+                  Kicker
+                  <input value={draft.kicker} onChange={(event) => updateDraft("kicker", event.target.value)} />
+                </label>
+                <label>
+                  Slide body
+                  <textarea value={draft.body} onChange={(event) => updateDraft("body", event.target.value)} />
+                </label>
+                <div className="shea-admin-form-row">
+                  <label>
+                    CTA label
+                    <input value={draft.ctaLabel} onChange={(event) => updateDraft("ctaLabel", event.target.value)} />
+                  </label>
+                  <label>
+                    CTA href
+                    <input value={draft.ctaHref} onChange={(event) => updateDraft("ctaHref", event.target.value)} />
+                  </label>
+                </div>
+              </>
+            ) : null}
+            <button type="submit">{editingId ? "Save media changes" : "Create media"}</button>
+          </form>
+        </Panel>
+      </section>
     </section>
   );
 }
