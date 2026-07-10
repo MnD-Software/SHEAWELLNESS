@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Heart, Leaf, LogIn, Menu, Search, ShoppingCart, UserRound, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Heart, LogIn, Menu, Search, ShoppingCart, UserRound, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { usePathname } from "next/navigation";
 import { sheaBrand } from "@/lib/shea-content";
@@ -112,8 +112,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       <div className="shea-nav-promo">100% natural ingredients. Ethically sourced Nilotica shea. Export-ready quality.</div>
       <div className="shea-nav-bar">
         <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
-          <span><Leaf size={18} /></span>
-          <strong>{sheaBrand.name}</strong>
+          <img src="/assets/shea-wellness-header-logo.jpeg" alt={sheaBrand.name} />
         </a>
 
         <nav className="shea-nav-desktop" aria-label="Primary navigation">
