@@ -27,6 +27,7 @@ import {
   sheaWhyChoose
 } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
+import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
 type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blog" | "quality" | "contact" | "catalogue";
 
@@ -100,7 +101,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
         <figure>
           <img src={meta.image} alt="" />
           <figcaption>
-            <video src={sheaVideos[0].src} muted loop autoPlay playsInline />
+            <video src={sheaVideos[0].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
             <span>{sheaVideos[0].tag}</span>
             <strong>Real product motion</strong>
           </figcaption>
@@ -410,7 +411,7 @@ function BlogSections() {
     <>
       <section className="shea-blog-editorial">
         <article className="shea-blog-feature">
-          <video src={sheaVideos[2].src} muted loop autoPlay playsInline preload="metadata" />
+          <video src={sheaVideos[2].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
           <div>
             <span>Cinematic feature</span>
             <h2>The Shea Wellness routine: cleanse, nourish, seal, and glow.</h2>
@@ -518,7 +519,7 @@ function LivingPageSection({ kind }: { kind: SheaPageKind }) {
       <figure>
         <img src={copy.image} alt="" loading="lazy" />
         <figcaption>
-          <video src={sheaVideos[1].src} muted loop autoPlay playsInline preload="metadata" />
+          <video src={sheaVideos[1].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
         </figcaption>
       </figure>
       <div>
@@ -613,7 +614,7 @@ function CatalogueSections() {
         <div className="shea-video-slider">
           {sheaVideos.map((video) => (
             <article key={video.src}>
-              <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
+              <video src={video.src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
               <strong>{video.title}</strong>
             </article>
           ))}
@@ -634,7 +635,7 @@ function VideoShowcase({ title, body }: { title: string; body: string }) {
       <div className="shea-video-slider featured">
         {sheaVideos.slice(0, 3).map((video) => (
           <article key={video.src}>
-            <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
+            <video src={video.src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
             <strong>{video.title}</strong>
           </article>
         ))}
@@ -679,30 +680,5 @@ function StoryCard({ title, body }: { title: string; body: string }) {
 }
 
 function SheaFooter() {
-  return (
-    <footer className="shea-page-footer">
-      <div className="shea-page-footer-brand">
-        <strong>{sheaBrand.name}</strong>
-        <p>{sheaBrand.summary}</p>
-        <small>{sheaBrand.address}</small>
-      </div>
-      <div>
-        <span>Explore</span>
-        <a href="/shop">Shop</a>
-        <a href="/products">Products</a>
-        <a href="/blog">Blog</a>
-      </div>
-      <div>
-        <span>Company</span>
-        <a href="/about">About</a>
-        <a href="/wholesale">Wholesale</a>
-        <a href="/quality">Quality</a>
-      </div>
-      <div>
-        <span>Contact</span>
-        <a href={`mailto:${sheaBrand.email}`}>{sheaBrand.email}</a>
-        <a href={`tel:${sheaBrand.phone}`}>{sheaBrand.phone}</a>
-      </div>
-    </footer>
-  );
+  return <><SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp /></>;
 }

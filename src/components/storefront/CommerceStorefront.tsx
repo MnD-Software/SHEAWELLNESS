@@ -9,6 +9,7 @@ import {
   Eye,
   Grid2X2,
   Home,
+  Heart,
   Minus,
   Plus,
   RotateCcw,
@@ -26,6 +27,7 @@ import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
+import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import type { Product, Store } from "@/lib/types";
 
 type CartLine = {
@@ -197,6 +199,8 @@ export function CommerceStorefront({
   const [orderNumber, setOrderNumber] = useState("");
   const [heroIndex, setHeroIndex] = useState(0);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
+  const [wishlist, setWishlist] = useState<string[]>([]);
+  const [saleSeconds, setSaleSeconds] = useState(47 * 60 * 60 + 36 * 60);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
 
   const heroSlides = mediaConfig.heroSlides.length ? mediaConfig.heroSlides : sheaDefaultMediaConfig.heroSlides;
@@ -220,6 +224,15 @@ export function CommerceStorefront({
     } catch {
       setMediaConfig(sheaDefaultMediaConfig);
     }
+  }, []);
+
+  useEffect(() => {
+    setWishlist(JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[]);
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setSaleSeconds((value) => Math.max(0, value - 1)), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -320,6 +333,14 @@ export function CommerceStorefront({
       return lines.map((line, index) => (index === existingIndex ? { ...line, quantity: line.quantity + quantity } : line));
     });
     setCartOpen(true);
+  }
+
+  function toggleWishlist(productId: string) {
+    setWishlist((current) => {
+      const next = current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId];
+      window.localStorage.setItem("sheaWellnessWishlist", JSON.stringify(next));
+      return next;
+    });
   }
 
   function updateLine(index: number, quantity: number) {
@@ -555,25 +576,30 @@ export function CommerceStorefront({
         <div className="commerce-product-grid">
           {displayedProducts.map((product) => {
             const productReviews = getProductReviews(product.id);
-            const reviewCount = productReviews.length;
+            const reviewCount = product.reviewCount + productReviews.length;
             const averageRating = reviewCount
-              ? productReviews.reduce((totalRating, review) => totalRating + review.rating, 0) / reviewCount
-              : 0;
+              ? ((product.rating * product.reviewCount) + productReviews.reduce((totalRating, review) => totalRating + review.rating, 0)) / reviewCount
+              : product.rating;
+            const lowStock = product.status === "low_stock" || product.inventoryQty <= 10;
+            const wished = wishlist.includes(product.id);
             return (
             <article className="commerce-product-card" key={product.id}>
               <a className="commerce-product-image" href={`/products/${encodeURIComponent(product.id)}`}>
-                <img src={product.imageUrl} alt={product.title} loading="lazy" style={{ objectPosition: product.imagePosition }} />
+                <img src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
+                <span className="commerce-card-badges"><em>{product.badge || "Best seller"}</em>{product.sales >= 80 ? <em className="sale">Sale</em> : null}{lowStock ? <em className="stock">Low stock</em> : null}</span>
                 <b>View product</b>
               </a>
+              <button type="button" className={clsx("commerce-card-wishlist", wished && "active")} onClick={() => toggleWishlist(product.id)} aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}><Heart size={18} fill={wished ? "currentColor" : "none"} /></button>
               <div className="commerce-product-body">
                 <div>
                   <strong>{product.title}</strong>
                   <p>{product.description}</p>
                 </div>
                 <div className="commerce-rating">
-                  <span><Star size={14} fill="currentColor" /> {reviewCount ? averageRating.toFixed(1) : "New"}</span>
+                  <span><Star size={14} fill="currentColor" /> {averageRating ? averageRating.toFixed(1) : "New"}</span>
                   <small>{reviewCount ? `${reviewCount} customer reviews` : "Be first to review"}</small>
                 </div>
+                <div className={clsx("commerce-stock-status", lowStock && "low")}><i />{lowStock ? `Only ${product.inventoryQty} left` : "In stock and ready to ship"}</div>
                 <div className="commerce-price-row">
                   <span>{formatMoney(product.price, store.currency)}</span>
                 </div>
@@ -600,6 +626,15 @@ export function CommerceStorefront({
 
       {isHomePage ? (
       <>
+      <section className="commerce-sale-banner" aria-label="Limited wellness offer">
+        <div><span>Limited wellness offer</span><h2>Build a complete routine and save.</h2><p>Pair any body butter with a cleansing or botanical oil step for a more complete ritual.</p><a href="/shop">Shop bundle offers <ArrowRight size={17} /></a></div>
+        <div className="commerce-countdown" aria-label="Offer countdown"><strong>{String(Math.floor(saleSeconds / 3600)).padStart(2, "0")}</strong><span>Hours</span><strong>{String(Math.floor((saleSeconds % 3600) / 60)).padStart(2, "0")}</strong><span>Minutes</span><strong>{String(saleSeconds % 60).padStart(2, "0")}</strong><span>Seconds</span></div>
+      </section>
+
+      <section className="commerce-merchandising-rails">
+        {[{ title: "Best sellers", body: "Customer favourites with strong reviews and repeat demand.", items: [...liveProducts].sort((a,b) => b.sales-a.sales).slice(0,4) }, { title: "New arrivals", body: "Fresh additions to skin, hair, gifting, and spa care.", items: [...liveProducts].reverse().slice(0,4) }].map((rail) => <div key={rail.title}><header><span>{rail.title}</span><p>{rail.body}</p></header><div>{rail.items.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><span><strong>{item.title}</strong><small><Star size={12} fill="currentColor" /> {item.rating.toFixed(1)} · {formatMoney(item.price, store.currency)}</small></span></a>)}</div></div>)}
+      </section>
+
       <section className="commerce-concerns-section" id="skin-concerns">
         <div className="commerce-section-title split">
           <div>
@@ -776,30 +811,9 @@ export function CommerceStorefront({
       </>
       ) : null}
 
-      <footer className="commerce-footer">
-        <div className="commerce-footer-brand">
-          <strong>{store.name}</strong>
-          <p>Premium handcrafted shea butter skincare and wellness products made from ethically sourced Nilotica shea.</p>
-          <small>Unga House, 1st Floor, Westlands, Nairobi</small>
-        </div>
-        <div>
-          <span>Shop</span>
-          <a href="/shop">Shop products</a>
-          <a href="/products">Product guide</a>
-          <a href="/catalogue">Media catalogue</a>
-        </div>
-        <div>
-          <span>Company</span>
-          <a href="/about">About</a>
-          <a href="/sustainability">Sustainability</a>
-          <a href="/quality">Quality</a>
-        </div>
-        <div>
-          <span>Contact</span>
-          <a href="mailto:sheabutterwellness@gmail.com">Email</a>
-          <a href="tel:+254729621930">+254729621930</a>
-        </div>
-      </footer>
+      <SheaTrustGrid />
+      <SheaCommerceFooter />
+      <SheaWhatsApp />
 
       <nav className="commerce-mobile-tabs" aria-label="Mobile storefront navigation">
         <a href="#top"><Home size={20} /><span>Home</span></a>

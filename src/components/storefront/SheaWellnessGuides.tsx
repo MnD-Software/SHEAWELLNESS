@@ -1,5 +1,6 @@
 import { CheckCircle2, Droplets, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
+import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
 type ProductStep = {
   name: string;
@@ -201,6 +202,7 @@ export function SheaWellnessGuides() {
         <Leaf size={24} />
         <div><h2>Gentle care, informed choices.</h2><p>Cosmetic results vary. Patch test new products, discontinue use if irritation occurs, and consult a qualified healthcare professional for persistent, severe, or diagnosed skin and scalp conditions. These guides do not replace medical advice.</p></div>
       </section>
+      <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
     </main>
   );
 }

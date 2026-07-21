@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, PackageCheck, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Heart, Leaf, PackageCheck, RotateCcw, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { sheaVideos } from "@/lib/shea-content";
 import type { Product } from "@/lib/types";
+import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
 type ProductReview = {
   source?: string;
@@ -36,6 +37,8 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const [reviewBody, setReviewBody] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [notice, setNotice] = useState("");
+  const [wished, setWished] = useState(false);
+  const [recentProductIds, setRecentProductIds] = useState<string[]>([]);
 
   useEffect(() => {
     const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
@@ -50,16 +53,32 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     setSize(nextProduct?.sizes[0] ?? "100g");
     setReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
     setCartCount(savedCart.reduce((total, line) => total + line.quantity, 0));
+    const savedWishlist = JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[];
+    setWished(savedWishlist.includes(productId));
+    const savedRecent = JSON.parse(window.localStorage.getItem("sheaWellnessRecentlyViewed") ?? "[]") as string[];
+    const nextRecent = [productId, ...savedRecent.filter((id) => id !== productId)].slice(0, 8);
+    window.localStorage.setItem("sheaWellnessRecentlyViewed", JSON.stringify(nextRecent));
+    setRecentProductIds(nextRecent.filter((id) => id !== productId));
   }, [productId]);
 
   const productReviews = product ? reviews.filter((review) => review.productId === product.id) : [];
-  const averageRating = productReviews.length
-    ? productReviews.reduce((total, review) => total + review.rating, 0) / productReviews.length
+  const totalReviewCount = (product?.reviewCount ?? 0) + productReviews.length;
+  const averageRating = product && totalReviewCount
+    ? ((product.rating * product.reviewCount) + productReviews.reduce((total, review) => total + review.rating, 0)) / totalReviewCount
     : 0;
   const relatedProducts = useMemo(() => {
     if (!product) return [];
     return products.filter((item) => item.id !== product.id && item.category === product.category).slice(0, 4);
   }, [product, products]);
+  const recentlyViewed = useMemo(() => recentProductIds.map((id) => products.find((item) => item.id === id)).filter((item): item is Product => Boolean(item)).slice(0, 4), [products, recentProductIds]);
+
+  function toggleWishlist() {
+    if (!product) return;
+    const saved = JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[];
+    const next = saved.includes(product.id) ? saved.filter((id) => id !== product.id) : [...saved, product.id];
+    window.localStorage.setItem("sheaWellnessWishlist", JSON.stringify(next));
+    setWished(next.includes(product.id));
+  }
 
   function addToCart() {
     if (!product) return;
@@ -109,6 +128,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
   return (
     <main className="shea-product-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, image: product.imageUrl, description: product.description, brand: { "@type": "Brand", name: "Shea Wellness" }, aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount }, offers: { "@type": "Offer", priceCurrency: platformSnapshot.activeStore.currency, price: product.price, availability: product.inventoryQty > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } }) }} />
       <SheaGlobalHeader cartCount={cartCount} />
 
       <section className="shea-product-detail-hero">
@@ -118,7 +138,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
           <div className="shea-product-thumbs">
             <img src={product.imageUrl} alt="" style={{ objectPosition: product.imagePosition }} />
-            <video src={sheaVideos[0].src} muted loop autoPlay playsInline preload="metadata" />
+            <video src={sheaVideos[0].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
           </div>
         </div>
 
@@ -127,11 +147,12 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           <h1>{product.title}</h1>
           <div className="shea-product-rating">
             <Star size={18} fill="currentColor" />
-            <strong>{productReviews.length ? `${averageRating.toFixed(1)}/5` : "New"}</strong>
-            <a href="#reviews">{productReviews.length ? `${productReviews.length} customer reviews` : "Write the first review"}</a>
+            <strong>{averageRating ? `${averageRating.toFixed(1)}/5` : "New"}</strong>
+            <a href="#reviews">{totalReviewCount ? `${totalReviewCount} customer reviews` : "Write the first review"}</a>
           </div>
           <strong className="shea-product-price">{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong>
           <p>{product.description}</p>
+          <div className="shea-live-stock"><i />{product.status === "low_stock" || product.inventoryQty <= 10 ? `Only ${product.inventoryQty} left — order soon` : `${product.inventoryQty} available and ready to ship`}</div>
 
           <div className="shea-product-facts">
             <div><strong>Material</strong><span>{product.material}</span></div>
@@ -146,10 +167,10 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
             ))}
           </fieldset>
 
-          <button type="button" className="shea-product-add" onClick={addToCart}>
+          <div className="shea-product-primary-actions"><button type="button" className="shea-product-add" onClick={addToCart}>
             <ShoppingCart size={20} />
             Add to cart
-          </button>
+          </button><button type="button" className={wished ? "shea-product-wishlist active" : "shea-product-wishlist"} onClick={toggleWishlist} aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}><Heart size={20} fill={wished ? "currentColor" : "none"} /></button></div>
           {notice ? <p className="shea-product-notice">{notice}</p> : null}
 
           <div className="shea-product-assurance">
@@ -172,6 +193,15 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           <p>Shea Wellness products are positioned around natural ingredients, ethical Nilotica shea, and practical daily use for body, face, hair, aromatherapy, and spa care.</p>
         </div>
       </section>
+
+      <section className="shea-product-guide-grid">
+        <article><Leaf size={22} /><span>Ingredients</span><h2>What is inside.</h2><p>{product.material}. Nature-led ingredients selected for practical everyday skin, hair, body, or spa use.</p></article>
+        <article><CheckCircle2 size={22} /><span>Benefits</span><h2>Why customers choose it.</h2><ul><li>{product.deliveryBadge}</li><li>Supports a simple, consistent wellness routine</li><li>Made with Shea Wellness quality standards</li></ul></article>
+        <article><RotateCcw size={22} /><span>Directions</span><h2>How to use.</h2><p>Apply a measured amount to clean skin or hair. Massage gently until absorbed. Start with less, layer only where needed, and patch-test before first use.</p></article>
+        <article><Truck size={22} /><span>Shipping</span><h2>Delivery and returns.</h2><p>Kenya delivery and international wholesale support are available. Damaged or incorrect orders are handled under our refund policy.</p><a href="/shipping-policy">Read shipping information</a></article>
+      </section>
+
+      <section className="shea-product-faq" id="faq"><div><span>Product FAQ</span><h2>Good to know before you order.</h2></div><div><details><summary>Is this suitable for sensitive skin?</summary><p>Patch-test first and introduce one product at a time. Stop use if irritation occurs.</p></details><details><summary>How should I store it?</summary><p>Keep it sealed in a cool, dry place away from direct sunlight and excess heat.</p></details><details><summary>Can I order for a spa or retail store?</summary><p>Yes. Contact our wholesale team for bulk sizes, pricing, and fulfilment guidance.</p></details></div></section>
 
       <section className="shea-product-reviews" id="reviews">
         <div className="shea-product-review-copy">
@@ -219,6 +249,15 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
         </section>
       ) : null}
+
+      {relatedProducts.length >= 2 ? <section className="shea-frequently-bought"><div><span>Frequently bought together</span><h2>Build a complete ritual.</h2><p>Pair {product.title} with complementary care from the same collection.</p></div><div>{[product, ...relatedProducts.slice(0, 2)].map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
+
+      {recentlyViewed.length ? <section className="shea-product-related recently-viewed"><div className="shea-section-title"><span>Recently viewed</span><h2>Continue where you left off.</h2></div><div>{recentlyViewed.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
+
+      <SheaTrustGrid />
+      <SheaCommerceFooter />
+      <SheaWhatsApp />
+      <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart}><ShoppingCart size={18} /> Add to cart</button></div>
     </main>
   );
 }

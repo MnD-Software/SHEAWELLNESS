@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Leaf, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, Leaf, ShoppingBag, ShoppingCart, Sparkles, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { platformSnapshot } from "@/lib/platform-data";
 import { formatMoney } from "@/lib/format";
 import type { Product } from "@/lib/types";
+import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
 export type DepartmentKind = "face" | "skin" | "hair" | "gifts" | "spa";
 
@@ -60,6 +61,7 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
   const [products, setProducts] = useState<Product[]>(platformSnapshot.products);
   const [cartCount, setCartCount] = useState(0);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [wishlist, setWishlist] = useState<string[]>([]);
 
   useEffect(() => {
     const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
@@ -69,6 +71,7 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
       if (Array.isArray(parsed) && parsed.length) setProducts(parsed);
     }
     setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
+    setWishlist(JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[]);
   }, []);
 
   const departmentProducts = useMemo(() => products.filter((product) => content.categories.includes(product.category) && product.status !== "draft"), [content.categories, products]);
@@ -90,6 +93,18 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
   };
 
   const featuredProduct = featuredProducts[carouselIndex];
+
+  function toggleWishlist(productId: string) {
+    setWishlist((current) => { const next = current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId]; window.localStorage.setItem("sheaWellnessWishlist", JSON.stringify(next)); return next; });
+  }
+
+  function quickAdd(product: Product) {
+    const saved = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
+    const index = saved.findIndex((line) => line.productId === product.id && line.size === product.sizes[0]);
+    const next = index >= 0 ? saved.map((line, itemIndex) => itemIndex === index ? { ...line, quantity: line.quantity + 1 } : line) : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: product.price, size: product.sizes[0], quantity: 1 }, ...saved];
+    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(next));
+    setCartCount(next.reduce((total, line) => total + line.quantity, 0));
+  }
 
   return (
     <main className={`shea-department-page department-${kind}`}>
@@ -135,12 +150,14 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
       <section className="department-products" id="department-products">
         <header><div><span>{content.eyebrow}</span><h2>Products for this routine.</h2></div><a href="/shop">View complete shop <ArrowRight size={17} /></a></header>
         <div>
-          {departmentProducts.map((product) => <article key={product.id}>
+          {departmentProducts.map((product) => <article key={product.id} className="department-product-card">
             <a href={`/products/${encodeURIComponent(product.id)}`}><img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} /></a>
-            <div><span>{product.badge}</span><h3>{product.title}</h3><p>{product.description}</p><footer><strong>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong><a href={`/products/${encodeURIComponent(product.id)}`}><ShoppingBag size={16} /> View product</a></footer></div>
+            <button type="button" className={wishlist.includes(product.id) ? "department-card-wishlist active" : "department-card-wishlist"} onClick={() => toggleWishlist(product.id)} aria-label={`Add ${product.title} to wishlist`}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "none"} /></button>
+            <div><span>{product.badge}</span><h3>{product.title}</h3><div className="department-card-rating"><Star size={14} fill="currentColor" /> {product.rating.toFixed(1)} <small>({product.reviewCount} reviews)</small></div><p>{product.description}</p><div className="department-card-stock"><i />{product.status === "low_stock" ? `Only ${product.inventoryQty} left` : "In stock"}</div><footer><strong>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong><button type="button" onClick={() => quickAdd(product)}><ShoppingCart size={16} /> Quick add</button><a href={`/products/${encodeURIComponent(product.id)}`} aria-label={`View ${product.title}`}><ShoppingBag size={16} /></a></footer></div>
           </article>)}
         </div>
       </section>
+      <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
     </main>
   );
 }

@@ -6,6 +6,7 @@ import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { sheaBrand } from "@/lib/shea-content";
+import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
 type AccountOrder = {
   source?: string;
@@ -154,6 +155,7 @@ export function SheaAccountDashboard() {
         </div>
         <a href="/shop">Open shop</a>
       </section>
+      <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
     </main>
   );
 }
