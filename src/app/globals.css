@@ -10759,6 +10759,42 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .commerce-product-body { min-width: 0; }
 .commerce-card-actions { flex-wrap: wrap; }
 
+/* Fixed navigation occupies reserved space and remains independent of page content. */
+:root { --shea-fixed-header: 124px; }
+.shea-nav-shell {
+  position: fixed !important;
+  inset: 0 0 auto 0;
+  z-index: 600 !important;
+  width: 100%;
+  background: #f2f3ee;
+  box-shadow: 0 12px 34px rgba(17, 49, 34, .09);
+}
+.shea-nav-promo { min-height: 34px; }
+.shea-nav-bar {
+  width: calc(100% - 28px) !important;
+  min-height: 70px !important;
+  margin: 9px 14px 11px !important;
+  border: 1px solid rgba(23, 61, 43, .11);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(18, 48, 34, .08);
+}
+.commerce-site,
+.shea-page { padding-top: var(--shea-fixed-header) !important; }
+.shea-desktop-sidebar { top: var(--shea-fixed-header); height: calc(100dvh - var(--shea-fixed-header)); }
+.shea-sidebar-scrim { top: var(--shea-fixed-header); }
+
+@media (max-width: 1099px) {
+  :root { --shea-fixed-header: 178px; }
+  .shea-nav-bar { margin-bottom: 7px !important; }
+  .shea-mobile-category-nav { min-height: 49px; padding-bottom: 9px; }
+}
+
+@media (max-width: 560px) {
+  :root { --shea-fixed-header: 174px; }
+  .shea-nav-bar { width: calc(100% - 16px) !important; margin-inline: 8px !important; }
+}
+
 .guide-hero {
   padding: clamp(5rem, 10vw, 9rem) clamp(1.25rem, 6vw, 7rem) 4rem;
   background: radial-gradient(circle at 85% 10%, rgba(201, 175, 90, .22), transparent 30%), #173d2b;
