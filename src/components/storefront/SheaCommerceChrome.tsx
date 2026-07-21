@@ -26,7 +26,12 @@ export function SheaCommerceFooter() {
         <form onSubmit={subscribe}><label className="sr-only" htmlFor="footer-email">Email address</label><input id="footer-email" required type="email" placeholder="Email address" /><button type="submit">{joined ? "Thank you" : "Subscribe"}</button></form>
       </div>
       <div className="shea-commerce-footer-grid">
-        <div className="shea-commerce-footer-brand"><img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" /><p>Natural skin, face, hair, and spa care rooted in African botanical heritage.</p><span><PackageCheck size={16} /> Made in Kenya</span></div>
+        <div className="shea-commerce-footer-brand">
+          <a className="shea-footer-logo" href="/" aria-label="Shea Wellness home"><img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" /></a>
+          <div><strong>Shea Wellness Ltd</strong><small>Care inspired by nature</small></div>
+          <p>Natural skin, face, hair, and spa care rooted in African botanical heritage.</p>
+          <span><PackageCheck size={16} /> Made in Kenya</span>
+        </div>
         <nav aria-label="Company links"><strong>Company</strong><a href="/about">About</a><a href="/contact">Contact</a><a href="/sustainability">Sustainability</a><a href="/wholesale">Wholesale</a></nav>
         <nav aria-label="Customer care links"><strong>Customer care</strong><a href="/policies">Policies</a><a href="/refund-policy">Refund policy</a><a href="/shipping-policy">Shipping</a><a href="/faq">FAQ</a></nav>
         <nav aria-label="Social media links"><strong>Follow us</strong><a href="https://www.instagram.com/sheawellnesske/" target="_blank" rel="noreferrer">Instagram</a><a href="https://wa.me/254729621930" target="_blank" rel="noreferrer">WhatsApp</a><a href="mailto:sheabutterwellness@gmail.com">Email</a></nav>

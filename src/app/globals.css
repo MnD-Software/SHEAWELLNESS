@@ -11148,8 +11148,14 @@ body {
 .shea-commerce-footer-newsletter input { width: 100%; min-width: 0; padding: 0 16px; border: 0; outline: 0; background: transparent; }
 .shea-commerce-footer-newsletter button { min-height: 48px; padding: 0 20px; border: 0; border-radius: 999px; background: #81904f; color: #fff; font-weight: 850; }
 .shea-commerce-footer-grid { width: min(1320px, calc(100% - 48px)); margin: 0 auto; display: grid; grid-template-columns: 1.5fr repeat(4, 1fr); gap: 34px; padding: 52px 0; }
-.shea-commerce-footer-brand img { width: 76px; height: 76px; object-fit: cover; border-radius: 50%; background: #fff; }
-.shea-commerce-footer-brand p { max-width: 300px; color: rgba(255,255,255,.62); line-height: 1.55; }
+.shea-commerce-footer-brand { display: grid; justify-items: start; align-content: start; gap: 14px; }
+.shea-footer-logo { display: grid; place-items: center; width: 116px; height: 142px; padding: 8px; overflow: hidden; border-radius: 24px; background: #fff; box-shadow: 0 14px 34px rgba(0,0,0,.2); transition: transform .25s ease, box-shadow .25s ease; }
+.shea-footer-logo:hover { transform: translateY(-3px); box-shadow: 0 18px 42px rgba(0,0,0,.28); }
+.shea-commerce-footer-brand .shea-footer-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; background: transparent; }
+.shea-commerce-footer-brand > div { display: grid; gap: 3px; }
+.shea-commerce-footer-brand > div strong { color: #fff; font-family: Georgia, serif; font-size: 22px; line-height: 1; }
+.shea-commerce-footer-brand > div small { color: #cdbd70; font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.shea-commerce-footer-brand p { max-width: 310px; margin: 0; color: rgba(255,255,255,.72); line-height: 1.65; }
 .shea-commerce-footer-brand span, .shea-footer-payments small { display: flex; align-items: center; gap: 7px; color: #cdbd70; font-size: 11px; }
 .shea-commerce-footer nav, .shea-footer-payments { display: flex; flex-direction: column; align-items: flex-start; gap: 11px; }
 .shea-commerce-footer nav strong, .shea-footer-payments strong { margin-bottom: 5px; color: #fff; font-size: 13px; }
@@ -11229,7 +11235,10 @@ body {
   .shea-commerce-footer-newsletter, .shea-commerce-footer-grid { width: calc(100% - 32px); }
   .shea-commerce-footer-newsletter form { border-radius: 14px; }
   .shea-commerce-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 18px; }
-  .shea-commerce-footer-brand { grid-column: 1 / -1; }
+  .shea-commerce-footer-brand { grid-column: 1 / -1; justify-items: center; text-align: center; }
+  .shea-commerce-footer-brand p { max-width: 360px; }
+  .shea-commerce-footer-brand > span { justify-content: center; }
+  .shea-footer-logo { width: 104px; height: 128px; border-radius: 20px; }
   .shea-footer-payments { flex-wrap: wrap; overflow: visible; }
   .shea-footer-payments > strong, .shea-footer-payments > div, .shea-footer-payments span { flex: 0 0 auto; }
   .shea-footer-payments > div { flex-wrap: nowrap; }
