@@ -138,7 +138,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
           <div className="shea-product-thumbs">
             <img src={product.imageUrl} alt="" style={{ objectPosition: product.imagePosition }} />
-            <video src={sheaVideos[0].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+            <video src={sheaVideos[0].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
           </div>
         </div>
 

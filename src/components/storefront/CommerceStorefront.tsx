@@ -520,7 +520,7 @@ export function CommerceStorefront({
             <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
               {mediaVideos.slice(0, 4).map((video) => (
                 <article key={video.src}>
-                  <video src={video.src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+                  <video src={video.src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
                   <strong>{video.title}</strong>
                 </article>
               ))}

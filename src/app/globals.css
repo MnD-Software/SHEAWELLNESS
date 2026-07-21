@@ -11054,6 +11054,39 @@ body {
   .commerce-document-guide-grid img { width: 64px; height: 70px; }
 }
 
+/* Complete founder-led Our Story page. */
+.shea-page-about .shea-page-hero figure > img { object-position: center 22%; }
+.shea-founder-caption { min-width: 230px; }
+.shea-complete-story { width: min(1180px, calc(100% - 48px)); margin: 76px auto 100px; color: #173d2b; }
+.shea-complete-story > header { max-width: 940px; margin: 0 auto 54px; text-align: center; }
+.shea-complete-story > header span, .shea-complete-story article > span { color: #81904f; text-transform: uppercase; letter-spacing: .15em; font-size: 10px; font-weight: 900; }
+.shea-complete-story > header h2 { margin: 13px 0 0; font-family: Georgia, serif; font-size: clamp(46px, 6vw, 78px); line-height: .96; letter-spacing: -.035em; }
+.shea-story-opening { display: grid; grid-template-columns: .78fr 1.22fr; align-items: center; gap: clamp(34px, 6vw, 80px); margin-bottom: 70px; padding: clamp(24px, 4vw, 50px); border-radius: 30px; background: #edf0e8; }
+.shea-story-opening img { width: 100%; max-height: 720px; aspect-ratio: .72; object-fit: cover; object-position: center top; border-radius: 22px; box-shadow: 0 24px 55px rgba(23,61,43,.14); }
+.shea-story-opening p, .shea-complete-story article p { color: #58675d; font-size: 16px; line-height: 1.78; }
+.shea-story-opening p:first-child { color: #173d2b; font-family: Georgia, serif; font-size: clamp(24px, 2.5vw, 35px); line-height: 1.35; }
+.shea-complete-story > article { max-width: 950px; margin: 18px auto; padding: clamp(30px, 5vw, 58px); border: 1px solid #dfe5dc; border-radius: 24px; background: #fff; }
+.shea-complete-story article h3 { margin: 10px 0 22px; font-family: Georgia, serif; font-size: clamp(34px, 4vw, 53px); line-height: 1; }
+.shea-complete-story article ul { margin: 20px 0 26px; padding: 0; list-style: none; }
+.shea-complete-story article li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #edf0eb; color: #42554a; line-height: 1.5; }
+.shea-complete-story article li svg { flex: 0 0 auto; margin-top: 2px; color: #81904f; }
+.shea-story-collections ul, .shea-story-sustainability ul { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 22px; }
+.shea-story-partner { background: #eef1e9 !important; }
+.shea-story-partner a { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 13px 17px; border-radius: 999px; background: #173d2b; color: #fff; font-size: 12px; font-weight: 850; }
+.shea-story-promise { max-width: 1080px !important; text-align: center; background: #173d2b !important; color: #fff; }
+.shea-story-promise > span { color: #cdbd70 !important; }
+.shea-story-promise p { max-width: 780px; margin-inline: auto; color: rgba(255,255,255,.72) !important; }
+.shea-story-promise > strong { display: block; margin-top: 28px; color: #cdbd70; }
+.shea-story-promise blockquote { max-width: 850px; margin: 18px auto 0; font-family: Georgia, serif; font-size: clamp(23px, 3vw, 38px); line-height: 1.2; }
+
+@media (max-width: 760px) {
+  .shea-complete-story { width: calc(100% - 24px); margin: 50px auto 70px; }
+  .shea-story-opening { grid-template-columns: 1fr; padding: 18px; border-radius: 22px; }
+  .shea-story-opening img { max-height: 620px; }
+  .shea-complete-story > article { padding: 30px 22px; border-radius: 20px; }
+  .shea-story-collections ul, .shea-story-sustainability ul { grid-template-columns: 1fr; }
+}
+
 /* Conversion-focused commerce completion. */
 .commerce-product-card { position: relative; transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease !important; }
 .commerce-product-card:hover { transform: translateY(-6px) !important; box-shadow: 0 24px 52px rgba(20,55,39,.14) !important; }
@@ -11482,7 +11515,7 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .shea-nav-left .shea-nav-mobile-toggle { position: static !important; grid-column: auto !important; grid-row: auto !important; margin: 0 !important; flex: 0 0 auto; }
 .shea-nav-brand { display: flex !important; width: auto !important; min-width: 0; height: 66px !important; padding: 3px 8px !important; border: 0 !important; background: transparent !important; box-shadow: none !important; }
 .shea-nav-brand { width: 62px !important; height: 62px !important; padding: 0 !important; overflow: hidden; border: 1px solid #dfe6dc !important; border-radius: 50% !important; background: #fff !important; }
-.shea-nav-brand img { width: 100% !important; height: 100% !important; border-radius: 50% !important; object-fit: cover !important; object-position: center !important; mix-blend-mode: normal !important; }
+.shea-nav-brand img { width: 100% !important; height: 100% !important; border-radius: 50% !important; object-fit: cover !important; object-position: center 16% !important; mix-blend-mode: normal !important; transform: scale(1.24) translateY(3px); }
 .shea-nav-desktop { grid-column: 2 !important; justify-self: center; justify-content: center !important; gap: clamp(14px, 2vw, 34px) !important; }
 .shea-nav-actions { grid-column: 3 !important; justify-self: end; justify-content: flex-end; }
 

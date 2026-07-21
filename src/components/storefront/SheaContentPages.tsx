@@ -36,7 +36,7 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
     eyebrow: "Our brand story",
     title: "Nurturing wellness. Empowering communities. Sustaining nature.",
     body: "At Shea Wellness Ltd, we believe that wellness is more than skincare—it's a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.",
-    image: "/assets/sheawellness/lavender-shea-butter-lid.jpeg"
+    image: "/assets/shea-wellness-founder.jpeg"
   },
   products: {
     eyebrow: "Product catalogue",
@@ -86,7 +86,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
 
   return (
-    <main className="shea-page">
+    <main className={`shea-page shea-page-${kind}`}>
       <SheaGlobalHeader />
       <section className="shea-page-hero">
         <div>
@@ -99,12 +99,12 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
           </div>
         </div>
         <figure>
-          <img src={meta.image} alt="" />
-          <figcaption>
-            <video src={sheaVideos[0].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+          <img src={meta.image} alt={kind === "about" ? "Shea Wellness founder seated in front of a fireplace" : `${meta.title} by Shea Wellness`} />
+          {kind === "about" ? <figcaption className="shea-founder-caption"><span>Shea Wellness Ltd</span><strong>Care Inspired by Nature</strong></figcaption> : <figcaption>
+            <video src={sheaVideos[0].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
             <span>{sheaVideos[0].tag}</span>
             <strong>Real product motion</strong>
-          </figcaption>
+          </figcaption>}
         </figure>
       </section>
 
@@ -264,39 +264,25 @@ function PromiseGrid() {
 
 function AboutSections() {
   return (
-    <>
-      <PromiseGrid />
-      <section className="shea-split-section">
-        <div>
-          <span>Our story</span>
-          <h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2>
-          <p>
-            Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium
-            shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products
-            that care for the skin, hair, and overall wellbeing of the whole family. Every product we make
-            reflects our commitment to purity, quality, and intentional craftsmanship.
-          </p>
-        </div>
-        <div className="shea-card-grid two">
-          {sheaBrand.standards.map((standard) => (
-            <article key={standard}><Leaf size={20} /><strong>{standard}</strong></article>
-          ))}
-        </div>
-      </section>
-      <section className="shea-card-grid three">
-        <StoryCard title="More than skincare" body="Shea Wellness connects sustainable sourcing, local manufacturing, innovation, and community empowerment." />
-        <StoryCard title="Made in Kenya" body="By manufacturing locally and sourcing high-quality natural ingredients, the brand shows that African businesses can produce world-class wellness products." />
-        <StoryCard title="Future vision" body="Growth means more jobs, stronger manufacturing, empowered entrepreneurs, and Shea Wellness products in homes, hotels, spas, retail stores, and international markets." />
-      </section>
-      <section className="shea-section">
-        <SectionTitle label="Our values" title="Sustainability, ethical sourcing, natural wellness, and African heritage." />
-        <div className="shea-card-grid four">
-          {["Sustainability", "Ethical sourcing", "Natural wellness", "African heritage"].map((item) => (
-            <article key={item}><Sparkles size={20} /><strong>{item}</strong></article>
-          ))}
-        </div>
-      </section>
-    </>
+    <section className="shea-complete-story">
+      <header><span>Our story</span><h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2></header>
+      <div className="shea-story-opening">
+        <img src="/assets/shea-wellness-founder.jpeg" alt="Shea Wellness founder" />
+        <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
+      </div>
+
+      <article><span>Purpose beyond beauty</span><h3>More Than a Skincare Brand</h3><p>Shea Wellness was founded with a purpose beyond beauty.</p><p>We exist to build a business that creates shared value by connecting sustainable sourcing, local manufacturing, innovation, and community empowerment. Through ethical partnerships with farmers, processors, and local suppliers, we contribute to stronger livelihoods while promoting responsible production and consumption.</p><p>By manufacturing in Kenya and sourcing high-quality natural ingredients, we are helping demonstrate that African businesses can produce world-class wellness products that compete confidently in local and international markets.</p></article>
+
+      <article className="shea-story-collections"><span>Our collections</span><h3>Wellness Inspired by Nature</h3><p>Our carefully curated collections include:</p><ul>{["Natural Body Care", "Face Care", "Hair & Scalp Care", "Essential Oils", "Massage & Body Oils", "Aromatherapy Products", "SPA Essentials", "Wellness Gift Collections"].map((item) => <li key={item}><Leaf size={18} />{item}</li>)}</ul><p>Each product is thoughtfully formulated to support healthy skin, healthy hair, relaxation, and everyday self-care while embracing the power of nature.</p></article>
+
+      <article className="shea-story-sustainability"><span>Responsibility</span><h3>Sustainability at Our Core</h3><p>Sustainability is not an initiative—it is part of who we are.</p><p>We are committed to:</p><ul>{["Responsibly sourced natural ingredients.", "Supporting ethical and transparent supply chains.", "Reducing environmental impact through conscious production.", "Minimising waste through thoughtful packaging choices.", "Promoting wellness that benefits both people and the planet."].map((item) => <li key={item}><CheckCircle2 size={18} />{item}</li>)}</ul><p>As we continue to grow, we remain committed to aligning our work with global sustainability goals while creating products that future generations can be proud of.</p></article>
+
+      <article><span>Our ambition</span><h3>Our Vision for the Future</h3><p>Our ambition is to become one of Africa&apos;s leading holistic wellness brands, recognised for innovation, quality, sustainability, and social impact.</p><p>We envision Shea Wellness products in homes, hotels, spas, wellness centres, retail stores, and international markets—bringing African excellence to customers around the world.</p><p>Growth for us means more than increased sales. It means creating jobs, strengthening local manufacturing, empowering entrepreneurs, supporting women and youth across our value chain, and contributing to healthier communities.</p></article>
+
+      <article className="shea-story-partner"><span>Collaboration</span><h3>Partner With Us</h3><p>We believe the future of wellness is built through collaboration.</p><p>Whether you are:</p><ul>{["A retailer or distributor seeking premium natural products,", "A hotel, spa, salon, or wellness centre looking for trusted wellness solutions,", "A corporate organisation interested in wellness gifting,", "An investor seeking a purpose-driven manufacturing business,", "Or a development partner passionate about sustainable enterprise and community impact,"].map((item) => <li key={item}>{item}</li>)}</ul><p>we invite you to join us as we continue building a brand that delivers value for people, communities, and the planet.</p><p>Together, we can redefine wellness through innovation, sustainability, and African excellence.</p><a href="/contact">Partner with Shea Wellness <ArrowRight size={17} /></a></article>
+
+      <article className="shea-story-promise"><span>Our Promise</span><h3>Care Inspired by Nature.</h3><p>Every Shea Wellness product represents our unwavering commitment to quality, integrity, sustainability, and care.</p><p>Because we believe that true wellness begins with nature, grows through community, and flourishes when business becomes a force for good.</p><strong>Shea Wellness Ltd</strong><blockquote>Care Inspired by Nature. Wellness for Every Skin. Wellness for Every Home. Wellness for Every Generation.</blockquote></article>
+    </section>
   );
 }
 
@@ -411,7 +397,7 @@ function BlogSections() {
     <>
       <section className="shea-blog-editorial">
         <article className="shea-blog-feature">
-          <video src={sheaVideos[2].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+          <video src={sheaVideos[2].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
           <div>
             <span>Cinematic feature</span>
             <h2>The Shea Wellness routine: cleanse, nourish, seal, and glow.</h2>
@@ -519,7 +505,7 @@ function LivingPageSection({ kind }: { kind: SheaPageKind }) {
       <figure>
         <img src={copy.image} alt="" loading="lazy" />
         <figcaption>
-          <video src={sheaVideos[1].src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+          <video src={sheaVideos[1].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
         </figcaption>
       </figure>
       <div>
@@ -614,7 +600,7 @@ function CatalogueSections() {
         <div className="shea-video-slider">
           {sheaVideos.map((video) => (
             <article key={video.src}>
-              <video src={video.src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+              <video src={video.src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
               <strong>{video.title}</strong>
             </article>
           ))}
@@ -635,7 +621,7 @@ function VideoShowcase({ title, body }: { title: string; body: string }) {
       <div className="shea-video-slider featured">
         {sheaVideos.slice(0, 3).map((video) => (
           <article key={video.src}>
-            <video src={video.src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+            <video src={video.src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
             <strong>{video.title}</strong>
           </article>
         ))}
