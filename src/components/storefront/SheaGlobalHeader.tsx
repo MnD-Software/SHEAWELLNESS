@@ -23,6 +23,7 @@ const shopLinks = [
 
 const companyLinks = [
   { label: "About", href: "/about" },
+  { label: "Wellness guides", href: "/wellness-guides" },
   { label: "Sustainability", href: "/sustainability" },
   { label: "Quality", href: "/quality" },
   { label: "Blog", href: "/blog" },
@@ -30,6 +31,7 @@ const companyLinks = [
 ];
 
 const pageSearchLinks = [
+  { label: "Wellness guides", href: "/wellness-guides", body: "Dry skin, sensitive skin, face, body glow, hair, scalp, and spa routines." },
   { label: "Wholesale", href: "/wholesale", body: "Distributor pricing, partners, and bulk supply." },
   { label: "Sustainability", href: "/sustainability", body: "Ethical sourcing and eco-conscious packaging." },
   { label: "Quality", href: "/quality", body: "Ingredients, standards, and formulation promises." },
@@ -45,11 +47,13 @@ const mobilePrimaryLinks = [
   { label: "Hair Care", href: "/collections/hair-care" },
   { label: "Reviews", href: "/shop#products" },
   { label: "How to Use", href: "/blog" },
+  { label: "Wellness Guides", href: "/wellness-guides" },
   { label: "Wholesale", href: "/wholesale" }
 ];
 
 const mobilePolicyLinks = [
   { label: "About", href: "/about" },
+  { label: "Wellness Guides", href: "/wellness-guides" },
   { label: "Quality", href: "/quality" },
   { label: "Sustainability", href: "/sustainability" },
   { label: "Catalogue", href: "/catalogue" },

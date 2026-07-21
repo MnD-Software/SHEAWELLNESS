@@ -224,6 +224,7 @@ export const sheaNav = [
   { label: "Shop", href: "/shop" },
   { label: "About", href: "/about" },
   { label: "Products", href: "/products" },
+  { label: "Wellness Guides", href: "/wellness-guides" },
   { label: "Wholesale", href: "/wholesale" },
   { label: "Sustainability", href: "/sustainability" },
   { label: "Blog", href: "/blog" },
