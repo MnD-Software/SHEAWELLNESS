@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Gift, Heart, Home, LogIn, Menu, Search, ShoppingBag, ShoppingCart, Sparkles, Store, UserRound, X } from "lucide-react";
+import { ArrowRight, Gift, Heart, Home, Menu, Search, ShoppingBag, ShoppingCart, Sparkles, Store, UserRound, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { usePathname } from "next/navigation";
 import { sheaBrand } from "@/lib/shea-content";
@@ -20,27 +20,6 @@ const pageSearchLinks = [
   { label: "Quality", href: "/quality", body: "Ingredients, standards, and formulation promises." },
   { label: "Blog", href: "/blog", body: "Wellness education and skincare routines." },
   { label: "Contact", href: "/contact", body: "Reach Shea Wellness LTD." }
-];
-
-const mobilePrimaryLinks = [
-  { label: "Home", href: "/" },
-  { label: "Shop", href: "/shop" },
-  { label: "Body Care", href: "/collections/body-care" },
-  { label: "Face Care", href: "/collections/face-care" },
-  { label: "Hair Care", href: "/collections/hair-care" },
-  { label: "Reviews", href: "/shop#products" },
-  { label: "How to Use", href: "/blog" },
-  { label: "Wellness Guides", href: "/wellness-guides" },
-  { label: "Wholesale", href: "/wholesale" }
-];
-
-const mobilePolicyLinks = [
-  { label: "About", href: "/about" },
-  { label: "Wellness Guides", href: "/wellness-guides" },
-  { label: "Quality", href: "/quality" },
-  { label: "Sustainability", href: "/sustainability" },
-  { label: "Catalogue", href: "/catalogue" },
-  { label: "Contact", href: "/contact" }
 ];
 
 const categoryLinks = [
@@ -116,7 +95,18 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
 
   return (
     <>
-    <aside className="shea-desktop-sidebar" aria-label="Complete site navigation">
+    <button
+      type="button"
+      className={`shea-sidebar-scrim${mobileOpen ? " open" : ""}`}
+      onClick={() => setMobileOpen(false)}
+      aria-label="Close site navigation"
+      tabIndex={mobileOpen ? 0 : -1}
+    />
+    <aside className={`shea-desktop-sidebar${mobileOpen ? " open" : ""}`} aria-label="Complete site navigation" aria-hidden={!mobileOpen}>
+      <div className="shea-sidebar-topline">
+        <span>Menu</span>
+        <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close site navigation"><X size={22} /></button>
+      </div>
       <a className="shea-sidebar-logo" href="/" aria-label={`${sheaBrand.name} home`}>
         <img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" />
       </a>
@@ -205,37 +195,6 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
         </section>
       ) : null}
 
-      {mobileOpen ? (
-        <div className="shea-mobile-menu-layer" role="dialog" aria-modal="true" aria-label="Mobile navigation menu">
-          <button type="button" className="shea-mobile-menu-scrim" onClick={() => setMobileOpen(false)} aria-label="Close navigation" />
-          <aside className="shea-nav-mobile-panel">
-            <div className="shea-mobile-menu-head">
-              <strong>Menu</strong>
-              <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close navigation"><X size={24} /></button>
-            </div>
-            <div className="shea-mobile-menu-scroll">
-              <div className="shea-nav-mobile-grid">
-                {mobilePrimaryLinks.map((item) => (
-                  <a href={item.href} key={item.label}>{item.label}</a>
-                ))}
-              </div>
-              <a className="shea-mobile-login" href="/account">
-                <LogIn size={18} />
-                Customer account
-              </a>
-              <div className="shea-nav-mobile-list">
-                {mobilePolicyLinks.map((item) => (
-                  <a href={item.href} key={item.label}>{item.label}</a>
-                ))}
-              </div>
-            </div>
-            <div className="shea-mobile-menu-foot">
-              <span>Shea Wellness LTD</span>
-              <a href={`mailto:${sheaBrand.email}`}>{sheaBrand.email}</a>
-            </div>
-          </aside>
-        </div>
-      ) : null}
     </header>
     </>
   );

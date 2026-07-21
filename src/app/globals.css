@@ -10748,6 +10748,17 @@ body {
   .commerce-document-guide-grid img { width: 64px; height: 70px; }
 }
 
+html,
+body { max-width: 100%; overflow-x: hidden; scrollbar-width: none; -ms-overflow-style: none; }
+html::-webkit-scrollbar,
+body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.commerce-site,
+.shea-page { width: 100%; padding-left: 0; }
+.commerce-product-grid,
+.commerce-product-card,
+.commerce-product-body { min-width: 0; }
+.commerce-card-actions { flex-wrap: wrap; }
+
 .guide-hero {
   padding: clamp(5rem, 10vw, 9rem) clamp(1.25rem, 6vw, 7rem) 4rem;
   background: radial-gradient(circle at 85% 10%, rgba(201, 175, 90, .22), transparent 30%), #173d2b;
@@ -10807,7 +10818,40 @@ body {
 }
 
 /* Two-part navigation: persistent complete sidebar + focused category bar. */
-.shea-desktop-sidebar { display: none; }
+.shea-desktop-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 500;
+  width: min(340px, calc(100vw - 42px));
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f7f4ec;
+  border-right: 1px solid #dfe4db;
+  box-shadow: 24px 0 70px rgba(12, 37, 25, .2);
+  transform: translateX(-105%);
+  transition: transform .28s ease;
+  scrollbar-width: none;
+}
+.shea-desktop-sidebar::-webkit-scrollbar { display: none; }
+.shea-desktop-sidebar.open { transform: translateX(0); }
+.shea-sidebar-scrim { position: fixed; inset: 0; z-index: 490; display: block; border: 0; background: rgba(8, 27, 18, .48); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+.shea-sidebar-scrim.open { opacity: 1; pointer-events: auto; }
+.shea-sidebar-topline { display: flex; align-items: center; justify-content: space-between; min-height: 40px; }
+.shea-sidebar-topline > span { color: #173d2b; text-transform: uppercase; letter-spacing: .14em; font-size: 11px; font-weight: 900; }
+.shea-sidebar-topline button { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid #d9dfd6; border-radius: 50%; background: #fff; color: #173d2b; }
+.shea-sidebar-logo { display: grid; place-items: center; padding: 4px 12px 18px; border-bottom: 1px solid #dfe4db; }
+.shea-sidebar-logo img { width: 138px; height: 138px; object-fit: contain; mix-blend-mode: multiply; }
+.shea-sidebar-label { margin: 20px 12px 9px; color: #889087; text-transform: uppercase; letter-spacing: .14em; font-size: 10px; font-weight: 900; }
+.shea-desktop-sidebar nav { display: grid; gap: 3px; }
+.shea-desktop-sidebar nav a { display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; color: #30483a; font-size: 14px; font-weight: 750; }
+.shea-desktop-sidebar nav a:hover,
+.shea-desktop-sidebar nav a.active { background: #173d2b; color: #fff; }
+.shea-sidebar-contact { margin-top: 18px; display: grid; gap: 5px; padding: 16px 12px; border-radius: 14px; background: #e6ebdf; }
+.shea-sidebar-contact span { margin-bottom: 3px; color: #173d2b; font-size: 13px; font-weight: 900; }
+.shea-sidebar-contact a { color: #52665b; font-size: 12px; overflow-wrap: anywhere; }
 .shea-mobile-category-nav { display: none; }
 
 .commerce-brand-intro {
@@ -10820,40 +10864,15 @@ body {
 .commerce-brand-intro p { max-width: 900px; margin: 0 auto; color: #5b675f; font-size: clamp(16px, 1.5vw, 20px); line-height: 1.75; }
 
 @media (min-width: 1100px) {
-  .commerce-site,
-  .shea-page { padding-left: 268px; }
-
-  .shea-desktop-sidebar {
-    position: fixed;
-    inset: 0 auto 0 0;
-    z-index: 300;
-    width: 268px;
-    display: flex;
-    flex-direction: column;
-    padding: 22px 18px 18px;
-    overflow-y: auto;
-    background: #f7f4ec;
-    border-right: 1px solid #dfe4db;
-    box-shadow: 18px 0 42px rgba(20, 54, 38, .06);
-  }
-
-  .shea-sidebar-logo { display: grid; place-items: center; padding: 6px 12px 20px; border-bottom: 1px solid #dfe4db; }
-  .shea-sidebar-logo img { width: 154px; height: 154px; object-fit: contain; mix-blend-mode: multiply; }
-  .shea-sidebar-label { margin: 22px 12px 9px; color: #889087; text-transform: uppercase; letter-spacing: .14em; font-size: 10px; font-weight: 900; }
-  .shea-desktop-sidebar nav { display: grid; gap: 3px; }
-  .shea-desktop-sidebar nav a { display: flex; align-items: center; gap: 12px; min-height: 42px; padding: 0 12px; border-radius: 10px; color: #30483a; font-size: 14px; font-weight: 750; }
-  .shea-desktop-sidebar nav a:hover,
-  .shea-desktop-sidebar nav a.active { background: #173d2b; color: #fff; }
-  .shea-sidebar-contact { margin-top: auto; display: grid; gap: 5px; padding: 16px 12px; border-radius: 14px; background: #e6ebdf; }
-  .shea-sidebar-contact span { margin-bottom: 3px; color: #173d2b; font-size: 13px; font-weight: 900; }
-  .shea-sidebar-contact a { color: #52665b; font-size: 12px; overflow-wrap: anywhere; }
-
-  .shea-nav-bar { grid-template-columns: minmax(0, 1fr) auto !important; padding-inline: 26px !important; }
+  .shea-nav-bar { grid-template-columns: auto minmax(0, 1fr) auto auto !important; padding-inline: 26px !important; }
   .shea-nav-brand { display: none !important; }
   .shea-nav-desktop { justify-content: flex-start !important; gap: clamp(8px, 1.4vw, 24px) !important; }
   .shea-nav-desktop > a { padding: 10px 4px !important; border: 0 !important; border-bottom: 2px solid transparent !important; border-radius: 0 !important; text-transform: uppercase; letter-spacing: .06em; font-size: 12px !important; font-weight: 900 !important; }
   .shea-nav-desktop > a:hover,
   .shea-nav-desktop > a.active { border-bottom-color: #173d2b !important; color: #173d2b !important; background: transparent !important; }
+  .shea-nav-mobile-toggle { display: grid !important; grid-column: 1; grid-row: 1; margin-right: 8px; }
+  .shea-nav-desktop { grid-column: 2; }
+  .shea-nav-actions { grid-column: 4; }
 }
 
 @media (max-width: 1099px) {
