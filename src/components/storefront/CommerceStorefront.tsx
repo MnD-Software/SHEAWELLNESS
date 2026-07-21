@@ -434,6 +434,28 @@ export function CommerceStorefront({
             </p>
           </section>
 
+          <section className="commerce-our-story" aria-labelledby="our-story-heading">
+            <div className="commerce-story-visual">
+              <img src="/assets/shea-hero.png" alt="Natural Shea Wellness body, face, and hair care products" />
+              <span>Rooted in African botanical heritage</span>
+            </div>
+            <div className="commerce-story-copy">
+              <span>Our story</span>
+              <h2 id="our-story-heading">Natural care that creates shared value.</h2>
+              <p>
+                Our journey began with a simple vision: create honest, effective wellness products inspired by
+                Africa&apos;s rich botanical heritage. We combine premium shea butter, cold-pressed plant oils,
+                and carefully selected essential oils with intentional local craftsmanship.
+              </p>
+              <p>
+                Shea Wellness is more than skincare. It is a commitment to ethical sourcing, quality Kenyan
+                manufacturing, community opportunity, and everyday rituals that help people feel comfortable
+                in their skin, hair, and homes.
+              </p>
+              <a href="/about">Discover our full story <ArrowRight size={17} /></a>
+            </div>
+          </section>
+
           <section className="commerce-service-strip" aria-label="Store benefits">
             <span><Truck size={18} /> Export-ready packaging</span>
             <span><RotateCcw size={18} /> Wholesale support</span>

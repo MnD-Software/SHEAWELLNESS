@@ -37,7 +37,7 @@ const sidebarLinks = [
   { label: "Wellness guides", href: "/wellness-guides", icon: Sparkles },
   { label: "Wellness gifts", href: "/shop?search=gift", icon: Gift },
   { label: "Wholesale", href: "/wholesale", icon: Store },
-  { label: "About us", href: "/about", icon: UserRound },
+  { label: "Our story", href: "/about", icon: UserRound },
   { label: "Sustainability", href: "/sustainability", icon: Sparkles },
   { label: "Quality", href: "/quality", icon: Heart },
   { label: "Blog", href: "/blog", icon: ShoppingBag },
@@ -153,9 +153,20 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
         <span className="promo-short">100% natural. Nilotica shea. Export-ready.</span>
       </div>
       <div className="shea-nav-bar">
-        <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
-          <img src="/assets/shea-wellness-tree-logo.jpeg" alt={sheaBrand.name} />
-        </a>
+        <div className="shea-nav-left">
+          <button
+            type="button"
+            className="shea-nav-mobile-toggle"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-expanded={mobileOpen}
+            aria-label="Open navigation"
+          >
+            <Menu size={21} />
+          </button>
+          <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
+            <img src="/assets/shea-wellness-tree-logo.jpeg" alt={sheaBrand.name} />
+          </a>
+        </div>
 
         <nav className="shea-nav-desktop" aria-label="Primary navigation">
           {categoryLinks.map((item) => (
@@ -174,15 +185,6 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
 
         <button type="button" className="shea-nav-search-button mobile-action" onClick={() => setSearchOpen((open) => !open)} aria-label="Search Shea Wellness">
           <Search size={19} />
-        </button>
-        <button
-          type="button"
-          className="shea-nav-mobile-toggle"
-          onClick={() => setMobileOpen((open) => !open)}
-          aria-expanded={mobileOpen}
-          aria-label="Open navigation"
-        >
-          <Menu size={21} />
         </button>
       </div>
 
