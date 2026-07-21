@@ -25,7 +25,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
-import { sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
+import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import type { Product, Store } from "@/lib/types";
@@ -98,7 +98,7 @@ const concernCards = [
   {
     title: "Face care routine",
     body: "A simple three-step routine: cleanse, nourish, and protect by day; restore by night.",
-    image: "/assets/sheawellness/face-care-routine.png",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
     href: "/wellness-guides#face-care"
   },
   {
@@ -126,7 +126,7 @@ const comparisonRows = [
 const beforeAfterSlides = [
   {
     title: "Shea Wellness face care routine",
-    image: "/assets/sheawellness/face-care-routine.png",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
     labels: ["Morning", "Evening"]
   },
   {
@@ -219,7 +219,7 @@ export function CommerceStorefront({
     try {
       const parsedMedia = JSON.parse(savedMedia) as SheaMediaConfig;
       if (Array.isArray(parsedMedia.heroSlides) && Array.isArray(parsedMedia.images) && Array.isArray(parsedMedia.videos)) {
-        setMediaConfig(parsedMedia);
+        setMediaConfig(sanitizeSheaMediaConfig(parsedMedia));
       }
     } catch {
       setMediaConfig(sheaDefaultMediaConfig);
@@ -242,7 +242,7 @@ export function CommerceStorefront({
     try {
       const parsedProducts = JSON.parse(savedProducts) as Product[];
       if (Array.isArray(parsedProducts) && parsedProducts.length) {
-        setCatalogProducts(parsedProducts);
+        setCatalogProducts(parsedProducts.map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
       }
     } catch {
       setCatalogProducts(products);
@@ -458,7 +458,7 @@ export function CommerceStorefront({
 
           <section className="commerce-our-story" aria-labelledby="our-story-heading">
             <div className="commerce-story-visual">
-              <Image src="/assets/shea-hero.png" alt="Natural Shea Wellness body, face, and hair care products" fill sizes="(max-width: 980px) 100vw, 54vw" style={{ objectFit: "cover", objectPosition: "60% center" }} />
+              <Image src="/assets/shea-wellness-founder.jpeg" alt="Shea Wellness founder seated in front of a fireplace" fill sizes="(max-width: 980px) 100vw, 54vw" style={{ objectFit: "cover", objectPosition: "50% 28%" }} />
               <span>Rooted in African botanical heritage</span>
             </div>
             <div className="commerce-story-copy">
@@ -658,7 +658,7 @@ export function CommerceStorefront({
 
       <section className="commerce-routine-section" id="face-care-routine">
         <figure>
-          <img src="/assets/sheawellness/face-care-routine.png" alt="Shea Wellness face care routine guide" loading="lazy" />
+          <img src="/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg" alt="Model cleansing her face as part of a skincare routine" loading="lazy" />
         </figure>
         <div className="commerce-routine-copy">
           <span>Face care routine</span>

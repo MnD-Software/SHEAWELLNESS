@@ -97,10 +97,10 @@ const guides: Guide[] = [
     id: "face-care",
     title: "Natural face care routine",
     intro: "A simple morning-and-evening routine designed to cleanse gently, replenish moisture, support the natural barrier, and maintain a healthy-looking complexion.",
-    image: "/assets/sheawellness/face-care-routine.png",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
     products: [
       { name: "African Liquid Black Soap", image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg", role: "Gentle daily face cleanser", benefits: ["Removes dirt, excess oil, sunscreen, and impurities", "Maintains moisture balance", "Leaves skin fresh and soft", "Prepares skin for oils and moisturizers"], usage: ["Wet with lukewarm water", "Massage gently in circular motions", "Avoid vigorous scrubbing", "Rinse thoroughly and pat dry"] },
-      { name: "Rosehip Facial Oil", image: "/assets/sheawellness/face-care-routine.png", role: "Nourishing skin moisture", benefits: ["Hydrates without a heavy finish", "Softens and smooths", "Supports the moisture barrier", "Promotes a healthy-looking glow"], usage: ["Apply 2-4 drops to slightly damp skin", "Press and massage into face and neck", "Allow to absorb before sunscreen or makeup"] },
+      { name: "Rosehip Facial Oil", image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg", role: "Nourishing skin moisture", benefits: ["Hydrates without a heavy finish", "Softens and smooths", "Supports the moisture barrier", "Promotes a healthy-looking glow"], usage: ["Apply 2-4 drops to slightly damp skin", "Press and massage into face and neck", "Allow to absorb before sunscreen or makeup"] },
       { name: "Lavender Shea Butter", image: "/assets/sheawellness/lavender-shea-butter-front.jpeg", role: "Overnight moisture barrier", benefits: ["Nourishes dry areas", "Helps prevent overnight moisture loss", "Softens rough patches", "Relieves dryness-related tightness"], usage: ["Warm a very small amount between fingertips", "Press onto dry areas as the final evening step", "Use sparingly on oily or combination skin"] }
     ],
     morning: ["Cleanse with African Liquid Black Soap", "Apply 2-4 drops of Rosehip Facial Oil", "Finish with broad-spectrum SPF 30 or higher"],
@@ -127,11 +127,11 @@ const guides: Guide[] = [
     id: "hair-scalp",
     title: "Hair & scalp moisture solution",
     intro: "A flexible routine for natural, relaxed, braided, loc'd, colour-treated, or covered hair that focuses on a clean scalp, moisture retention, softness, and manageability.",
-    image: "/assets/shea-chebe-haircare.png",
+    image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
     products: [
       { name: "African Liquid Black Soap", image: "/assets/WhatsApp Image 2026-07-08 at 12.44.25.jpeg", role: "Gentle hair and scalp cleanser", benefits: ["Removes sweat, excess oil, and buildup", "Helps maintain scalp moisture balance", "Leaves the scalp fresh", "Prepares hair for nourishing oils"], usage: ["Wet hair thoroughly", "Lather in hands or apply carefully to the scalp", "Massage with fingertips", "Work through lengths and rinse thoroughly"] },
       { name: "Cold Pressed Yellow Castor Oil", image: "/assets/WhatsApp Image 2026-07-08 at 12.44.26.jpeg", role: "Deep moisture and scalp nourishment", benefits: ["Moisturizes a dry scalp", "Softens brittle hair", "Helps reduce the appearance of a flaky scalp", "Seals in moisture", "Improves manageability and shine"], usage: ["Warm a small amount between palms", "Massage into scalp and smooth through ends", "For an overnight treatment, cover with a satin bonnet", "Apply to exposed scalp between wash days"] },
-      { name: "Rosemary Essential Oil", image: "/assets/shea-essential-oils.png", role: "Diluted scalp-care boost", benefits: ["Refreshes the scalp", "Supports a clean scalp environment", "Complements regular hair care", "Adds a herbal aroma"], usage: ["Mix 2-3 drops with one tablespoon of castor oil", "Massage into the scalp for 3-5 minutes", "Leave on before styling or overnight if comfortable"], caution: "Never apply essential oil undiluted. Stop use if irritation occurs." }
+      { name: "Rosemary Essential Oil", image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg", role: "Diluted scalp-care boost", benefits: ["Refreshes the scalp", "Supports a clean scalp environment", "Complements regular hair care", "Adds a herbal aroma"], usage: ["Mix 2-3 drops with one tablespoon of castor oil", "Massage into the scalp for 3-5 minutes", "Leave on before styling or overnight if comfortable"], caution: "Never apply essential oil undiluted. Stop use if irritation occurs." }
     ],
     morning: ["Between wash days, apply a small amount of castor oil as needed", "Focus on dry ends", "Massage gently for even distribution"],
     evening: ["On wash day, cleanse scalp and hair", "Seal moisture with castor oil", "Use only a diluted rosemary blend for scalp massage"],
@@ -142,9 +142,9 @@ const guides: Guide[] = [
     id: "spa-essentials",
     title: "SPA essentials collection",
     intro: "Essential oils, aroma diffusers, and humidifiers help create calm, refreshing wellness spaces at home, work, salons, spas, hotels, and studios.",
-    image: "/assets/shea-essential-oils.png",
+    image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
     products: [
-      { name: "Shea Wellness Essential Oils", image: "/assets/shea-essential-oils.png", role: "Nature-inspired aromatherapy", benefits: ["Creates an inviting atmosphere", "Freshens indoor spaces", "Complements massage when properly diluted", "Supports meditation, prayer, yoga, and mindfulness"], usage: ["Choose lemongrass, lavender, peppermint, eucalyptus, sweet orange, or rosemary", "Diffuse according to appliance instructions", "Dilute correctly before any topical use"], caution: "Keep essential oils away from children and pets and follow the individual oil's instructions." },
+      { name: "Shea Wellness Essential Oils", image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg", role: "Nature-inspired aromatherapy", benefits: ["Creates an inviting atmosphere", "Freshens indoor spaces", "Complements massage when properly diluted", "Supports meditation, prayer, yoga, and mindfulness"], usage: ["Choose lemongrass, lavender, peppermint, eucalyptus, sweet orange, or rosemary", "Diffuse according to appliance instructions", "Dilute correctly before any topical use"], caution: "Keep essential oils away from children and pets and follow the individual oil's instructions." },
       { name: "Aroma Diffusers", image: "/assets/WhatsApp Image 2026-07-08 at 12.44.24.jpeg", role: "Natural fragrance for your space", benefits: ["Disperses essential oils through a room", "Creates a calm ambience", "Refreshes stale-smelling spaces", "Adds a decorative wellness touch"], usage: ["Fill with clean water", "Add 3-8 drops of essential oil", "Switch on and enjoy", "Clean according to manufacturer instructions"] },
       { name: "Humidifiers", image: "/assets/WhatsApp Image 2026-07-08 at 12.44.24 (1).jpeg", role: "Indoor comfort", benefits: ["Adds moisture to dry indoor air", "Improves comfort during dry weather or air conditioning", "Supports a pleasant work, rest, or sleep environment"], usage: ["Fill with clean water", "Adjust mist level", "Clean regularly"], caution: "Only add essential oils if the specific humidifier model is designed for aromatherapy." }
     ],

@@ -42,7 +42,7 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
     eyebrow: "Product catalogue",
     title: "Skin care, hair care, face care, and spa essentials.",
     body: "Browse Shea Wellness routines for dry skin, sensitive skin, body glow, natural face care, hair and scalp moisture, and spa environments.",
-    image: "/assets/sheawellness/face-care-routine.png"
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg"
   },
   wholesale: {
     eyebrow: "Retail partners",
@@ -135,7 +135,7 @@ const sheaEditorialStories = [
   {
     title: "From wash day to protective style: chebe, shea, and length retention",
     category: "Hair lesson",
-    image: "/assets/shea-chebe-haircare.png",
+    image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
     readTime: "8 min read",
     body: "A hair-care guide for customers who want moisture retention, softer ends, and a consistent weekly routine without overloading the scalp.",
     lesson: "Layer water-based moisture first, seal lightly with shea or chebe butter, then focus on ends and high-friction areas."
@@ -143,7 +143,7 @@ const sheaEditorialStories = [
   {
     title: "Black soap without the harsh feeling: how to cleanse with balance",
     category: "Face guide",
-    image: "/assets/shea-black-soap.png",
+    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
     readTime: "5 min read",
     body: "A cleanser guide explaining how African black soap can fit into a routine when used gently, rinsed thoroughly, and followed with moisture.",
     lesson: "Start a few times weekly, avoid the eye area, and always moisturize after cleansing."
@@ -471,8 +471,8 @@ function BlogSections() {
               <img
                 src={[
                   "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-                  "/assets/shea-chebe-haircare.png",
-                  "/assets/shea-essential-oils.png",
+                  "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+                  "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
                   "/assets/sheawellness/grapefruit-shea-butter-front.jpeg"
                 ][index]}
                 alt=""

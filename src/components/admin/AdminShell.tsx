@@ -31,6 +31,8 @@ import {
   sheaBlogTopics,
   sheaBrand,
   sheaCatalogueDownload,
+  replaceRetiredSyntheticImage,
+  sanitizeSheaMediaConfig,
   sheaDefaultMediaConfig,
   sheaProductCategories,
   sheaQuality,
@@ -172,7 +174,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
       try {
         const parsedMedia = JSON.parse(savedMedia) as SheaMediaConfig;
         if (Array.isArray(parsedMedia.heroSlides) && Array.isArray(parsedMedia.images) && Array.isArray(parsedMedia.videos)) {
-          setMediaConfig(parsedMedia);
+          setMediaConfig(sanitizeSheaMediaConfig(parsedMedia));
         }
       } catch {
         setMediaConfig(sheaDefaultMediaConfig);
@@ -185,7 +187,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     try {
       const parsedProducts = JSON.parse(savedProducts) as Product[];
       if (Array.isArray(parsedProducts)) {
-        setManagedProducts(parsedProducts);
+        setManagedProducts(parsedProducts.map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
       }
     } catch {
       setManagedProducts(snapshot.products);

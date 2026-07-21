@@ -31,6 +31,28 @@ export type SheaMediaConfig = {
   videos: SheaMediaAsset[];
 };
 
+const retiredSyntheticImages: Record<string, string> = {
+  "/assets/shea-hero.png": "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+  "/assets/shea-essential-oils.png": "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+  "/assets/shea-chebe-haircare.png": "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+  "/assets/shea-body-butter.png": "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+  "/assets/shea-black-soap.png": "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+  "/assets/sheawellness/face-care-routine.png": "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+  "/assets/sheawellness/face-care-routine-hero.png": "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg"
+};
+
+export function replaceRetiredSyntheticImage(src: string) {
+  return retiredSyntheticImages[src] ?? src;
+}
+
+export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfig {
+  return {
+    heroSlides: config.heroSlides.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
+    images: config.images.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
+    videos: config.videos
+  };
+}
+
 const whatsappImageFiles = [
   "WhatsApp Image 2026-07-07 at 11.44.10.jpeg",
   "WhatsApp Image 2026-07-07 at 11.48.21 (1).jpeg",
@@ -152,7 +174,7 @@ export const sheaHeroSlides: SheaHeroSlide[] = [
     title: "SKIN CARE. HAIR CARE. FACE CARE. SPA ESSENTIALS",
     kicker: "Complete natural care",
     body: "Shea Wellness believes healthy skin begins with nature.",
-    src: "/assets/sheawellness/face-care-routine-hero.png",
+    src: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
     type: "image",
     tag: "Routine Guide",
     ctaLabel: "Shop routines",
@@ -198,7 +220,7 @@ export const sheaHeroSlides: SheaHeroSlide[] = [
 ];
 
 export const sheaImageMedia: SheaMediaAsset[] = [
-  "/assets/sheawellness/face-care-routine.png",
+  "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
   "/assets/sheawellness/pure-raw-shea-butter.jpeg",
   "/assets/sheawellness/lavender-shea-butter-front.jpeg",
   "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
@@ -299,7 +321,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Rosehip Facial Oil",
-        image: "/assets/sheawellness/face-care-routine.png",
+        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
         description: "Lightweight botanical facial oil for daily moisture and a healthy-looking glow.",
         ingredients: ["Rosehip Oil", "Botanical Oil Blend"],
         benefits: ["Deep hydration", "Softens and smooths", "Supports the moisture barrier"],
@@ -317,7 +339,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Cucumber Mint Sunscreen SPF Gel",
-        image: "/assets/sheawellness/face-care-routine.png",
+        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
         description: "Daily SPF step for the morning routine to help protect skin from UV exposure.",
         ingredients: ["Cucumber", "Mint", "Broad-spectrum SPF"],
         benefits: ["Daily protection", "Light gel finish", "Supports a healthy barrier"],
@@ -332,7 +354,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Chebe Hair Growth Serum with Karkar Oil",
-        image: "/assets/shea-chebe-haircare.png",
+        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
         description: "A nourishing serum for protective styles, length retention, and scalp care.",
         ingredients: ["Chebe Powder", "Karkar Oil", "Natural Oils"],
         benefits: ["Length retention", "Strengthens hair strands", "Adds shine"],
@@ -341,7 +363,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Chebe Hair Butter",
-        image: "/assets/shea-chebe-haircare.png",
+        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
         description: "Rich hair butter for nourishment, shine, and breakage prevention.",
         ingredients: ["Shea Butter", "Chebe", "Natural Oils"],
         benefits: ["Rich nourishment", "Prevents breakage", "Improves manageability"],
@@ -359,7 +381,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Cold Pressed Yellow Castor Oil",
-        image: "/assets/sheawellness/face-care-routine.png",
+        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
         description: "A rich oil for dry scalp, brittle hair, protective styles, and body moisture sealing.",
         ingredients: ["Cold Pressed Yellow Castor Oil"],
         benefits: ["Moisturizes dry scalp", "Softens brittle hair", "Seals in moisture"],
@@ -368,7 +390,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Rosemary Essential Oil Scalp Boost",
-        image: "/assets/shea-essential-oils.png",
+        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
         description: "A concentrated essential oil for diluted scalp massage blends.",
         ingredients: ["Rosemary Essential Oil"],
         benefits: ["Refreshes the scalp", "Complements hair routines", "Provides herbal aroma"],
@@ -382,7 +404,7 @@ export const sheaProductCategories = [
     summary: "Pure oils for relaxation, sleep, focus, skincare boosts, and aromatherapy routines.",
     products: ["Lavender", "Lemongrass", "Tea Tree", "Eucalyptus", "Peppermint", "Rosemary", "Sweet Orange", "Vanilla", "Rosemary and Tea Tree"].map((oil) => ({
       name: `${oil} Essential Oil`,
-      image: "/assets/shea-essential-oils.png",
+      image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
       description: `${oil} essential oil for wellness, aroma, and skincare routines.`,
       ingredients: [`${oil} Essential Oil`],
       benefits: ["Relaxation", "Sleep and focus support", "Skincare boosts"],
@@ -396,7 +418,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Aromatherapy Humidifier",
-        image: "/assets/shea-essential-oils.png",
+        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
         description: "A diffuser-ready wellness device for essential oil routines.",
         ingredients: ["Humidifier Device", "Essential Oil Compatibility"],
         benefits: ["Relaxation", "Sleep support", "Spa ambience"],
@@ -411,7 +433,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Disposable Massage Bed Sheets",
-        image: "/assets/shea-hero.png",
+        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
         description: "Clean, professional disposable bed sheets for spa treatment rooms.",
         ingredients: ["Disposable spa-grade material"],
         benefits: ["Hygienic setup", "Easy room turnover", "Professional presentation"],
@@ -420,7 +442,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Disposable Pants & Bras",
-        image: "/assets/shea-hero.png",
+        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
         description: "Disposable client wear for massage, spa, and salon treatments.",
         ingredients: ["Disposable spa-grade material"],
         benefits: ["Client comfort", "Spa hygiene", "Treatment-room readiness"],
@@ -429,7 +451,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Massage Oils",
-        image: "/assets/shea-essential-oils.png",
+        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
         description: "Energizing, relaxing, and detoxifying blends for body treatments.",
         ingredients: ["Natural Oils", "Essential Oil Blends"],
         benefits: ["Smooth massage glide", "Relaxing aroma", "Spa-grade treatment support"],
@@ -438,7 +460,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Professional Salon Equipment",
-        image: "/assets/shea-hero.png",
+        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
         description: "Professional wellness and salon supplies for treatment businesses.",
         ingredients: ["Salon equipment assortment"],
         benefits: ["Professional readiness", "Retail and spa support", "Distributor-friendly supply"],
