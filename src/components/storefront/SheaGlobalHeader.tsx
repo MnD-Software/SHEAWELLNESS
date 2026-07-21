@@ -23,11 +23,11 @@ const pageSearchLinks = [
 ];
 
 const categoryLinks = [
-  { label: "Face", href: "/collections/face-care" },
-  { label: "Skin", href: "/collections/body-care" },
-  { label: "Hair", href: "/collections/hair-care" },
-  { label: "Wellness Gifts", href: "/shop?search=gift" },
-  { label: "SPA Essentials", href: "/wellness-guides#spa-essentials" }
+  { label: "Face", href: "/collections/face-care", icon: Sparkles },
+  { label: "Skin", href: "/collections/body-care", icon: Heart },
+  { label: "Hair", href: "/collections/hair-care", icon: Sparkles },
+  { label: "Wellness Gifts", href: "/shop?search=gift", icon: Gift },
+  { label: "SPA Essentials", href: "/wellness-guides#spa-essentials", icon: Store }
 ];
 
 const sidebarLinks = [
@@ -126,7 +126,10 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
 
       <div className="shea-sidebar-label">Shop by category</div>
       <nav className="shea-sidebar-category-grid" aria-label="Shop by category">
-        {categoryLinks.map((item) => <a href={item.href} key={item.label}><span>{item.label}</span><ArrowRight size={15} /></a>)}
+        {categoryLinks.map((item) => {
+          const Icon = item.icon;
+          return <a href={item.href} key={item.label}><i><Icon size={17} /></i><span>{item.label}</span><ArrowRight size={15} /></a>;
+        })}
       </nav>
 
       <div className="shea-sidebar-label">Explore</div>
