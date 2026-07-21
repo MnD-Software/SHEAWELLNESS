@@ -255,7 +255,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
       {recentlyViewed.length ? <section className="shea-product-related recently-viewed"><div className="shea-section-title"><span>Recently viewed</span><h2>Continue where you left off.</h2></div><div>{recentlyViewed.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
 
       <SheaTrustGrid />
-      <SheaCommerceFooter />
+      <SheaCommerceFooter cartCount={cartCount} />
       <SheaWhatsApp />
       <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart}><ShoppingCart size={18} /> Add to cart</button></div>
     </main>

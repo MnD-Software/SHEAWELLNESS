@@ -156,7 +156,7 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
           </article>)}
         </div>
       </section>
-      <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
+      <SheaTrustGrid /><SheaCommerceFooter cartCount={cartCount} /><SheaWhatsApp />
     </main>
   );
 }

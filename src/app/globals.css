@@ -11533,9 +11533,13 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 }
 
 @media (max-width: 1099px) {
-  .shea-nav-bar { grid-template-columns: 1fr auto !important; column-gap: 12px !important; padding-inline: 14px !important; }
+  .shea-nav-bar { grid-template-columns: auto minmax(0, 1fr) auto !important; column-gap: 12px !important; padding-inline: 14px !important; }
   .shea-nav-left { grid-column: 1; }
-  .shea-nav-actions { grid-column: 2 !important; }
+  .shea-nav-desktop { grid-column: 2 !important; width: 100%; display: flex !important; justify-content: flex-start !important; gap: 5px !important; overflow-x: auto; padding: 4px; border: 0; scrollbar-width: none; }
+  .shea-nav-desktop::-webkit-scrollbar { display: none; }
+  .shea-nav-desktop > a { flex: 0 0 auto; padding: 8px 10px !important; border: 1px solid #e0e5dd !important; border-radius: 999px !important; text-transform: uppercase; letter-spacing: .04em; font-size: 10px !important; }
+  .shea-nav-actions { grid-column: 3 !important; }
+  .shea-mobile-category-nav { display: none !important; }
   .shea-nav-brand { width: 56px !important; height: 56px !important; padding: 0 !important; }
   .shea-nav-brand img { width: 100% !important; height: 100% !important; }
 }
@@ -11550,7 +11554,37 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .shea-nav-brand { width: 52px !important; height: 52px !important; }
   .shea-nav-shell { max-width: 100vw; overflow: hidden; }
   .shea-nav-bar { width: calc(100% - 16px) !important; margin-inline: 8px !important; padding: 6px 10px !important; }
-  .shea-nav-left { gap: 7px; }
-  .shea-nav-left .shea-nav-mobile-toggle { width: 42px !important; height: 42px !important; }
-  .shea-mobile-category-nav { width: 100%; max-width: 100vw; padding-inline: 12px; overscroll-behavior-inline: contain; }
+  .shea-nav-left { gap: 5px; }
+  .shea-nav-left .shea-nav-mobile-toggle { width: 38px !important; height: 38px !important; }
+  .shea-nav-brand { width: 46px !important; height: 46px !important; }
+  .shea-nav-desktop > a { padding: 7px 9px !important; font-size: 9px !important; }
+}
+
+/* Responsive card completion across every customer-facing grid. */
+.commerce-product-card, .department-product-card, .shea-product-related a, .shea-frequently-bought a, .shea-policy-cards article, .shea-card-grid article { min-width: 0; height: 100%; }
+.commerce-product-body { height: 100%; display: flex; flex-direction: column; gap: 14px; }
+.commerce-product-body .commerce-card-actions { margin-top: auto; }
+.shea-global-bottom-nav a.active { color: #173d2b; background: #edf3ed; }
+.shea-global-bottom-nav a { position: relative; min-width: 0; }
+.shea-global-bottom-nav a b { position: absolute; top: 7px; left: calc(50% + 7px); }
+
+@media (max-width: 760px) {
+  .commerce-product-grid, .commerce-products-section.shop-only > .commerce-product-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .commerce-product-card { width: 100%; max-width: 560px; margin-inline: auto; }
+  .commerce-product-image { min-height: 300px; }
+  .commerce-card-actions { grid-template-columns: 1.3fr 1fr 1fr !important; }
+  .department-products > div, .shea-product-related > div:last-child { grid-template-columns: 1fr !important; }
+  .department-product-card { max-width: 560px; margin-inline: auto; }
+  .shea-card-grid.two, .shea-card-grid.three, .shea-card-grid.four, .shea-policy-cards { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 520px) {
+  .shea-nav-actions { display: none !important; }
+  .shea-nav-bar { grid-template-columns: auto minmax(0, 1fr) !important; }
+  .shea-nav-desktop { grid-column: 2 !important; }
+  .commerce-product-image { min-height: 270px; }
+  .commerce-card-actions { grid-template-columns: 1fr 1fr !important; }
+  .commerce-card-actions .review { grid-column: 1 / -1; }
+  .shea-frequently-bought > div:last-child { grid-template-columns: 1fr !important; }
+  .shea-frequently-bought > div:last-child a:first-child { grid-column: auto; }
 }

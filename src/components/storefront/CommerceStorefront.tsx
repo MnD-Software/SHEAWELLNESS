@@ -7,8 +7,6 @@ import {
   ChevronDown,
   CreditCard,
   Eye,
-  Grid2X2,
-  Home,
   Heart,
   Minus,
   Plus,
@@ -283,6 +281,17 @@ export function CommerceStorefront({
       quantity: line.quantity
     } satisfies StoredCartLine))));
   }, [cart, cartHydrated]);
+
+  useEffect(() => {
+    if (!cartHydrated) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("checkout") === "open" && cart.length) {
+      setCheckoutOpen(true);
+      setCartOpen(false);
+    } else if (params.get("cart") === "open" || params.get("checkout") === "open") {
+      setCartOpen(true);
+    }
+  }, [cart.length, cartHydrated]);
 
   useEffect(() => {
     if (heroSlides.length < 2) return;
@@ -812,22 +821,8 @@ export function CommerceStorefront({
       ) : null}
 
       <SheaTrustGrid />
-      <SheaCommerceFooter />
+      <SheaCommerceFooter cartCount={cartCount} />
       <SheaWhatsApp />
-
-      <nav className="commerce-mobile-tabs" aria-label="Mobile storefront navigation">
-        <a href="#top"><Home size={20} /><span>Home</span></a>
-        <a href="/shop"><Grid2X2 size={20} /><span>Shop</span></a>
-        <button type="button" onClick={() => setCartOpen(true)}>
-          <ShoppingCart size={20} />
-          <span>Cart</span>
-          <b>{cartCount}</b>
-        </button>
-        <button type="button" onClick={() => setCheckoutOpen(true)} disabled={cart.length === 0}>
-          <CreditCard size={20} />
-          <span>Checkout</span>
-        </button>
-      </nav>
 
       <CartDrawer
         cart={cart}
