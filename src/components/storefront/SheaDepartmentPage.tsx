@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, Leaf, ShoppingBag, ShoppingCart, Sparkles, Star } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, ShoppingBag, ShoppingCart, Sparkles, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { platformSnapshot } from "@/lib/platform-data";
@@ -111,7 +111,7 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
       <SheaGlobalHeader cartCount={cartCount} />
       <section className="department-hero">
         <div><span>{content.eyebrow}</span><h1>{content.title}</h1><p>{content.intro}</p><div><a href="#department-products">Shop this collection <ArrowRight size={17} /></a><a className="secondary" href="/wellness-guides">Read care guides</a></div></div>
-        <div className="department-product-carousel" aria-label={`${content.eyebrow} product carousel`}>
+        <div className="department-product-carousel shea-carousel-shell" aria-label={`${content.eyebrow} product carousel`}>
           {featuredProduct ? (
             <>
               <div className="department-carousel-stage">
@@ -126,13 +126,12 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
                 </div>
               </div>
               {featuredProducts.length > 1 && <>
-                <button type="button" className="department-carousel-arrow previous" onClick={() => moveCarousel(-1)} aria-label="Previous product"><ChevronLeft /></button>
-                <button type="button" className="department-carousel-arrow next" onClick={() => moveCarousel(1)} aria-label="Next product"><ChevronRight /></button>
-                <div className="department-carousel-dots" aria-label="Choose a product">
+                <button type="button" className="department-carousel-arrow shea-carousel-control previous" onClick={() => moveCarousel(-1)} aria-label="Previous product"><ChevronLeft /></button>
+                <button type="button" className="department-carousel-arrow shea-carousel-control next" onClick={() => moveCarousel(1)} aria-label="Next product"><ChevronRight /></button>
+                <div className="department-carousel-dots shea-carousel-pagination" aria-label="Choose a product">
                   {featuredProducts.map((product, index) => <button key={product.id} type="button" className={index === carouselIndex ? "active" : ""} onClick={() => setCarouselIndex(index)} aria-label={`Show ${product.title}`} />)}
                 </div>
               </>}
-              <div className="department-carousel-promise"><Leaf size={17} /><span>{content.promise}</span></div>
             </>
           ) : <p className="department-carousel-empty">New products for this collection are coming soon.</p>}
         </div>

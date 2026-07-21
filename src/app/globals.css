@@ -11469,6 +11469,14 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .department-carousel-promise svg { flex: 0 0 auto; }
 .department-carousel-empty { color: #173d2b !important; }
 
+/* Shared carousel language: homepage keeps campaigns; departments show products only. */
+.shea-carousel-shell { isolation: isolate; }
+.shea-carousel-control { display: grid !important; place-items: center; border: 1px solid rgba(23,61,43,.14) !important; border-radius: 50% !important; background: rgba(255,255,255,.94) !important; color: #173d2b !important; box-shadow: 0 10px 28px rgba(23,61,43,.16) !important; transition: transform .2s ease, background .2s ease !important; }
+.shea-carousel-control:hover { background: #173d2b !important; color: #fff !important; transform: translateY(-50%) scale(1.06) !important; }
+.shea-carousel-pagination button { border: 0 !important; border-radius: 999px !important; transition: width .22s ease, background .22s ease !important; }
+.shea-carousel-pagination button.active { width: 28px !important; background: #173d2b !important; }
+.commerce-hero-card .shea-carousel-pagination button.active { background: #fff !important; }
+
 .commerce-our-story { width: min(1320px, calc(100% - 48px)); margin: 42px auto 76px; display: grid; grid-template-columns: 1.08fr .92fr; overflow: hidden; border-radius: 30px; background: #173d2b; box-shadow: 0 24px 60px rgba(23,61,43,.12); }
 .commerce-story-visual { position: relative; min-height: 540px; overflow: hidden; }
 .commerce-story-visual img { width: 100%; height: 100%; object-fit: cover; object-position: 60% center; }

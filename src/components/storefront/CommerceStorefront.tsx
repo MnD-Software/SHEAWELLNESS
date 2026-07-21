@@ -288,7 +288,7 @@ export function CommerceStorefront({
     if (heroSlides.length < 2) return;
     const timer = window.setInterval(() => {
       setHeroIndex((index) => (index + 1) % heroSlides.length);
-    }, 5200);
+    }, 5500);
     return () => window.clearInterval(timer);
   }, [heroSlides.length]);
 
@@ -400,7 +400,7 @@ export function CommerceStorefront({
       {isHomePage ? (
         <>
           <section className="commerce-hero" id="top">
-            <div className="commerce-hero-card" aria-label="Before and after carousel">
+            <div className="commerce-hero-card shea-carousel-shell" aria-label="Shea Wellness campaign carousel">
               {heroSlide ? (
                 <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" style={{ objectFit: "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
               ) : (
@@ -425,14 +425,14 @@ export function CommerceStorefront({
                 </div>
               ) : null}
 
-              <button type="button" className="commerce-carousel-arrow previous" onClick={() => moveHero(-1)} aria-label="Previous product">
+              <button type="button" className="commerce-carousel-arrow shea-carousel-control previous" onClick={() => moveHero(-1)} aria-label="Previous campaign slide">
                 <ArrowLeft size={20} />
               </button>
-              <button type="button" className="commerce-carousel-arrow next" onClick={() => moveHero(1)} aria-label="Next product">
+              <button type="button" className="commerce-carousel-arrow shea-carousel-control next" onClick={() => moveHero(1)} aria-label="Next campaign slide">
                 <ArrowRight size={20} />
               </button>
 
-              <div className="commerce-carousel-dots" aria-label="Choose featured product">
+              <div className="commerce-carousel-dots shea-carousel-pagination" aria-label="Choose campaign slide">
                 {heroSlides.map((slide, index) => (
                   <button
                     type="button"
