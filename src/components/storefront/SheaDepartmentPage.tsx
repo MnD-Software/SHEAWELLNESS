@@ -26,7 +26,7 @@ const departmentContent: Record<DepartmentKind, {
     eyebrow: "Skin and body care", title: "Comfort for dry, sensitive, and glow-seeking skin.",
     intro: "Pure shea butter and botanical infusions designed for dry patches, sensitive-feeling skin, body moisture, massage, and everyday radiance.",
     categories: ["Body Care"],
-    promise: "Choose a butter by concern, texture, and the kind of daily ritual you want to create.",
+    promise: "Choose a butter by concern, texture, and the kind of daily routine you want to create.",
     routines: [{ title: "Dry & flaky", copy: "Layer Vanilla-Mint Shea Butter over damp skin and seal rough areas with body oil." }, { title: "Fresh body glow", copy: "Use Grapefruit Shea Butter after bathing, then finish with a light oil layer." }],
     benefits: ["Long-lasting moisture", "Comfort for rough areas", "Naturally radiant finish"]
   },
@@ -40,18 +40,18 @@ const departmentContent: Record<DepartmentKind, {
   },
   gifts: {
     eyebrow: "Wellness gifting", title: "Thoughtful care, beautifully grouped for giving.",
-    intro: "Curated Shea Wellness rituals for birthdays, corporate appreciation, hospitality, family care, and quiet moments of self-care.",
+    intro: "Curated Shea Wellness routines for birthdays, corporate appreciation, hospitality, family care, and quiet moments of self-care.",
     categories: ["Gift Sets"],
     promise: "Gift-ready combinations with clear routines, premium presentation, and options for individual or corporate orders.",
-    routines: [{ title: "Calm collection", copy: "Lavender shea, gentle cleansing, and aromatherapy for an evening wind-down." }, { title: "Glow collection", copy: "Grapefruit shea, black soap, and botanical oil for a complete body ritual." }],
-    benefits: ["Ready-to-gift rituals", "Corporate order support", "Personalized collection choices"]
+    routines: [{ title: "Calm collection", copy: "Lavender shea, gentle cleansing, and aromatherapy for an evening wind-down." }, { title: "Glow collection", copy: "Grapefruit shea, black soap, and botanical oil for a complete body routine." }],
+    benefits: ["Ready-to-gift routines", "Corporate order support", "Personalized collection choices"]
   },
   spa: {
     eyebrow: "SPA essentials", title: "Turn everyday spaces into places of restoration.",
     intro: "Essential oils, diffusers, humidifiers, massage care, and professional treatment-room supplies for homes and wellness businesses.",
     categories: ["Spa Essentials", "Aromatherapy", "Essential Oils"],
     promise: "Create calm, refreshing spaces with clear aromatherapy guidance and professional-ready supplies.",
-    routines: [{ title: "Home ritual", copy: "Pair a diffuser with a suitable essential oil and create a gentle morning or evening atmosphere." }, { title: "Professional care", copy: "Build treatment-room consistency with massage oils, disposables, and bulk-ready spa supplies." }],
+    routines: [{ title: "Home routine", copy: "Pair a diffuser with a suitable essential oil and create a gentle morning or evening atmosphere." }, { title: "Professional care", copy: "Build treatment-room consistency with massage oils, disposables, and bulk-ready spa supplies." }],
     benefits: ["Home and professional use", "Aromatherapy guidance", "Wholesale and spa support"]
   }
 };

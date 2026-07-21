@@ -22,7 +22,7 @@ export function SheaCommerceFooter() {
   return (
     <footer className="shea-commerce-footer">
       <div className="shea-commerce-footer-newsletter">
-        <div><span>Stay naturally informed</span><h2>New rituals, offers, and wellness guidance.</h2></div>
+        <div><span>Stay naturally informed</span><h2>New routines, offers, and wellness guidance.</h2></div>
         <form onSubmit={subscribe}><label className="sr-only" htmlFor="footer-email">Email address</label><input id="footer-email" required type="email" placeholder="Email address" /><button type="submit">{joined ? "Thank you" : "Subscribe"}</button></form>
       </div>
       <div className="shea-commerce-footer-grid">

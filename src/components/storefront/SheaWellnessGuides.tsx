@@ -151,7 +151,7 @@ const guides: Guide[] = [
     morning: ["Diffuse sweet orange or lemongrass for a bright start", "Use a humidifier where indoor air feels dry"],
     evening: ["Diffuse lavender for a calm wind-down", "Pair aroma with skincare, reading, prayer, meditation, or self-care"],
     lifestyle: ["Ideal for homes and bedrooms", "Useful in offices and reception areas", "Suitable for salons, barber shops, spas, hotels, and wellness centres", "A thoughtful addition to gift hampers and wellness packages"],
-    results: ["A calmer atmosphere", "Naturally refreshed indoor fragrance", "More comfortable-feeling indoor air", "A more intentional everyday wellness ritual"]
+    results: ["A calmer atmosphere", "Naturally refreshed indoor fragrance", "More comfortable-feeling indoor air", "A more intentional everyday wellness routine"]
   }
 ];
 

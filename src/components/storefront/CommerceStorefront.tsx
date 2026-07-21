@@ -627,7 +627,7 @@ export function CommerceStorefront({
       {isHomePage ? (
       <>
       <section className="commerce-sale-banner" aria-label="Limited wellness offer">
-        <div><span>Limited wellness offer</span><h2>Build a complete routine and save.</h2><p>Pair any body butter with a cleansing or botanical oil step for a more complete ritual.</p><a href="/shop">Shop bundle offers <ArrowRight size={17} /></a></div>
+        <div><span>Limited wellness offer</span><h2>Build a complete routine and save.</h2><p>Pair any body butter with a cleansing or botanical oil step for a more complete routine.</p><a href="/shop">Shop bundle offers <ArrowRight size={17} /></a></div>
         <div className="commerce-countdown" aria-label="Offer countdown"><strong>{String(Math.floor(saleSeconds / 3600)).padStart(2, "0")}</strong><span>Hours</span><strong>{String(Math.floor((saleSeconds % 3600) / 60)).padStart(2, "0")}</strong><span>Minutes</span><strong>{String(saleSeconds % 60).padStart(2, "0")}</strong><span>Seconds</span></div>
       </section>
 
