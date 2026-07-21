@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Heart, LogIn, Menu, Search, ShoppingCart, UserRound, X } from "lucide-react";
+import { ArrowRight, Gift, Heart, Home, LogIn, Menu, Search, ShoppingBag, ShoppingCart, Sparkles, Store, UserRound, X } from "lucide-react";
 import { FormEvent, useState } from "react";
 import { usePathname } from "next/navigation";
 import { sheaBrand } from "@/lib/shea-content";
@@ -12,23 +12,6 @@ type SheaGlobalHeaderProps = {
   searchValue?: string;
   onSearchChange?: (value: string) => void;
 };
-
-const shopLinks = [
-  { label: "Shop all", href: "/shop", body: "All Shea Wellness products in one catalogue." },
-  { label: "Body care", href: "/collections/body-care", body: "Body butters, raw shea, and daily moisture routines." },
-  { label: "Face care", href: "/collections/face-care", body: "Black soap cleansers and gentle botanical routines." },
-  { label: "Hair care", href: "/collections/hair-care", body: "Scalp, edge, and hair moisture essentials." },
-  { label: "Media catalogue", href: "/catalogue", body: "Product films, images, and brand proof." }
-];
-
-const companyLinks = [
-  { label: "About", href: "/about" },
-  { label: "Wellness guides", href: "/wellness-guides" },
-  { label: "Sustainability", href: "/sustainability" },
-  { label: "Quality", href: "/quality" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "/contact" }
-];
 
 const pageSearchLinks = [
   { label: "Wellness guides", href: "/wellness-guides", body: "Dry skin, sensitive skin, face, body glow, hair, scalp, and spa routines." },
@@ -58,6 +41,29 @@ const mobilePolicyLinks = [
   { label: "Sustainability", href: "/sustainability" },
   { label: "Catalogue", href: "/catalogue" },
   { label: "Contact", href: "/contact" }
+];
+
+const categoryLinks = [
+  { label: "Face", href: "/collections/face-care" },
+  { label: "Skin", href: "/collections/body-care" },
+  { label: "Hair", href: "/collections/hair-care" },
+  { label: "Wellness Gifts", href: "/shop?search=gift" },
+  { label: "SPA Essentials", href: "/wellness-guides#spa-essentials" }
+];
+
+const sidebarLinks = [
+  { label: "Home", href: "/", icon: Home },
+  { label: "Shop all", href: "/shop", icon: ShoppingBag },
+  { label: "Products", href: "/products", icon: Store },
+  { label: "Wellness guides", href: "/wellness-guides", icon: Sparkles },
+  { label: "Wellness gifts", href: "/shop?search=gift", icon: Gift },
+  { label: "Wholesale", href: "/wholesale", icon: Store },
+  { label: "About us", href: "/about", icon: UserRound },
+  { label: "Sustainability", href: "/sustainability", icon: Sparkles },
+  { label: "Quality", href: "/quality", icon: Heart },
+  { label: "Blog", href: "/blog", icon: ShoppingBag },
+  { label: "Catalogue", href: "/catalogue", icon: ShoppingBag },
+  { label: "Contact", href: "/contact", icon: UserRound }
 ];
 
 export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchChange }: SheaGlobalHeaderProps) {
@@ -94,9 +100,6 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
     window.location.href = term ? `/shop?search=${encodeURIComponent(term)}` : "/shop";
   }
 
-  const shopActive = pathname === "/shop" || pathname.startsWith("/products/") || pathname.startsWith("/collections/");
-  const companyActive = ["/about", "/sustainability", "/quality", "/contact"].some((path) => pathname.startsWith(path));
-
   const cartAction = onCartOpen ? (
     <button type="button" className="shea-nav-cart" onClick={onCartOpen}>
       <ShoppingCart size={18} />
@@ -112,6 +115,26 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
   );
 
   return (
+    <>
+    <aside className="shea-desktop-sidebar" aria-label="Complete site navigation">
+      <a className="shea-sidebar-logo" href="/" aria-label={`${sheaBrand.name} home`}>
+        <img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" />
+      </a>
+      <div className="shea-sidebar-label">Explore Shea Wellness</div>
+      <nav>
+        {sidebarLinks.map((item) => {
+          const Icon = item.icon;
+          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href.split("?")[0].split("#")[0]);
+          return <a href={item.href} className={active ? "active" : undefined} key={item.label}><Icon size={18} /><span>{item.label}</span></a>;
+        })}
+      </nav>
+      <div className="shea-sidebar-contact">
+        <span>Need help choosing?</span>
+        <a href={`tel:${sheaBrand.phone}`}>{sheaBrand.phone}</a>
+        <a href={`mailto:${sheaBrand.email}`}>Email Shea Wellness</a>
+      </div>
+    </aside>
+
     <header className="shea-nav-shell">
       <div className="shea-nav-promo">
         <span className="promo-full">100% natural ingredients. Ethically sourced Nilotica shea. Export-ready quality.</span>
@@ -119,43 +142,13 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       </div>
       <div className="shea-nav-bar">
         <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
-          <img src="/assets/shea-wellness-header-wordmark.jpeg" alt={sheaBrand.name} />
+          <img src="/assets/shea-wellness-tree-logo.jpeg" alt={sheaBrand.name} />
         </a>
 
         <nav className="shea-nav-desktop" aria-label="Primary navigation">
-          <a href="/" className={pathname === "/" ? "active" : undefined}>Home</a>
-          <div className="shea-nav-dropdown">
-            <a href="/shop" className={`shea-nav-trigger${shopActive ? " active" : ""}`}>
-              Shop <ChevronDown size={15} />
-            </a>
-            <div className="shea-nav-mega">
-              <div className="shea-nav-mega-copy">
-                <span>Shop by routine</span>
-                <strong>Clean product paths without crowding the header.</strong>
-                <p>Browse the store by category, use case, or product media.</p>
-              </div>
-              <div className="shea-nav-mega-links">
-                {shopLinks.map((item) => (
-                  <a href={item.href} key={item.label}>
-                    <strong>{item.label}</strong>
-                    <span>{item.body}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-          <a href="/wholesale" className={pathname.startsWith("/wholesale") ? "active" : undefined}>Wholesale</a>
-          <a href="/blog" className={pathname.startsWith("/blog") ? "active" : undefined}>Blog</a>
-          <div className="shea-nav-dropdown small">
-            <button type="button" className={`shea-nav-trigger${companyActive ? " active" : ""}`}>
-              Company <ChevronDown size={15} />
-            </button>
-            <div className="shea-nav-menu-card">
-              {companyLinks.map((item) => (
-                <a href={item.href} key={item.label}>{item.label}</a>
-              ))}
-            </div>
-          </div>
+          {categoryLinks.map((item) => (
+            <a href={item.href} className={pathname.startsWith(item.href.split("?")[0].split("#")[0]) ? "active" : undefined} key={item.label}>{item.label}</a>
+          ))}
         </nav>
 
         <div className="shea-nav-actions">
@@ -180,6 +173,10 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
           {mobileOpen ? <X size={21} /> : <Menu size={21} />}
         </button>
       </div>
+
+      <nav className="shea-mobile-category-nav" aria-label="Product categories">
+        {categoryLinks.map((item) => <a href={item.href} key={item.label}>{item.label}</a>)}
+      </nav>
 
       {searchOpen ? (
         <section className="shea-nav-search-panel" aria-label="Search Shea Wellness">
@@ -240,5 +237,6 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
         </div>
       ) : null}
     </header>
+    </>
   );
 }

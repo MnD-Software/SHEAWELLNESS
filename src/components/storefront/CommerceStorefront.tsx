@@ -424,6 +424,16 @@ export function CommerceStorefront({
             </div>
           </section>
 
+          <section className="commerce-brand-intro" aria-labelledby="shea-intro-heading">
+            <span>Welcome to Shea Wellness</span>
+            <h2 id="shea-intro-heading">Healthy skin begins with nature.</h2>
+            <p>
+              Shea Wellness believes healthy skin begins with nature. Our carefully crafted products combine the
+              nourishing power of pure shea butter, botanical oils, and natural plant extracts to restore moisture,
+              protect your skin&apos;s natural barrier, and reveal soft, radiant skin every day.
+            </p>
+          </section>
+
           <section className="commerce-service-strip" aria-label="Store benefits">
             <span><Truck size={18} /> Export-ready packaging</span>
             <span><RotateCcw size={18} /> Wholesale support</span>
