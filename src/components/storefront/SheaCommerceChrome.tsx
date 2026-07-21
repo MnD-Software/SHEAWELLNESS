@@ -1,8 +1,7 @@
 "use client";
 
-import { CheckCircle2, CreditCard, Grid2X2, HeartHandshake, Home, Leaf, LockKeyhole, MessageCircle, PackageCheck, Rabbit, Recycle, ShoppingCart, Truck } from "lucide-react";
-import { FormEvent, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { CheckCircle2, CreditCard, HeartHandshake, Leaf, LockKeyhole, MessageCircle, PackageCheck, Rabbit, Recycle, Truck } from "lucide-react";
+import { FormEvent, useState } from "react";
 
 export function SheaTrustGrid() {
   const items = [
@@ -17,17 +16,8 @@ export function SheaTrustGrid() {
   return <section className="shea-commerce-trust" aria-label="Shopping assurances">{items.map(([Icon, label]) => <span key={label}><Icon size={19} /><strong>{label}</strong></span>)}</section>;
 }
 
-export function SheaCommerceFooter({ cartCount }: { cartCount?: number }) {
+export function SheaCommerceFooter() {
   const [joined, setJoined] = useState(false);
-  const [storedCartCount, setStoredCartCount] = useState(0);
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity?: number }>;
-      setStoredCartCount(saved.reduce((total, line) => total + (line.quantity ?? 0), 0));
-    } catch {
-      setStoredCartCount(0);
-    }
-  }, []);
   function subscribe(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setJoined(true); }
   return (
     <footer className="shea-commerce-footer">
@@ -43,20 +33,8 @@ export function SheaCommerceFooter({ cartCount }: { cartCount?: number }) {
         <div className="shea-footer-payments"><strong>Payment methods</strong><div><span>M-Pesa</span><span>Visa</span><span>Mastercard</span><span>PayPal</span></div><small><LockKeyhole size={14} /> Secure checkout</small></div>
       </div>
       <div className="shea-commerce-footer-bottom"><span>© {new Date().getFullYear()} Shea Wellness Ltd.</span><span><CheckCircle2 size={15} /> Natural care. Intentional wellness.</span></div>
-      <SheaBottomNav cartCount={cartCount ?? storedCartCount} />
     </footer>
   );
-}
-
-function SheaBottomNav({ cartCount }: { cartCount: number }) {
-  const pathname = usePathname();
-  const items = [
-    { label: "Home", href: "/", icon: Home },
-    { label: "Shop", href: "/shop", icon: Grid2X2 },
-    { label: "Cart", href: "/shop?cart=open", icon: ShoppingCart, count: cartCount },
-    { label: "Checkout", href: cartCount ? "/shop?checkout=open" : "/shop?cart=open", icon: CreditCard }
-  ];
-  return <nav className="commerce-mobile-tabs shea-global-bottom-nav" aria-label="Storefront navigation">{items.map((item) => { const Icon = item.icon; const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href.split("?")[0]); return <a href={item.href} className={active ? "active" : undefined} aria-current={active ? "page" : undefined} key={item.label}><Icon size={20} /><span>{item.label}</span>{item.count !== undefined ? <b>{item.count}</b> : null}</a>; })}</nav>;
 }
 
 export function SheaWhatsApp() {
