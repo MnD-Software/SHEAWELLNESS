@@ -6223,6 +6223,106 @@ video {
   }
 }
 
+/* Premium full-height commerce drawer. */
+body.shea-menu-open { overflow: hidden !important; }
+.shea-desktop-sidebar {
+  inset: 0 auto 0 0 !important;
+  z-index: 720 !important;
+  width: min(430px, 100vw) !important;
+  height: 100dvh !important;
+  padding: 0 22px 20px !important;
+  background: #fbfaf5 !important;
+  border-right: 0 !important;
+  box-shadow: 28px 0 90px rgba(9, 30, 19, .28) !important;
+  overscroll-behavior: contain;
+}
+.shea-sidebar-scrim { inset: 0 !important; z-index: 710 !important; background: rgba(10, 30, 20, .55) !important; backdrop-filter: blur(3px); }
+.shea-sidebar-topline {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  min-height: 92px !important;
+  margin: 0 -2px;
+  padding: 12px 0;
+  background: rgba(251,250,245,.96);
+  border-bottom: 1px solid #e1e5dd;
+  backdrop-filter: blur(12px);
+}
+.shea-sidebar-topline > a { min-width: 0; display: flex; align-items: center; gap: 12px; color: #173d2b; }
+.shea-sidebar-topline > a img { width: 62px; height: 62px; object-fit: contain; mix-blend-mode: multiply; }
+.shea-sidebar-topline > a span { min-width: 0; display: grid; gap: 2px; }
+.shea-sidebar-topline > a strong { font-family: Georgia, serif; font-size: 18px; line-height: 1; }
+.shea-sidebar-topline > a small { color: #7a867d; font-size: 11px; }
+.shea-sidebar-topline > button { flex: 0 0 auto; width: 42px; height: 42px; }
+
+.shea-sidebar-feature {
+  display: grid;
+  gap: 9px;
+  margin: 18px 0 20px;
+  padding: 20px;
+  border-radius: 18px;
+  color: #fff;
+  background: radial-gradient(circle at 100% 0, rgba(205,190,105,.34), transparent 42%), #173d2b;
+}
+.shea-sidebar-feature > span { color: #d9ca82; text-transform: uppercase; letter-spacing: .13em; font-size: 10px; font-weight: 900; }
+.shea-sidebar-feature > strong { max-width: 330px; font-family: Georgia, serif; font-size: 21px; line-height: 1.18; }
+.shea-sidebar-feature > a { width: fit-content; display: flex; align-items: center; gap: 7px; margin-top: 4px; color: #fff; font-size: 12px; font-weight: 850; }
+
+.shea-desktop-sidebar .shea-sidebar-label { margin: 17px 2px 9px !important; }
+.shea-sidebar-category-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px !important; }
+.shea-sidebar-category-grid a {
+  min-height: 50px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px !important;
+  padding: 0 14px !important;
+  border: 1px solid #dfe4dc;
+  border-radius: 13px !important;
+  background: #fff;
+  color: #173d2b !important;
+  font-size: 12px !important;
+}
+.shea-sidebar-category-grid a:first-child { background: #e9eee5; }
+.shea-sidebar-category-grid a:hover { background: #173d2b !important; color: #fff !important; }
+
+.shea-sidebar-site-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 8px !important; }
+.shea-sidebar-site-grid a {
+  min-height: 39px !important;
+  gap: 8px !important;
+  padding: 0 9px !important;
+  border-radius: 9px !important;
+  font-size: 12px !important;
+}
+.shea-sidebar-site-grid a svg { width: 16px; height: 16px; }
+.shea-sidebar-site-grid a.active { background: #e5ebe1 !important; color: #173d2b !important; }
+
+.shea-desktop-sidebar .shea-sidebar-contact {
+  margin-top: 18px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px !important;
+  padding: 13px !important;
+  background: #eef1ea !important;
+}
+.shea-sidebar-contact div { min-width: 0; display: grid; }
+.shea-sidebar-contact div span { margin: 0; font-size: 12px; }
+.shea-sidebar-contact div small { color: #748078; font-size: 10px; }
+.shea-sidebar-contact > a { padding: 8px 10px; border-radius: 999px; background: #fff; color: #173d2b; font-size: 10px; font-weight: 850; white-space: nowrap; }
+
+@media (max-width: 520px) {
+  .shea-desktop-sidebar { padding-inline: 16px !important; }
+  .shea-sidebar-topline { min-height: 82px !important; }
+  .shea-sidebar-topline > a img { width: 54px; height: 54px; }
+  .shea-sidebar-feature { margin-top: 13px; padding: 17px; }
+  .shea-sidebar-feature > strong { font-size: 19px; }
+  .shea-sidebar-category-grid { grid-template-columns: 1fr 1fr; }
+  .shea-sidebar-category-grid a { padding-inline: 10px !important; font-size: 11px !important; }
+  .shea-desktop-sidebar .shea-sidebar-contact { grid-template-columns: 1fr auto; }
+  .shea-sidebar-contact > a:last-child { display: none; }
+}
+
 /* Premium Shea Wellness navigation replacement */
 .shea-nav-shell {
   position: sticky;

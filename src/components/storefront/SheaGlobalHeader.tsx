@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Gift, Heart, Home, Menu, Search, ShoppingBag, ShoppingCart, Sparkles, Store, UserRound, X } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { sheaBrand } from "@/lib/shea-content";
 import { platformSnapshot } from "@/lib/platform-data";
@@ -50,6 +50,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
   const [localSearch, setLocalSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const sidebarRef = useRef<HTMLElement | null>(null);
   const value = searchValue ?? localSearch;
   const searchTerm = value.trim().toLowerCase();
   const searchResults = [
@@ -63,6 +64,12 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
     if (!searchTerm) return true;
     return `${item.label} ${item.body}`.toLowerCase().includes(searchTerm);
   }).slice(0, 7);
+
+  useEffect(() => {
+    document.body.classList.toggle("shea-menu-open", mobileOpen);
+    if (mobileOpen && sidebarRef.current) sidebarRef.current.scrollTop = 0;
+    return () => document.body.classList.remove("shea-menu-open");
+  }, [mobileOpen]);
 
   function setValue(nextValue: string) {
     if (onSearchChange) {
@@ -102,16 +109,28 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       aria-label="Close site navigation"
       tabIndex={mobileOpen ? 0 : -1}
     />
-    <aside className={`shea-desktop-sidebar${mobileOpen ? " open" : ""}`} aria-label="Complete site navigation" aria-hidden={!mobileOpen}>
+    <aside ref={sidebarRef} className={`shea-desktop-sidebar${mobileOpen ? " open" : ""}`} aria-label="Complete site navigation" aria-hidden={!mobileOpen}>
       <div className="shea-sidebar-topline">
-        <span>Menu</span>
+        <a href="/" aria-label={`${sheaBrand.name} home`}>
+          <img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" />
+          <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
+        </a>
         <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close site navigation"><X size={22} /></button>
       </div>
-      <a className="shea-sidebar-logo" href="/" aria-label={`${sheaBrand.name} home`}>
-        <img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" />
-      </a>
-      <div className="shea-sidebar-label">Explore Shea Wellness</div>
-      <nav>
+
+      <section className="shea-sidebar-feature">
+        <span>Natural care, clearly guided</span>
+        <strong>Find the right routine for skin, face, hair, and home.</strong>
+        <a href="/wellness-guides">Explore wellness guides <ArrowRight size={16} /></a>
+      </section>
+
+      <div className="shea-sidebar-label">Shop by category</div>
+      <nav className="shea-sidebar-category-grid" aria-label="Shop by category">
+        {categoryLinks.map((item) => <a href={item.href} key={item.label}><span>{item.label}</span><ArrowRight size={15} /></a>)}
+      </nav>
+
+      <div className="shea-sidebar-label">Explore</div>
+      <nav className="shea-sidebar-site-grid" aria-label="Explore Shea Wellness">
         {sidebarLinks.map((item) => {
           const Icon = item.icon;
           const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href.split("?")[0].split("#")[0]);
@@ -119,9 +138,9 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
         })}
       </nav>
       <div className="shea-sidebar-contact">
-        <span>Need help choosing?</span>
-        <a href={`tel:${sheaBrand.phone}`}>{sheaBrand.phone}</a>
-        <a href={`mailto:${sheaBrand.email}`}>Email Shea Wellness</a>
+        <div><span>Need help choosing?</span><small>Talk to the Shea Wellness team.</small></div>
+        <a href={`tel:${sheaBrand.phone}`}>Call us</a>
+        <a href="/account">My account</a>
       </div>
     </aside>
 
@@ -160,7 +179,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
           aria-expanded={mobileOpen}
           aria-label="Open navigation"
         >
-          {mobileOpen ? <X size={21} /> : <Menu size={21} />}
+          <Menu size={21} />
         </button>
       </div>
 
