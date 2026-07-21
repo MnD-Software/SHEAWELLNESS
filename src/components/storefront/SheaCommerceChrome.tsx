@@ -30,7 +30,7 @@ export function SheaCommerceFooter() {
         <nav aria-label="Company links"><strong>Company</strong><a href="/about">About</a><a href="/contact">Contact</a><a href="/sustainability">Sustainability</a><a href="/wholesale">Wholesale</a></nav>
         <nav aria-label="Customer care links"><strong>Customer care</strong><a href="/policies">Policies</a><a href="/refund-policy">Refund policy</a><a href="/shipping-policy">Shipping</a><a href="/faq">FAQ</a></nav>
         <nav aria-label="Social media links"><strong>Follow us</strong><a href="https://www.instagram.com/sheawellnesske/" target="_blank" rel="noreferrer">Instagram</a><a href="https://wa.me/254729621930" target="_blank" rel="noreferrer">WhatsApp</a><a href="mailto:sheabutterwellness@gmail.com">Email</a></nav>
-        <div className="shea-footer-payments"><strong>Payment methods</strong><span>M-Pesa</span><span>Visa</span><span>Mastercard</span><span>PayPal</span><small><LockKeyhole size={14} /> Secure checkout</small></div>
+        <div className="shea-footer-payments"><strong>Payment methods</strong><div><span>M-Pesa</span><span>Visa</span><span>Mastercard</span><span>PayPal</span></div><small><LockKeyhole size={14} /> Secure checkout</small></div>
       </div>
       <div className="shea-commerce-footer-bottom"><span>© {new Date().getFullYear()} Shea Wellness Ltd.</span><span><CheckCircle2 size={15} /> Natural care. Intentional wellness.</span></div>
     </footer>

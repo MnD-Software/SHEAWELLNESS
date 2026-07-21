@@ -11123,6 +11123,10 @@ body {
 .shea-commerce-footer nav a, .shea-footer-payments span { color: rgba(255,255,255,.64); font-size: 12px; }
 .shea-commerce-footer nav a:hover { color: #fff; }
 .shea-footer-payments span { display: inline-flex; padding: 6px 9px; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; }
+.shea-footer-payments { grid-column: 1 / -1; flex-direction: row; align-items: center; flex-wrap: wrap; gap: 12px !important; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.1); }
+.shea-footer-payments > strong { margin: 0 8px 0 0; }
+.shea-footer-payments > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.shea-footer-payments > small { margin-left: auto; }
 .shea-commerce-footer-bottom { display: flex; justify-content: space-between; gap: 20px; padding: 20px max(24px, calc((100% - 1320px)/2)); border-top: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.55); font-size: 11px; }
 .shea-commerce-footer-bottom span { display: flex; align-items: center; gap: 6px; }
 .shea-whatsapp-chat { position: fixed; z-index: 350; right: 22px; bottom: 24px; display: flex; align-items: center; gap: 8px; min-height: 50px; padding: 0 17px; border-radius: 999px; background: #25d366; color: #092c19; font-size: 12px; font-weight: 900; box-shadow: 0 14px 35px rgba(15,70,38,.25); }
@@ -11192,6 +11196,10 @@ body {
   .shea-commerce-footer-newsletter form { border-radius: 14px; }
   .shea-commerce-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 18px; }
   .shea-commerce-footer-brand { grid-column: 1 / -1; }
+  .shea-footer-payments { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .shea-footer-payments::-webkit-scrollbar { display: none; }
+  .shea-footer-payments > strong, .shea-footer-payments > small, .shea-footer-payments > div, .shea-footer-payments span { flex: 0 0 auto; }
+  .shea-footer-payments > small { margin-left: 0; }
   .shea-commerce-footer-bottom { flex-direction: column; padding-bottom: 90px; }
   .shea-product-page { padding-bottom: 86px; }
   .shea-whatsapp-chat { right: 12px; bottom: 78px; width: 48px; height: 48px; justify-content: center; padding: 0; }
