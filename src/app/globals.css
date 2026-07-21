@@ -11218,6 +11218,7 @@ body {
   .shea-product-faq, .shea-frequently-bought { grid-template-columns: 1fr; gap: 22px; }
   .commerce-sale-banner { grid-template-columns: 1fr; }
   .commerce-merchandising-rails { grid-template-columns: 1fr; }
+  .shea-footer-payments > small { flex: 0 0 100%; margin-left: 0; }
 }
 
 @media (max-width: 640px) {
@@ -11229,11 +11230,11 @@ body {
   .shea-commerce-footer-newsletter form { border-radius: 14px; }
   .shea-commerce-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 30px 18px; }
   .shea-commerce-footer-brand { grid-column: 1 / -1; }
-  .shea-footer-payments { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
-  .shea-footer-payments::-webkit-scrollbar { display: none; }
-  .shea-footer-payments > strong, .shea-footer-payments > small, .shea-footer-payments > div, .shea-footer-payments span { flex: 0 0 auto; }
-  .shea-footer-payments > small { margin-left: 0; }
-  .shea-commerce-footer-bottom { flex-direction: column; padding-bottom: 90px; }
+  .shea-footer-payments { flex-wrap: wrap; overflow: visible; }
+  .shea-footer-payments > strong, .shea-footer-payments > div, .shea-footer-payments span { flex: 0 0 auto; }
+  .shea-footer-payments > div { flex-wrap: nowrap; }
+  .shea-footer-payments > small { flex: 0 0 100%; margin-left: 0; }
+  .shea-commerce-footer-bottom { flex-direction: row; flex-wrap: wrap; gap: 10px 20px; padding-bottom: 72px; }
   .shea-product-page { padding-bottom: 86px; }
   .shea-whatsapp-chat { right: 12px; bottom: 78px; width: 48px; height: 48px; justify-content: center; padding: 0; }
   .shea-whatsapp-chat span { display: none; }
