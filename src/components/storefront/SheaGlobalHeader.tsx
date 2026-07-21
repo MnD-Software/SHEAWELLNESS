@@ -23,11 +23,11 @@ const pageSearchLinks = [
 ];
 
 const categoryLinks = [
-  { label: "Face", href: "/collections/face-care", icon: Sparkles },
-  { label: "Skin", href: "/collections/body-care", icon: Heart },
-  { label: "Hair", href: "/collections/hair-care", icon: Sparkles },
-  { label: "Wellness Gifts", href: "/shop?search=gift", icon: Gift },
-  { label: "SPA Essentials", href: "/wellness-guides#spa-essentials", icon: Store }
+  { label: "Face", href: "/face", icon: Sparkles },
+  { label: "Skin", href: "/skin", icon: Heart },
+  { label: "Hair", href: "/hair", icon: Sparkles },
+  { label: "Wellness Gifts", href: "/wellness-gifts", icon: Gift },
+  { label: "SPA Essentials", href: "/spa-essentials", icon: Store }
 ];
 
 const sidebarLinks = [
