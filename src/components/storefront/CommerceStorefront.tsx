@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
+import Image from "next/image";
 import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
@@ -380,9 +381,9 @@ export function CommerceStorefront({
           <section className="commerce-hero" id="top">
             <div className="commerce-hero-card" aria-label="Before and after carousel">
               {heroSlide ? (
-                <img src={heroSlide.src} alt={heroSlide.title} style={{ objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
+                <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" style={{ objectFit: "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
               ) : (
-                <img src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" />
+                <Image src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" fill priority sizes="100vw" style={{ objectFit: "cover" }} />
               )}
               <div className="commerce-hero-overlay" />
 
@@ -436,22 +437,23 @@ export function CommerceStorefront({
 
           <section className="commerce-our-story" aria-labelledby="our-story-heading">
             <div className="commerce-story-visual">
-              <img src="/assets/shea-hero.png" alt="Natural Shea Wellness body, face, and hair care products" />
+              <Image src="/assets/shea-hero.png" alt="Natural Shea Wellness body, face, and hair care products" fill sizes="(max-width: 980px) 100vw, 54vw" style={{ objectFit: "cover", objectPosition: "60% center" }} />
               <span>Rooted in African botanical heritage</span>
             </div>
             <div className="commerce-story-copy">
               <span>Our story</span>
-              <h2 id="our-story-heading">Natural care that creates shared value.</h2>
+              <h2 id="our-story-heading">Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2>
               <p>
-                Our journey began with a simple vision: create honest, effective wellness products inspired by
-                Africa&apos;s rich botanical heritage. We combine premium shea butter, cold-pressed plant oils,
-                and carefully selected essential oils with intentional local craftsmanship.
+                At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our
+                journey began with a simple yet powerful vision: to create natural, effective, and sustainable
+                personal care products that nourish people while creating lasting value for communities and the environment.
               </p>
               <p>
-                Shea Wellness is more than skincare. It is a commitment to ethical sourcing, quality Kenyan
-                manufacturing, community opportunity, and everyday rituals that help people feel comfortable
-                in their skin, hair, and homes.
+                Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea
+                butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care
+                for the skin, hair, and overall wellbeing of the whole family.
               </p>
+              <p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship.</p>
               <a href="/about">Discover our full story <ArrowRight size={17} /></a>
             </div>
           </section>
@@ -477,7 +479,7 @@ export function CommerceStorefront({
               {concernCards.map((guide, index) => (
                 <a href={guide.href} key={guide.title}>
                   <span>0{index + 1}</span>
-                  <img src={guide.image} alt="" />
+                  <img src={guide.image} alt="" loading="lazy" decoding="async" />
                   <div><strong>{guide.title}</strong><small>{guide.body}</small></div>
                   <ArrowRight size={18} />
                 </a>
@@ -497,7 +499,7 @@ export function CommerceStorefront({
             <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
               {mediaVideos.slice(0, 4).map((video) => (
                 <article key={video.src}>
-                  <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
+                  <video src={video.src} controls muted loop playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
                   <strong>{video.title}</strong>
                 </article>
               ))}

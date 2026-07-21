@@ -34,7 +34,7 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
   about: {
     eyebrow: "Our brand story",
     title: "Nurturing wellness. Empowering communities. Sustaining nature.",
-    body: "Shea Wellness believes wellness is more than skincare. It is a way of living rooted in natural ingredients, local manufacturing, and community value.",
+    body: "At Shea Wellness Ltd, we believe that wellness is more than skincare—it's a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.",
     image: "/assets/sheawellness/lavender-shea-butter-lid.jpeg"
   },
   products: {
@@ -267,12 +267,13 @@ function AboutSections() {
       <PromiseGrid />
       <section className="shea-split-section">
         <div>
-          <span>About Shea Wellness</span>
-          <h2>Our journey began with a simple vision: natural care that creates shared value.</h2>
+          <span>Our story</span>
+          <h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2>
           <p>
-            Inspired by Africa's rich botanical heritage, Shea Wellness harnesses premium shea butter,
-            cold-pressed plant oils, and carefully selected essential oils to care for skin, hair, and
-            everyday wellbeing. Every product reflects purity, quality, and intentional craftsmanship.
+            Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium
+            shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products
+            that care for the skin, hair, and overall wellbeing of the whole family. Every product we make
+            reflects our commitment to purity, quality, and intentional craftsmanship.
           </p>
         </div>
         <div className="shea-card-grid two">

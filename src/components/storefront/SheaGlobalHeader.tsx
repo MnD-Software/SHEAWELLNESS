@@ -30,6 +30,11 @@ const categoryLinks = [
   { label: "SPA Essentials", href: "/spa-essentials", icon: Store }
 ];
 
+const primaryLinks = [
+  ...categoryLinks,
+  { label: "Our Story", href: "/about", icon: UserRound }
+];
+
 const sidebarLinks = [
   { label: "Home", href: "/", icon: Home },
   { label: "Shop all", href: "/shop", icon: ShoppingBag },
@@ -169,7 +174,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
         </div>
 
         <nav className="shea-nav-desktop" aria-label="Primary navigation">
-          {categoryLinks.map((item) => (
+          {primaryLinks.map((item) => (
             <a href={item.href} className={pathname.startsWith(item.href.split("?")[0].split("#")[0]) ? "active" : undefined} key={item.label}>{item.label}</a>
           ))}
         </nav>
@@ -189,7 +194,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       </div>
 
       <nav className="shea-mobile-category-nav" aria-label="Product categories">
-        {categoryLinks.map((item) => <a href={item.href} key={item.label}>{item.label}</a>)}
+        {primaryLinks.map((item) => <a href={item.href} key={item.label}>{item.label}</a>)}
       </nav>
 
       {searchOpen ? (
