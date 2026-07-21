@@ -78,37 +78,37 @@ const concernCards = [
     title: "Dry & flaky skin",
     body: "Cleanse gently, replenish lost moisture, and seal comfort into rough or flaky patches.",
     image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-    href: "/shop?search=vanilla"
+    href: "/wellness-guides#dry-flaky-skin"
   },
   {
     title: "Sensitive skin comfort",
     body: "Barrier-first care with African black soap, lavender shea butter, and patch-test guidance.",
     image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
-    href: "/shop?search=lavender"
+    href: "/wellness-guides#sensitive-skin"
   },
   {
     title: "Fresh body glow",
     body: "Refresh, moisturize, and finish with body oil for softer, naturally radiant skin.",
     image: "/assets/WhatsApp Image 2026-07-08 at 12.44.29 (3).jpeg",
-    href: "/shop?search=grapefruit"
+    href: "/wellness-guides#body-glow"
   },
   {
     title: "Face care routine",
     body: "A simple three-step routine: cleanse, nourish, and protect by day; restore by night.",
     image: "/assets/sheawellness/face-care-routine.png",
-    href: "/shop?search=face"
+    href: "/wellness-guides#face-care"
   },
   {
     title: "Hair & scalp moisture",
     body: "Clean scalp care, castor oil moisture, and rosemary scalp-massage support.",
     image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (1).jpeg",
-    href: "/shop?search=hair"
+    href: "/wellness-guides#hair-scalp"
   },
   {
     title: "Spa essentials",
     body: "Essential oils, diffusers, humidifiers, and treatment-room supplies for wellness spaces.",
     image: "/assets/sheawellness/lavender-shea-butter-back.jpeg",
-    href: "/wholesale"
+    href: "/wellness-guides#spa-essentials"
   }
 ];
 
@@ -392,7 +392,7 @@ export function CommerceStorefront({
                 {heroSlide?.body ? <p>{heroSlide.body}</p> : null}
                 <div className="commerce-hero-actions">
                   {heroSlide ? <a href={heroSlide.ctaHref}>{heroSlide.ctaLabel}</a> : null}
-                  <a className="ghost" href="/products">View product guide</a>
+                  <a className="ghost" href="/wellness-guides">Explore wellness guides</a>
                 </div>
               </div>
 
@@ -429,6 +429,28 @@ export function CommerceStorefront({
             <span><RotateCcw size={18} /> Wholesale support</span>
             <span><ShieldCheck size={18} /> Paraben and sulfate free</span>
             <span><Star size={18} /> Handmade wellness products</span>
+          </section>
+
+          <section className="commerce-document-feature" aria-labelledby="wellness-edit-heading">
+            <div className="commerce-document-intro">
+              <span>New complete care library</span>
+              <h2 id="wellness-edit-heading">Wellness for every skin, every hair type, and every home.</h2>
+              <p>
+                Discover complete morning and evening routines, product benefits, step-by-step directions,
+                lifestyle guidance, safety notes, and realistic results for consistent use.
+              </p>
+              <a href="/wellness-guides">Read all six wellness guides <ArrowRight size={18} /></a>
+            </div>
+            <div className="commerce-document-guide-grid">
+              {concernCards.map((guide, index) => (
+                <a href={guide.href} key={guide.title}>
+                  <span>0{index + 1}</span>
+                  <img src={guide.image} alt="" />
+                  <div><strong>{guide.title}</strong><small>{guide.body}</small></div>
+                  <ArrowRight size={18} />
+                </a>
+              ))}
+            </div>
           </section>
 
           <section className="commerce-video-section" id="product-films">

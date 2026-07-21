@@ -85,6 +85,8 @@ Source reviewed: `SHEA WELLNESS WEBSITE EDITS.docx` (30 pages, including 24 embe
 - [x] Preserved patch-test, sunscreen, essential-oil dilution, child/pet, and humidifier compatibility warnings.
 - [x] Added a discoverable `/wellness-guides` route to desktop navigation, mobile navigation, and search.
 - [x] Kept long-form copy off the home page so the primary shopping journey remains usable.
+- [x] Added a prominent homepage care-library section so all six document guides are immediately visible.
+- [x] Linked the homepage hero and every concern card directly to the relevant long-form guide.
 
 ## Verification
 
