@@ -29,6 +29,7 @@ import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMedia
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import type { Product, Store } from "@/lib/types";
+import { partnerLogos, quickFaqs } from "@/lib/shea-website-content";
 
 type CartLine = {
   product: Product;
@@ -202,6 +203,7 @@ export function CommerceStorefront({
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [saleSeconds, setSaleSeconds] = useState(47 * 60 * 60 + 36 * 60);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
+  const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
 
   const heroSlides = mediaConfig.heroSlides.length ? mediaConfig.heroSlides : sheaDefaultMediaConfig.heroSlides;
   const heroSlide = heroSlides[heroIndex] ?? heroSlides[0];
@@ -224,6 +226,19 @@ export function CommerceStorefront({
     } catch {
       setMediaConfig(sheaDefaultMediaConfig);
     }
+  }, []);
+
+  useEffect(() => {
+    const syncWellnessVisibility = () => {
+      setWellnessGuidesEnabled(window.localStorage.getItem("sheaWellnessHomepageGuidesEnabled") === "true");
+    };
+    syncWellnessVisibility();
+    window.addEventListener("storage", syncWellnessVisibility);
+    window.addEventListener("sheaWellnessSettingsChanged", syncWellnessVisibility);
+    return () => {
+      window.removeEventListener("storage", syncWellnessVisibility);
+      window.removeEventListener("sheaWellnessSettingsChanged", syncWellnessVisibility);
+    };
   }, []);
 
   useEffect(() => {
@@ -486,7 +501,7 @@ export function CommerceStorefront({
             <span><Star size={18} /> Handmade wellness products</span>
           </section>
 
-          <section className="commerce-document-feature" aria-labelledby="wellness-edit-heading">
+          {wellnessGuidesEnabled ? <section className="commerce-document-feature" aria-labelledby="wellness-edit-heading">
             <div className="commerce-document-intro">
               <span>New complete care library</span>
               <h2 id="wellness-edit-heading">Wellness for every skin, every hair type, and every home.</h2>
@@ -506,7 +521,7 @@ export function CommerceStorefront({
                 </a>
               ))}
             </div>
-          </section>
+          </section> : null}
 
           <section className="commerce-video-section" id="product-films">
             <div className="commerce-section-title split">
@@ -691,16 +706,24 @@ export function CommerceStorefront({
 
       <section className="commerce-seen-strip" aria-label="Shea Wellness credibility">
         <span>As trusted by</span>
-        <div className="commerce-marquee-viewport">
-          <div className="commerce-marquee-track">
-            {["KAM Expo", "Nairobi retail", "Organic beauty stores", "Wellness spas", "Wholesale buyers", "Natural skincare buyers"].map((item) => (
-              <strong key={item}>{item}</strong>
-            ))}
-            {["KAM Expo", "Nairobi retail", "Organic beauty stores", "Wellness spas", "Wholesale buyers", "Natural skincare buyers"].map((item) => (
-              <strong key={`${item}-repeat`} aria-hidden="true">{item}</strong>
-            ))}
+          <div className="commerce-marquee-viewport">
+            <div className="commerce-marquee-track">
+              <div className="commerce-marquee-group">
+                {partnerLogos.map(([name, file]) => (
+                  <figure className="commerce-marquee-logo" key={name}>
+                    <img src={`/assets/partners/${file}`} alt={`${name} logo`} loading="eager" decoding="async" />
+                  </figure>
+                ))}
+              </div>
+              <div className="commerce-marquee-group" aria-hidden="true">
+                {partnerLogos.map(([name, file]) => (
+                  <figure className="commerce-marquee-logo" key={`${name}-repeat`}>
+                    <img src={`/assets/partners/${file}`} alt="" loading="eager" decoding="async" />
+                  </figure>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
       </section>
 
       <section className="commerce-guarantee-strip" aria-label="Store assurances">
@@ -792,6 +815,12 @@ export function CommerceStorefront({
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="commerce-home-faq">
+        <header><span>Quick answers</span><h2>Good to know before you begin.</h2><p>Product, routine, sourcing and delivery guidance from Shea Wellness.</p></header>
+        <div>{quickFaqs.slice(0, 6).map(([question, answer]) => <details key={question}><summary>{question}<i>+</i></summary><p>{answer}</p></details>)}</div>
+        <a href="/faq">Explore all FAQs <ArrowRight size={17} /></a>
       </section>
 
       <section className="commerce-newsletter">

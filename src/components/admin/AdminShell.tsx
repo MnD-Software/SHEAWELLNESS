@@ -853,6 +853,18 @@ function MediaView({
 }
 
 function SettingsView({ snapshot }: { snapshot: PlatformSnapshot }) {
+  const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
+
+  useEffect(() => {
+    setWellnessGuidesEnabled(window.localStorage.getItem("sheaWellnessHomepageGuidesEnabled") === "true");
+  }, []);
+
+  function updateWellnessGuidesVisibility(enabled: boolean) {
+    setWellnessGuidesEnabled(enabled);
+    window.localStorage.setItem("sheaWellnessHomepageGuidesEnabled", String(enabled));
+    window.dispatchEvent(new Event("sheaWellnessSettingsChanged"));
+  }
+
   return (
     <section className="shea-admin-stack">
       <AdminHeading eyebrow="Configuration" title="Shea Wellness store settings" />
@@ -868,6 +880,21 @@ function SettingsView({ snapshot }: { snapshot: PlatformSnapshot }) {
           <Detail label="Phone" value={sheaBrand.phone} />
           <Detail label="Address" value={sheaBrand.address} />
           <Detail label="Products indexed" value={String(sheaProductCategories.reduce((total, category) => total + category.products.length, 0))} />
+        </Panel>
+        <Panel title="Homepage sections" description="Only administrators can control optional storefront content.">
+          <label className="shea-admin-setting-toggle">
+            <span>
+              <strong>Wellness guides feature</strong>
+              <small>{wellnessGuidesEnabled ? "Visible on the homepage" : "Hidden from the homepage"}</small>
+            </span>
+            <input
+              type="checkbox"
+              checked={wellnessGuidesEnabled}
+              onChange={(event) => updateWellnessGuidesVisibility(event.target.checked)}
+              aria-label="Show wellness guides feature on homepage"
+            />
+            <i aria-hidden="true" />
+          </label>
         </Panel>
       </section>
     </section>

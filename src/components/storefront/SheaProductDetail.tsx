@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowRight, CheckCircle2, Heart, Leaf, PackageCheck, RotateCcw, ShieldCheck, ShoppingCart, Star, Truck } from "lucide-react";
+import { ArrowRight, CheckCircle2, Heart, Leaf, PackageCheck, RotateCcw, ShieldCheck, ShoppingCart, Sparkles, Star, Truck } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { sheaVideos } from "@/lib/shea-content";
+import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
@@ -71,6 +72,10 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     return products.filter((item) => item.id !== product.id && item.category === product.category).slice(0, 4);
   }, [product, products]);
   const recentlyViewed = useMemo(() => recentProductIds.map((id) => products.find((item) => item.id === id)).filter((item): item is Product => Boolean(item)).slice(0, 4), [products, recentProductIds]);
+  const botanicalDetail = botanicalDetails.find((item) => item.productId === product?.id);
+  const matchingPairings = product
+    ? productPairings.filter((pairing) => pairing.products.some((item) => item.toLowerCase().includes(product.title.replace("Cold-Pressed ", "").replace("Cold Pressed ", "").toLowerCase().split(" ").slice(0, 2).join(" ")))).slice(0, 3)
+    : [];
 
   function toggleWishlist() {
     if (!product) return;
@@ -189,17 +194,22 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
         </div>
         <div>
           <span>Ingredients</span>
-          <h2>{product.material}</h2>
-          <p>Shea Wellness products are positioned around natural ingredients, ethical Nilotica shea, and practical daily use for body, face, hair, aromatherapy, and spa care.</p>
+          <h2>{botanicalDetail?.scientificName ?? product.material}</h2>
+          <p>{botanicalDetail?.origin ?? "Shea Wellness products are positioned around natural ingredients, ethical Nilotica shea, and practical daily use for body, face, hair, aromatherapy, and spa care."}</p>
         </div>
       </section>
 
-      <section className="shea-product-guide-grid">
-        <article><Leaf size={22} /><span>Ingredients</span><h2>What is inside.</h2><p>{product.material}. Nature-led ingredients selected for practical everyday skin, hair, body, or spa use.</p></article>
-        <article><CheckCircle2 size={22} /><span>Benefits</span><h2>Why customers choose it.</h2><ul><li>{product.deliveryBadge}</li><li>Supports a simple, consistent wellness routine</li><li>Made with Shea Wellness quality standards</li></ul></article>
-        <article><RotateCcw size={22} /><span>Directions</span><h2>How to use.</h2><p>Apply a measured amount to clean skin or hair. Massage gently until absorbed. Start with less, layer only where needed, and patch-test before first use.</p></article>
+      <section className="shea-product-guide-grid botanical">
+        <article><Leaf size={22} /><span>Key nutrients</span><h2>What is inside.</h2>{botanicalDetail ? <ul>{botanicalDetail.nutrients.map((item) => <li key={item}>{item}</li>)}</ul> : <p>{product.material}. Nature-led ingredients selected for practical everyday use.</p>}</article>
+        <article><CheckCircle2 size={22} /><span>Benefits</span><h2>Why customers choose it.</h2><ul>{(botanicalDetail?.benefits ?? [product.deliveryBadge, "Supports a simple, consistent wellness routine", "Made with Shea Wellness quality standards"]).map((item) => <li key={item}>{item}</li>)}</ul></article>
+        <article><RotateCcw size={22} /><span>Morning routine</span><h2>Start protected.</h2>{botanicalDetail ? <ol>{botanicalDetail.morning.map((item) => <li key={item}>{item}</li>)}</ol> : <p>Apply a measured amount to clean skin or hair and patch-test before first use.</p>}</article>
+        <article><RotateCcw size={22} /><span>Evening routine</span><h2>Nourish overnight.</h2>{botanicalDetail ? <ol>{botanicalDetail.evening.map((item) => <li key={item}>{item}</li>)}</ol> : <p>Apply a measured amount to clean skin or hair and massage gently until absorbed.</p>}</article>
+        {botanicalDetail?.additionalUse ? <article><Sparkles size={22} /><span>More ways to use it</span><h2>Face, body and hair.</h2><ul>{botanicalDetail.additionalUse.map((item) => <li key={item}>{item}</li>)}</ul></article> : null}
+        {botanicalDetail ? <article><ShieldCheck size={22} /><span>Suitability & care</span><h2>Use it thoughtfully.</h2><p><strong>Suitable for:</strong> {botanicalDetail.suitableFor.join(", ")}.</p><p>{botanicalDetail.caution}</p></article> : null}
         <article><Truck size={22} /><span>Shipping</span><h2>Delivery and returns.</h2><p>Kenya delivery and international wholesale support are available. Damaged or incorrect orders are handled under our refund policy.</p><a href="/shipping-policy">Read shipping information</a></article>
       </section>
+
+      {matchingPairings.length ? <section className="shea-product-pairing-block"><div><span>Perfect pairings</span><h2>Choose the right solution.</h2><p>Complete your routine with concern-led combinations from Shea Wellness.</p></div><div>{matchingPairings.map((pairing) => <article key={pairing.concern}><span>For</span><h3>{pairing.concern}</h3><p>{pairing.products.join(" + ")}</p><ul>{pairing.benefits.map((item) => <li key={item}>{item}</li>)}</ul></article>)}</div></section> : null}
 
       <section className="shea-product-faq" id="faq"><div><span>Product FAQ</span><h2>Good to know before you order.</h2></div><div><details><summary>Is this suitable for sensitive skin?</summary><p>Patch-test first and introduce one product at a time. Stop use if irritation occurs.</p></details><details><summary>How should I store it?</summary><p>Keep it sealed in a cool, dry place away from direct sunlight and excess heat.</p></details><details><summary>Can I order for a spa or retail store?</summary><p>Yes. Contact our wholesale team for bulk sizes, pricing, and fulfilment guidance.</p></details></div></section>
 

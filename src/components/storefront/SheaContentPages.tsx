@@ -28,6 +28,7 @@ import {
 } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
+import { partnerLogos } from "@/lib/shea-website-content";
 
 type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blog" | "quality" | "contact" | "catalogue";
 
@@ -340,6 +341,10 @@ function ProductsSections() {
 function WholesaleSections() {
   return (
     <>
+      <section className="shea-partners-section">
+        <header><span>Our partners</span><h2>Trusted across hospitality, retail, trade and wellness.</h2><p>Shea Wellness has built relationships with organisations and destinations in Kenya, Africa and beyond.</p></header>
+        <div>{partnerLogos.map(([name, file]) => <figure key={name}><img src={`/assets/partners/${file}`} alt={`${name} logo`} loading="lazy" /><figcaption>{name}</figcaption></figure>)}</div>
+      </section>
       <section className="shea-split-section">
         <div>
           <span>Wholesale opportunities</span>

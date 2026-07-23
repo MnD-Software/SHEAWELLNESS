@@ -200,6 +200,27 @@ export const platformSnapshot: PlatformSnapshot = {
       sales: 94
     },
     {
+      id: "prod_baobab_oil",
+      storeId: "store_shea",
+      title: "Cold-Pressed Baobab Oil",
+      description: "Lightweight African botanical oil for deeply nourished skin, conditioned hair, and a supported moisture barrier.",
+      category: "Face Care",
+      badge: "Cold-pressed",
+      imageUrl: "/assets/WhatsApp Image 2026-07-08 at 12.03.57.jpeg",
+      imagePosition: "50% 50%",
+      rating: 4.8,
+      reviewCount: 54,
+      colors: ["Baobab", "Face, body & hair"],
+      sizes: ["50ml", "100ml"],
+      material: "100% Cold-Pressed Baobab Oil (Adansonia digitata)",
+      deliveryBadge: "Skin and hair nourishment",
+      price: 2200,
+      inventoryQty: 72,
+      status: "active",
+      channel: "both",
+      sales: 112
+    },
+    {
       id: "prod_chebe_serum",
       storeId: "store_shea",
       title: "Chebe Hair Growth Serum with Karkar Oil",

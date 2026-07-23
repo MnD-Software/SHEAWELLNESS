@@ -1,6 +1,7 @@
 import { CheckCircle2, Droplets, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
+import { productPairings } from "@/lib/shea-website-content";
 
 type ProductStep = {
   name: string;
@@ -197,6 +198,21 @@ export function SheaWellnessGuides() {
           </div>
         </article>
       ))}
+
+      <section className="shea-pairings-library" id="product-pairings">
+        <header><span>Don’t buy products. Choose the right solution.</span><h2>Nature’s perfect pairings for healthy-looking skin and hair.</h2><p>Start with your concern, then follow a focused combination instead of collecting products without a routine.</p></header>
+        <div>
+          {productPairings.map((pairing, index) => (
+            <article key={pairing.concern}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{pairing.concern}</h3>
+              <strong>{pairing.products.join("  +  ")}</strong>
+              <ul>{pairing.benefits.map((benefit) => <li key={benefit}><CheckCircle2 size={15} />{benefit}</li>)}</ul>
+              <small>Best for: {pairing.bestFor}</small>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="guide-disclaimer">
         <Leaf size={24} />

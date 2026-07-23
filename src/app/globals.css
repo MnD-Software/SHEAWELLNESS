@@ -8175,13 +8175,23 @@ body.shea-menu-open { overflow: hidden !important; }
 }
 
 .commerce-marquee-track {
+  --marquee-gap: clamp(14px, 1.5vw, 24px);
   width: max-content;
   display: flex;
   align-items: center;
-  gap: clamp(34px, 5vw, 86px);
-  padding-inline: clamp(24px, 5vw, 72px);
+  gap: 0;
+  padding: 0;
   color: rgba(17, 24, 22, 0.58);
   animation: shea-trust-marquee 28s linear infinite;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+.commerce-marquee-group {
+  display: flex;
+  align-items: center;
+  gap: var(--marquee-gap);
+  padding-right: var(--marquee-gap);
 }
 
 .commerce-marquee-track strong {
@@ -8199,11 +8209,11 @@ body.shea-menu-open { overflow: hidden !important; }
 
 @keyframes shea-trust-marquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -8864,6 +8874,37 @@ body.shea-menu-open { overflow: hidden !important; }
 
 .commerce-marquee-track strong:nth-child(3n + 1) {
   color: #f4c56a;
+}
+
+.commerce-marquee-track .commerce-marquee-logo {
+  flex: 0 0 176px;
+  width: 176px;
+  height: 116px;
+  margin: 0;
+  padding: 16px 20px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(222, 228, 218, 0.9);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(4, 22, 14, 0.16);
+}
+
+.commerce-marquee-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  .commerce-marquee-track .commerce-marquee-logo {
+    flex-basis: 140px;
+    width: 140px;
+    height: 94px;
+    padding: 12px 14px;
+    border-radius: 14px;
+  }
 }
 
 @media (max-width: 980px) {
@@ -11073,6 +11114,102 @@ body {
 .shea-story-collections ul, .shea-story-sustainability ul { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 22px; }
 .shea-story-partner { background: #eef1e9 !important; }
 .shea-story-partner a { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 13px 17px; border-radius: 999px; background: #173d2b; color: #fff; font-size: 12px; font-weight: 850; }
+
+.shea-admin-setting-toggle { display:flex; align-items:center; justify-content:space-between; gap:24px; cursor:pointer; }
+.shea-admin-setting-toggle > span { display:grid; gap:5px; }
+.shea-admin-setting-toggle strong { color:#173d2b; font-size:14px; }
+.shea-admin-setting-toggle small { color:#738077; font-size:12px; }
+.shea-admin-setting-toggle input { position:absolute; opacity:0; pointer-events:none; }
+.shea-admin-setting-toggle i { position:relative; flex:0 0 48px; width:48px; height:27px; border-radius:999px; background:#cbd3cc; transition:.2s ease; }
+.shea-admin-setting-toggle i::after { content:""; position:absolute; top:3px; left:3px; width:21px; height:21px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(20,50,37,.2); transition:.2s ease; }
+.shea-admin-setting-toggle input:checked + i { background:#173d2b; }
+.shea-admin-setting-toggle input:checked + i::after { transform:translateX(21px); }
+.shea-admin-setting-toggle input:focus-visible + i { outline:3px solid rgba(130,144,77,.35); outline-offset:3px; }
+
+/* Document-led FAQ, partner, pairing and botanical detail content */
+.shea-faq-page, .shea-faq-page * { box-sizing: border-box; }
+.shea-faq-hero { padding: 94px max(24px, calc((100% - 1120px)/2)) 48px; background: linear-gradient(135deg,#f5f0e6,#fff 58%,#edf2e8); }
+.shea-faq-hero > span, .shea-partners-section header span, .shea-pairings-library header > span, .commerce-partners > div:first-child > span, .commerce-home-faq header > span, .shea-faq-advisor span, .shea-product-pairing-block > div:first-child > span { color:#82904d; font-size:10px; font-weight:900; letter-spacing:.16em; text-transform:uppercase; }
+.shea-faq-hero h1 { max-width:800px; margin:14px 0 18px; font: 500 clamp(48px,7vw,84px)/.96 Georgia,serif; color:#173d2b; letter-spacing:-.045em; }
+.shea-faq-hero > p { max-width:680px; color:#5f6e63; font-size:17px; line-height:1.7; }
+.shea-faq-hero label { display:flex; align-items:center; gap:12px; width:fit-content; margin-top:28px; padding:14px 18px; border:1px solid #dfe5d8; border-radius:999px; background:#fff; color:#667266; font-size:13px; }
+.shea-faq-nav { width:min(1120px,calc(100% - 48px)); margin:32px auto 0; display:flex; gap:10px; overflow:auto; padding-bottom:8px; }
+.shea-faq-nav a { flex:none; padding:11px 15px; border:1px solid #dbe2d6; border-radius:999px; color:#173d2b; font-size:12px; font-weight:800; }
+.shea-faq-groups { width:min(1120px,calc(100% - 48px)); margin:58px auto 90px; display:grid; gap:72px; }
+.shea-faq-groups > article { display:grid; grid-template-columns: .7fr 1.3fr; gap:70px; scroll-margin-top:110px; }
+.shea-faq-groups header span { color:#a2aa86; font:700 12px/1 sans-serif; }
+.shea-faq-groups h2 { margin:12px 0; font:500 clamp(32px,4vw,48px)/1 Georgia,serif; color:#173d2b; }
+.shea-faq-groups details { border-top:1px solid #dfe4db; }
+.shea-faq-groups details:last-child { border-bottom:1px solid #dfe4db; }
+.shea-faq-groups summary, .commerce-home-faq summary { display:flex; align-items:center; justify-content:space-between; gap:24px; min-height:68px; cursor:pointer; color:#243c31; font-weight:800; list-style:none; }
+.shea-faq-groups summary::-webkit-details-marker, .commerce-home-faq summary::-webkit-details-marker { display:none; }
+.shea-faq-groups summary i, .commerce-home-faq summary i { font-size:22px; font-style:normal; font-weight:400; transition:transform .2s; }
+.shea-faq-groups details[open] summary i, .commerce-home-faq details[open] summary i { transform:rotate(45deg); }
+.shea-faq-groups details p, .commerce-home-faq details p { margin:0; padding:0 42px 22px 0; color:#667268; line-height:1.65; }
+.shea-faq-advisor { width:min(1120px,calc(100% - 48px)); margin:0 auto 90px; padding:34px; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:24px; border-radius:26px; background:#173d2b; color:#fff; }
+.shea-faq-advisor h2 { margin:6px 0; font:500 clamp(28px,3vw,40px)/1 Georgia,serif; }
+.shea-faq-advisor p { margin:0; color:#d7dfd8; }
+.shea-faq-advisor a { display:inline-flex; align-items:center; gap:8px; padding:13px 17px; border-radius:999px; background:#fff; color:#173d2b; font-size:12px; font-weight:900; }
+
+.shea-partners-section { padding:90px max(24px,calc((100% - 1180px)/2)); background:#f7f4ed; }
+.shea-partners-section header { max-width:720px; margin-bottom:38px; }
+.shea-partners-section h2, .shea-pairings-library h2, .commerce-partners h2, .commerce-home-faq h2, .shea-product-pairing-block h2 { margin:10px 0 14px; font:500 clamp(38px,5vw,62px)/.98 Georgia,serif; color:#173d2b; letter-spacing:-.035em; }
+.shea-partners-section header p, .shea-pairings-library header p, .commerce-partners > div:first-child p, .commerce-home-faq header p { color:#647068; line-height:1.65; }
+.shea-partners-section > div { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; }
+.shea-partners-section figure { min-height:155px; margin:0; padding:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; border:1px solid #e2e3db; border-radius:18px; background:#fff; }
+.shea-partners-section img { width:100%; height:76px; object-fit:contain; }
+.shea-partners-section figcaption { color:#748078; font-size:10px; line-height:1.35; text-align:center; }
+
+.shea-pairings-library { padding:100px max(24px,calc((100% - 1180px)/2)); background:#f6f1e7; }
+.shea-pairings-library header { max-width:780px; margin-bottom:40px; }
+.shea-pairings-library > div { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.shea-pairings-library article { min-height:340px; padding:28px; display:flex; flex-direction:column; border:1px solid #dfe2d7; border-radius:22px; background:#fff; }
+.shea-pairings-library article > span { color:#a0a98d; font-size:10px; font-weight:900; }
+.shea-pairings-library h3 { margin:14px 0; font:500 28px/1.05 Georgia,serif; color:#173d2b; }
+.shea-pairings-library article > strong { color:#82904d; font-size:12px; line-height:1.6; }
+.shea-pairings-library ul { padding:0; margin:22px 0; list-style:none; display:grid; gap:9px; color:#59675f; font-size:13px; }
+.shea-pairings-library li { display:flex; gap:8px; }
+.shea-pairings-library small { margin-top:auto; padding-top:16px; border-top:1px solid #e8e9e3; color:#758078; line-height:1.5; }
+
+.commerce-partners, .commerce-home-faq { width:min(1180px,calc(100% - 48px)); margin:90px auto; }
+.commerce-partners { display:grid; grid-template-columns:.65fr 1.35fr; gap:60px; align-items:center; }
+.commerce-partners h2, .commerce-home-faq h2 { font-size:clamp(36px,4vw,52px); }
+.commerce-partners > div:first-child a, .commerce-home-faq > a { display:inline-flex; align-items:center; gap:8px; margin-top:18px; color:#173d2b; font-size:12px; font-weight:900; }
+.commerce-partners > div:last-child { display:grid; grid-template-columns:repeat(5,1fr); gap:9px; }
+.commerce-partners figure { height:100px; margin:0; padding:14px; border:1px solid #e2e5dc; border-radius:14px; background:#fff; }
+.commerce-partners img { width:100%; height:100%; object-fit:contain; }
+.commerce-home-faq { display:grid; grid-template-columns:.8fr 1.2fr; column-gap:80px; }
+.commerce-home-faq header { grid-row:1 / span 2; }
+.commerce-home-faq details { border-top:1px solid #dfe4db; }
+.commerce-home-faq details:last-child { border-bottom:1px solid #dfe4db; }
+.commerce-home-faq > a { grid-column:2; }
+
+.shea-product-guide-grid.botanical { grid-template-columns:repeat(3,1fr); }
+.shea-product-guide-grid.botanical article { min-height:310px; }
+.shea-product-guide-grid ol { padding-left:18px; color:#617067; line-height:1.7; }
+.shea-product-pairing-block { width:min(1120px,calc(100% - 48px)); margin:0 auto 90px; display:grid; grid-template-columns:.7fr 1.3fr; gap:60px; }
+.shea-product-pairing-block > div:last-child { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.shea-product-pairing-block article { padding:24px; border:1px solid #dfe4db; border-radius:18px; }
+.shea-product-pairing-block article > span { color:#839050; font-size:9px; font-weight:900; text-transform:uppercase; letter-spacing:.12em; }
+.shea-product-pairing-block h3 { margin:8px 0 12px; font:500 25px/1.05 Georgia,serif; color:#173d2b; }
+.shea-product-pairing-block article p, .shea-product-pairing-block article li { color:#637067; font-size:13px; line-height:1.55; }
+
+@media (max-width: 900px) {
+  .shea-faq-groups > article, .commerce-partners, .commerce-home-faq, .shea-product-pairing-block { grid-template-columns:1fr; gap:28px; }
+  .shea-partners-section > div { grid-template-columns:repeat(3,1fr); }
+  .shea-pairings-library > div, .shea-product-guide-grid.botanical { grid-template-columns:repeat(2,1fr); }
+  .commerce-home-faq header { grid-row:auto; }
+  .commerce-home-faq > a { grid-column:auto; }
+}
+@media (max-width: 600px) {
+  .shea-faq-hero { padding-top:64px; }
+  .shea-faq-hero h1 { font-size:46px; }
+  .shea-faq-nav, .shea-faq-groups, .shea-faq-advisor, .commerce-partners, .commerce-home-faq, .shea-product-pairing-block { width:calc(100% - 24px); }
+  .shea-faq-advisor { grid-template-columns:1fr; }
+  .shea-partners-section > div, .commerce-partners > div:last-child { grid-template-columns:repeat(2,1fr); }
+  .shea-pairings-library > div, .shea-product-guide-grid.botanical, .shea-product-pairing-block > div:last-child { grid-template-columns:1fr; }
+  .shea-partners-section figure { min-height:130px; padding:14px; }
+}
 .shea-story-promise { max-width: 1080px !important; text-align: center; background: #173d2b !important; color: #fff; }
 .shea-story-promise > span { color: #cdbd70 !important; }
 .shea-story-promise p { max-width: 780px; margin-inline: auto; color: rgba(255,255,255,.72) !important; }
@@ -11263,6 +11400,23 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* This brand reel is intentionally always animated as requested. */
+.commerce-seen-strip .commerce-marquee-track {
+  gap: 0 !important;
+  padding: 0 !important;
+  animation-name: shea-trust-marquee !important;
+  animation-duration: 70s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
+  animation-play-state: running !important;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.commerce-seen-strip:hover .commerce-marquee-track {
+  animation-play-state: running !important;
 }
 
 html,
