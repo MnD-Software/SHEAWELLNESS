@@ -152,6 +152,8 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [runtimeOrders, setRuntimeOrders] = useState<RuntimeOrder[]>([]);
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
+  const [saveState, setSaveState] = useState<"loading" | "saved" | "saving" | "error" | "setup">("loading");
+  const [saveMessage, setSaveMessage] = useState("Connecting to content database…");
   const activeStore = snapshot.activeStore;
 
   const filteredProducts = useMemo(() => {
@@ -166,42 +168,51 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   useEffect(() => {
     const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as RuntimeOrder[];
     const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as RuntimeReview[];
-    const savedMedia = window.localStorage.getItem("sheaWellnessMediaConfig");
     setRuntimeOrders(savedOrders.filter((order) => order.source === "shea_storefront_checkout"));
     setRuntimeReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
 
-    if (savedMedia) {
-      try {
-        const parsedMedia = JSON.parse(savedMedia) as SheaMediaConfig;
-        if (Array.isArray(parsedMedia.heroSlides) && Array.isArray(parsedMedia.images) && Array.isArray(parsedMedia.videos)) {
-          setMediaConfig(sanitizeSheaMediaConfig(parsedMedia));
-        }
-      } catch {
-        setMediaConfig(sheaDefaultMediaConfig);
-      }
-    }
-
-    const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
-    if (!savedProducts) return;
-
-    try {
-      const parsedProducts = JSON.parse(savedProducts) as Product[];
-      if (Array.isArray(parsedProducts)) {
-        setManagedProducts(parsedProducts.map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
-      }
-    } catch {
-      setManagedProducts(snapshot.products);
-    }
+    void fetch("/api/admin/content", { cache: "no-store" })
+      .then(async (response) => {
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error ?? "Unable to load content.");
+        setManagedProducts((payload.data.products as Product[]).map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
+        setMediaConfig(sanitizeSheaMediaConfig(payload.data.media as SheaMediaConfig));
+        setSaveState(payload.data.persisted ? "saved" : "setup");
+        setSaveMessage(payload.data.persisted ? "All changes are synced to Neon" : "Add DATABASE_URL to enable saving");
+      })
+      .catch((error: Error) => {
+        setSaveState("error");
+        setSaveMessage(error.message);
+      });
   }, []);
+
+  async function persistContent(body: object) {
+    setSaveState("saving");
+    setSaveMessage("Saving changes…");
+    try {
+      const response = await fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? "Unable to save changes.");
+      setSaveState("saved");
+      setSaveMessage("Saved to Neon");
+    } catch (error) {
+      setSaveState("error");
+      setSaveMessage(error instanceof Error ? error.message : "Unable to save changes.");
+    }
+  }
 
   function saveManagedProducts(nextProducts: Product[]) {
     setManagedProducts(nextProducts);
-    window.localStorage.setItem("sheaWellnessProducts", JSON.stringify(nextProducts));
+    void persistContent({ type: "products", products: nextProducts });
   }
 
   function saveMediaConfig(nextMediaConfig: SheaMediaConfig) {
     setMediaConfig(nextMediaConfig);
-    window.localStorage.setItem("sheaWellnessMediaConfig", JSON.stringify(nextMediaConfig));
+    void persistContent({ type: "media", media: nextMediaConfig });
   }
 
   const adminOrders = runtimeOrders;
@@ -243,6 +254,10 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Shea products, orders, buyers" />
           </label>
           <a href="/" target="_blank" rel="noreferrer">View Storefront</a>
+          <span className={clsx("shea-admin-sync", saveState)}>
+            <i aria-hidden="true" />
+            {saveMessage}
+          </span>
           <button type="button" onClick={() => setView("products")}><PackagePlus size={17} /> Add product</button>
         </header>
 

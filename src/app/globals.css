@@ -4738,6 +4738,34 @@ td {
   background: #ffffff;
 }
 
+.shea-admin-sync {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  color: #64736a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.shea-admin-sync i {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #aeb8b1;
+  box-shadow: 0 0 0 4px rgba(174, 184, 177, .16);
+}
+
+.shea-admin-sync.saved i { background: #4f7b55; box-shadow: 0 0 0 4px rgba(79, 123, 85, .14); }
+.shea-admin-sync.saving i,
+.shea-admin-sync.loading i { background: #c6923b; animation: shea-admin-pulse 1s ease-in-out infinite; }
+.shea-admin-sync.error i { background: #b75147; box-shadow: 0 0 0 4px rgba(183, 81, 71, .13); }
+.shea-admin-sync.setup i { background: #c6923b; box-shadow: 0 0 0 4px rgba(198, 146, 59, .14); }
+
+@keyframes shea-admin-pulse {
+  50% { opacity: .35; transform: scale(.8); }
+}
+
 .shea-admin-stack {
   display: grid;
   gap: 16px;

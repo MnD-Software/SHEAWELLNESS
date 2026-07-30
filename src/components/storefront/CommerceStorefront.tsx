@@ -215,17 +215,14 @@ export function CommerceStorefront({
   }
 
   useEffect(() => {
-    const savedMedia = window.localStorage.getItem("sheaWellnessMediaConfig");
-    if (!savedMedia) return;
-
-    try {
-      const parsedMedia = JSON.parse(savedMedia) as SheaMediaConfig;
-      if (Array.isArray(parsedMedia.heroSlides) && Array.isArray(parsedMedia.images) && Array.isArray(parsedMedia.videos)) {
-        setMediaConfig(sanitizeSheaMediaConfig(parsedMedia));
-      }
-    } catch {
-      setMediaConfig(sheaDefaultMediaConfig);
-    }
+    void fetch("/api/storefront/content", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = await response.json();
+        setMediaConfig(sanitizeSheaMediaConfig(payload.data.media as SheaMediaConfig));
+        setCatalogProducts((payload.data.products as Product[]).map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
+      })
+      .catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -249,20 +246,6 @@ export function CommerceStorefront({
     const timer = window.setInterval(() => setSaleSeconds((value) => Math.max(0, value - 1)), 1000);
     return () => window.clearInterval(timer);
   }, []);
-
-  useEffect(() => {
-    const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
-    if (!savedProducts) return;
-
-    try {
-      const parsedProducts = JSON.parse(savedProducts) as Product[];
-      if (Array.isArray(parsedProducts) && parsedProducts.length) {
-        setCatalogProducts(parsedProducts.map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
-      }
-    } catch {
-      setCatalogProducts(products);
-    }
-  }, [products]);
 
   useEffect(() => {
     const savedCart = window.localStorage.getItem("sheaWellnessCart");
