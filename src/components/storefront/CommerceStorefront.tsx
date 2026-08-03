@@ -23,7 +23,7 @@ import {
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
-import { formatMoney } from "@/lib/format";
+import { formatMoney, productPriceForSize } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
@@ -323,10 +323,11 @@ export function CommerceStorefront({
   const displayedProducts = featuredProductLimit ? filteredProducts.slice(0, featuredProductLimit) : filteredProducts;
 
   function addToCart(product: Product, quantity = 1, size = product.sizes[0]) {
+    const selectedProduct = { ...product, price: productPriceForSize(product, size) };
     setCart((lines) => {
       const existingIndex = lines.findIndex((line) => line.product.id === product.id && line.size === size);
       if (existingIndex === -1) {
-        return [...lines, { product, quantity, size }];
+        return [...lines, { product: selectedProduct, quantity, size }];
       }
       return lines.map((line, index) => (index === existingIndex ? { ...line, quantity: line.quantity + quantity } : line));
     });
@@ -1009,7 +1010,7 @@ function ProductModal({
             ))}
           </fieldset>
           <div className="commerce-modal-buy">
-            <strong>{formatMoney(product.price, currency)}</strong>
+            <strong>{formatMoney(productPriceForSize(product, size), currency)}</strong>
             <button type="button" onClick={() => onAdd(product, size)}>
               <ShoppingCart size={18} />
               Add to cart

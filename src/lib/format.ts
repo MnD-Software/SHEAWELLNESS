@@ -12,6 +12,10 @@ export function formatMoney(value: number, currency = "USD") {
   }).format(value);
 }
 
+export function productPriceForSize(product: { price: number; sizePrices?: Record<string, number> }, size?: string) {
+  return size && product.sizePrices?.[size] !== undefined ? product.sizePrices[size] : product.price;
+}
+
 export function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }

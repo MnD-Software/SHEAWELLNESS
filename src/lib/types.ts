@@ -30,6 +30,7 @@ export type Product = {
   material: string;
   deliveryBadge: string;
   price: number;
+  sizePrices?: Record<string, number>;
   inventoryQty: number;
   status: ProductStatus;
   channel: "online" | "pos" | "both";

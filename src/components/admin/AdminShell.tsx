@@ -411,6 +411,7 @@ function ProductsView({
       material: draft.material.trim() || "Raw Shea Butter",
       deliveryBadge: draft.deliveryBadge.trim() || "Handcrafted skincare",
       price: Number(draft.price) || 0,
+      sizePrices: existingProduct?.sizePrices,
       inventoryQty: Number(draft.inventoryQty) || 0,
       status: draft.status,
       channel: existingProduct?.channel ?? "both",

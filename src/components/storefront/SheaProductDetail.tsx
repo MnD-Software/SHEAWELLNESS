@@ -3,7 +3,7 @@
 import { ArrowRight, CheckCircle2, Heart, Leaf, PackageCheck, RotateCcw, ShieldCheck, ShoppingCart, Sparkles, Star, Truck } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
-import { formatMoney } from "@/lib/format";
+import { formatMoney, productPriceForSize } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { sheaVideos } from "@/lib/shea-content";
 import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
@@ -91,7 +91,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     const existingIndex = savedCart.findIndex((line) => line.productId === product.id && line.size === size);
     const nextCart = existingIndex >= 0
       ? savedCart.map((line, index) => index === existingIndex ? { ...line, quantity: line.quantity + 1 } : line)
-      : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: product.price, size, quantity: 1 }, ...savedCart];
+      : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: productPriceForSize(product, size), size, quantity: 1 }, ...savedCart];
 
     window.localStorage.setItem("sheaWellnessCart", JSON.stringify(nextCart));
     setCartCount(nextCart.reduce((total, line) => total + line.quantity, 0));
@@ -155,7 +155,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
             <strong>{averageRating ? `${averageRating.toFixed(1)}/5` : "New"}</strong>
             <a href="#reviews">{totalReviewCount ? `${totalReviewCount} customer reviews` : "Write the first review"}</a>
           </div>
-          <strong className="shea-product-price">{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong>
+          <strong className="shea-product-price">{formatMoney(productPriceForSize(product, size), platformSnapshot.activeStore.currency)}</strong>
           <p>{product.description}</p>
           <div className="shea-live-stock"><i />{product.status === "low_stock" || product.inventoryQty <= 10 ? `Only ${product.inventoryQty} left — order soon` : `${product.inventoryQty} available and ready to ship`}</div>
 
