@@ -24,7 +24,7 @@ import {
   Users
 } from "lucide-react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { formatMoney, titleCase } from "@/lib/format";
 import {
@@ -385,6 +385,7 @@ function ProductsView({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Choose a JPG, PNG, WebP, GIF, or AVIF image up to 10 MB.");
+  const productEditorRef = useRef<HTMLDivElement | null>(null);
   const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Body Care", "Face Care", "Hair Care", "Essential Oils"]));
 
   function updateDraft(field: keyof ProductFormState, value: string) {
@@ -394,11 +395,13 @@ function ProductsView({
   function startCreate() {
     setEditingId(null);
     setDraft(productToDraft());
+    window.setTimeout(() => productEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
   function startEdit(product: Product) {
     setEditingId(product.id);
     setDraft(productToDraft(product));
+    window.setTimeout(() => productEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
   async function uploadProductImage(event: ChangeEvent<HTMLInputElement>) {
@@ -482,6 +485,11 @@ function ProductsView({
           description="Changes save to Neon and publish to the customer storefront."
           action={<button type="button" onClick={startCreate}>New product</button>}
         >
+          <div ref={productEditorRef} className="shea-admin-editor-anchor">
+          <div className="shea-admin-editing-banner" aria-live="polite">
+            <span>{editingId ? "Editing product" : "Creating product"}</span>
+            <strong>{editingId ? draft.title : "New storefront product"}</strong>
+          </div>
           <form className="shea-admin-product-form" onSubmit={saveDraft}>
             <label>
               Product name
@@ -539,6 +547,7 @@ function ProductsView({
             </label>
             <button type="submit">{editingId ? "Save product changes" : "Create product"}</button>
           </form>
+          </div>
         </Panel>
       </section>
       <div className="shea-admin-product-grid">
@@ -706,6 +715,7 @@ function MediaView({
   const [editingId, setEditingId] = useState<string | null>(mediaConfig.heroSlides[0]?.id ?? null);
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Upload an image from this computer or keep using a hosted URL.");
+  const mediaEditorRef = useRef<HTMLDivElement | null>(null);
 
   const activeItems = section === "hero" ? mediaConfig.heroSlides : section === "images" ? mediaConfig.images : mediaConfig.videos;
 
@@ -723,11 +733,13 @@ function MediaView({
   function startCreate() {
     setEditingId(null);
     setDraft(mediaToDraft());
+    window.setTimeout(() => mediaEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
   function startEdit(asset: SheaMediaAsset | SheaHeroSlide) {
     setEditingId(asset.id);
     setDraft(mediaToDraft(asset));
+    window.setTimeout(() => mediaEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
   async function uploadMediaImage(event: ChangeEvent<HTMLInputElement>) {
@@ -874,6 +886,11 @@ function MediaView({
           title={editingId ? "Edit media" : "Add media"}
           description="Use public paths like /assets/file.jpeg or paste a full hosted media URL."
         >
+          <div ref={mediaEditorRef} className="shea-admin-editor-anchor">
+          <div className="shea-admin-editing-banner" aria-live="polite">
+            <span>{editingId ? "Editing media" : "Creating media"}</span>
+            <strong>{editingId ? draft.title : "New media entry"}</strong>
+          </div>
           <form className="shea-admin-product-form" onSubmit={saveDraft}>
             <label>
               Title
@@ -927,6 +944,7 @@ function MediaView({
             ) : null}
             <button type="submit">{editingId ? "Save media changes" : "Create media"}</button>
           </form>
+          </div>
         </Panel>
       </section>
     </section>
