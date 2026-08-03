@@ -37,7 +37,7 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
     eyebrow: "Our brand story",
     title: "Nurturing wellness. Empowering communities. Sustaining nature.",
     body: "At Shea Wellness Ltd, we believe that wellness is more than skincare—it's a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.",
-    image: "/assets/shea-wellness-founder.jpeg"
+    image: "/assets/website-edits/community-impact.png"
   },
   products: {
     eyebrow: "Product catalogue",
@@ -211,7 +211,7 @@ const pageLifeCopy: Record<SheaPageKind, { title: string; body: string; image: s
   about: {
     title: "A brand built from African wellness heritage.",
     body: "Every page connects back to the same promise: clean ingredients, ethical sourcing, and products customers can understand before they buy.",
-    image: "/assets/sheawellness/grapefruit-shea-butter-lid.jpeg"
+    image: "/assets/website-edits/community-impact.png"
   },
   products: {
     title: "See the texture, understand the routine, then choose the product.",

@@ -11917,3 +11917,89 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .shea-admin-editor-anchor { scroll-margin-top: 18px; }
   .shea-admin-editing-banner { align-items: flex-start; flex-direction: column; padding: 18px; }
 }
+
+/* Homepage campaign carousel: roomy editorial split with a glass copy panel. */
+@media (min-width: 761px) {
+  .commerce-hero-card {
+    height: clamp(440px, 56vw, 620px) !important;
+    display: grid !important;
+    grid-template-columns: minmax(0, .88fr) minmax(420px, 1.12fr);
+    gap: clamp(24px, 3vw, 52px);
+    align-items: stretch;
+    padding: clamp(24px, 3vw, 44px) !important;
+    background: linear-gradient(135deg, #dfe9df 0%, #f5efe5 52%, #e6ebdf 100%) !important;
+  }
+
+  .commerce-hero-card > img {
+    position: relative !important;
+    inset: auto !important;
+    z-index: 1;
+    grid-column: 2;
+    grid-row: 1;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border-radius: clamp(22px, 2vw, 34px) !important;
+    object-fit: cover !important;
+    box-shadow: 0 24px 58px rgba(23, 61, 43, .18);
+    filter: none !important;
+  }
+
+  .commerce-hero-overlay {
+    display: none !important;
+  }
+
+  .commerce-hero .commerce-hero-copy {
+    position: relative !important;
+    inset: auto !important;
+    z-index: 2;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    max-width: 640px;
+    padding: clamp(28px, 3.4vw, 52px);
+    border: 1px solid rgba(255, 255, 255, .68);
+    border-radius: clamp(24px, 2.4vw, 38px);
+    color: #102b20 !important;
+    background: rgba(255, 255, 255, .48);
+    box-shadow: 0 24px 70px rgba(23, 61, 43, .12);
+    backdrop-filter: blur(22px) saturate(135%);
+    -webkit-backdrop-filter: blur(22px) saturate(135%);
+  }
+
+  .commerce-hero .commerce-hero-copy > span { color: #6f7e3e !important; text-shadow: none !important; }
+  .commerce-hero .commerce-hero-copy h1 { max-width: 560px; color: #102b20 !important; font-size: clamp(36px, 4vw, 62px) !important; line-height: .98; text-shadow: none !important; }
+  .commerce-hero .commerce-hero-copy p { max-width: 540px; color: #53655b !important; font-size: clamp(14px, 1.1vw, 17px); line-height: 1.65; }
+  .commerce-hero .commerce-hero-actions a { color: #fff !important; background: #173d2b !important; }
+  .commerce-hero .commerce-hero-actions .ghost { color: #173d2b !important; border-color: rgba(23, 61, 43, .22) !important; background: rgba(255, 255, 255, .5) !important; }
+  .commerce-hero-meta { right: clamp(38px, 4vw, 64px) !important; bottom: clamp(38px, 4vw, 64px) !important; }
+  .commerce-carousel-arrow.previous { left: clamp(28px, 3vw, 48px) !important; }
+  .commerce-carousel-arrow.next { right: clamp(28px, 3vw, 48px) !important; }
+  .commerce-carousel-dots { bottom: clamp(12px, 1.5vw, 22px) !important; }
+}
+
+@media (max-width: 760px) {
+  .commerce-hero-card {
+    grid-template-rows: minmax(220px, 42vh) auto !important;
+    padding: 10px !important;
+    gap: 10px;
+    background: linear-gradient(155deg, #dfe9df, #f5efe5) !important;
+  }
+  .commerce-hero-card > img { border-radius: 16px !important; }
+  .commerce-hero-overlay { display: none !important; }
+  .commerce-hero .commerce-hero-copy {
+    padding: 24px 20px 58px !important;
+    border: 1px solid rgba(255, 255, 255, .72);
+    border-radius: 18px;
+    color: #102b20 !important;
+    background: rgba(255, 255, 255, .55) !important;
+    backdrop-filter: blur(18px) saturate(130%);
+    -webkit-backdrop-filter: blur(18px) saturate(130%);
+  }
+  .commerce-hero .commerce-hero-copy > span { color: #6f7e3e !important; text-shadow: none !important; }
+  .commerce-hero .commerce-hero-copy h1 { color: #102b20 !important; text-shadow: none !important; }
+  .commerce-hero .commerce-hero-copy p { color: #53655b !important; }
+  .commerce-hero .commerce-hero-actions a { color: #fff !important; background: #173d2b !important; }
+  .commerce-hero .commerce-hero-actions .ghost { color: #173d2b !important; border-color: rgba(23, 61, 43, .2) !important; background: rgba(255, 255, 255, .56) !important; }
+}

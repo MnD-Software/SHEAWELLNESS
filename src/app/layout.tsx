@@ -13,8 +13,8 @@ export const metadata: Metadata = {
     apple: "/assets/website-edits/shea-wellness-logo.jpg"
   },
   alternates: { canonical: "/" },
-  openGraph: { title: "Shea Wellness LTD", description: "Natural skin, face, hair, and spa care rooted in African botanical heritage.", type: "website", url: "/", images: [{ url: "/assets/shea-wellness-founder.jpeg", alt: "Shea Wellness founder" }] },
-  twitter: { card: "summary_large_image", title: "Shea Wellness LTD", description: "Natural care rooted in African botanical heritage.", images: ["/assets/shea-wellness-founder.jpeg"] }
+  openGraph: { title: "Shea Wellness LTD", description: "Natural skin, face, hair, and spa care rooted in African botanical heritage.", type: "website", url: "/", images: [{ url: "/assets/website-edits/community-impact.png", alt: "Women celebrating Shea Wellness community impact" }] },
+  twitter: { card: "summary_large_image", title: "Shea Wellness LTD", description: "Natural care rooted in African botanical heritage.", images: ["/assets/website-edits/community-impact.png"] }
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
