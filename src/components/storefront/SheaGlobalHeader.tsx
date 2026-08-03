@@ -117,7 +117,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
     <aside ref={sidebarRef} className={`shea-desktop-sidebar${mobileOpen ? " open" : ""}`} aria-label="Complete site navigation" aria-hidden={!mobileOpen}>
       <div className="shea-sidebar-topline">
         <a href="/" aria-label={`${sheaBrand.name} home`}>
-          <img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" />
+          <img src="/assets/website-edits/shea-wellness-logo.jpg" alt="Shea Wellness" />
           <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
         </a>
         <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close site navigation"><X size={22} /></button>
@@ -169,7 +169,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
             <Menu size={21} />
           </button>
           <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
-            <img src="/assets/shea-wellness-tree-logo.jpeg" alt={sheaBrand.name} />
+            <img src="/assets/website-edits/shea-wellness-logo.jpg" alt={sheaBrand.name} />
           </a>
         </div>
 

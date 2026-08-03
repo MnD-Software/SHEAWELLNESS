@@ -457,7 +457,7 @@ export function CommerceStorefront({
 
           <section className="commerce-our-story" aria-labelledby="our-story-heading">
             <div className="commerce-story-visual">
-              <Image src="/assets/shea-wellness-founder.jpeg" alt="Shea Wellness founder seated in front of a fireplace" fill sizes="(max-width: 980px) 100vw, 54vw" style={{ objectFit: "cover", objectPosition: "50% 28%" }} />
+              <Image src="/assets/website-edits/community-impact.png" alt="Women celebrating the community impact behind Shea Wellness" fill sizes="(max-width: 980px) 100vw, 54vw" style={{ objectFit: "cover", objectPosition: "50% 42%" }} />
               <span>Rooted in African botanical heritage</span>
             </div>
             <div className="commerce-story-copy">
@@ -473,7 +473,7 @@ export function CommerceStorefront({
                 butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care
                 for the skin, hair, and overall wellbeing of the whole family.
               </p>
-              <p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship.</p>
+              <p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p>
               <a href="/about">Discover our full story <ArrowRight size={17} /></a>
             </div>
           </section>
