@@ -23,7 +23,7 @@ import {
   Truck,
   Users
 } from "lucide-react";
-import type { FormEvent, ReactNode } from "react";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { formatMoney, titleCase } from "@/lib/format";
@@ -142,6 +142,15 @@ function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
     ctaHref: heroAsset.ctaHref ?? "/shop",
     objectPosition: asset?.objectPosition ?? "50% 50%"
   };
+}
+
+async function uploadAdminImage(file: File) {
+  const form = new FormData();
+  form.set("file", file);
+  const response = await fetch("/api/admin/upload", { method: "POST", body: form });
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error ?? "Unable to upload image.");
+  return payload.data.url as string;
 }
 
 export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
@@ -374,6 +383,8 @@ function ProductsView({
 }) {
   const [draft, setDraft] = useState<ProductFormState>(() => productToDraft());
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
+  const [imageUploadMessage, setImageUploadMessage] = useState("Choose a JPG, PNG, WebP, GIF, or AVIF image up to 10 MB.");
   const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Body Care", "Face Care", "Hair Care", "Essential Oils"]));
 
   function updateDraft(field: keyof ProductFormState, value: string) {
@@ -388,6 +399,24 @@ function ProductsView({
   function startEdit(product: Product) {
     setEditingId(product.id);
     setDraft(productToDraft(product));
+  }
+
+  async function uploadProductImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setImageUploadState("uploading");
+    setImageUploadMessage(`Uploading ${file.name}…`);
+    try {
+      const imageUrl = await uploadAdminImage(file);
+      updateDraft("imageUrl", imageUrl);
+      setImageUploadState("idle");
+      setImageUploadMessage("Upload complete. Save the product to publish this image.");
+    } catch (error) {
+      setImageUploadState("error");
+      setImageUploadMessage(error instanceof Error ? error.message : "Unable to upload image.");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   function saveDraft(event: FormEvent<HTMLFormElement>) {
@@ -450,7 +479,7 @@ function ProductsView({
         </Panel>
         <Panel
           title={editingId ? "Modify product" : "Add product"}
-          description="Updates save locally and refresh the customer storefront in this browser."
+          description="Changes save to Neon and publish to the customer storefront."
           action={<button type="button" onClick={startCreate}>New product</button>}
         >
           <form className="shea-admin-product-form" onSubmit={saveDraft}>
@@ -490,6 +519,12 @@ function ProductsView({
               Image URL
               <input required value={draft.imageUrl} onChange={(event) => updateDraft("imageUrl", event.target.value)} placeholder="/assets/sheawellness/product.jpeg" />
             </label>
+            <label className={`shea-admin-upload ${imageUploadState}`}>
+              <span>{imageUploadState === "uploading" ? "Uploading image…" : "Upload from computer"}</span>
+              <small>{imageUploadMessage}</small>
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" onChange={uploadProductImage} disabled={imageUploadState === "uploading"} />
+            </label>
+            {draft.imageUrl ? <img className="shea-admin-upload-preview" src={draft.imageUrl} alt="Product upload preview" /> : null}
             <label>
               Sizes
               <input value={draft.sizes} onChange={(event) => updateDraft("sizes", event.target.value)} placeholder="100g, 250g, 500g" />
@@ -669,6 +704,8 @@ function MediaView({
   const [section, setSection] = useState<MediaSection>("hero");
   const [draft, setDraft] = useState<MediaFormState>(() => mediaToDraft(mediaConfig.heroSlides[0]));
   const [editingId, setEditingId] = useState<string | null>(mediaConfig.heroSlides[0]?.id ?? null);
+  const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
+  const [imageUploadMessage, setImageUploadMessage] = useState("Upload an image from this computer or keep using a hosted URL.");
 
   const activeItems = section === "hero" ? mediaConfig.heroSlides : section === "images" ? mediaConfig.images : mediaConfig.videos;
 
@@ -691,6 +728,24 @@ function MediaView({
   function startEdit(asset: SheaMediaAsset | SheaHeroSlide) {
     setEditingId(asset.id);
     setDraft(mediaToDraft(asset));
+  }
+
+  async function uploadMediaImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setImageUploadState("uploading");
+    setImageUploadMessage(`Uploading ${file.name}…`);
+    try {
+      const imageUrl = await uploadAdminImage(file);
+      updateDraft("src", imageUrl);
+      setImageUploadState("idle");
+      setImageUploadMessage("Upload complete. Save the media entry to publish it.");
+    } catch (error) {
+      setImageUploadState("error");
+      setImageUploadMessage(error instanceof Error ? error.message : "Unable to upload image.");
+    } finally {
+      event.target.value = "";
+    }
   }
 
   function saveDraft(event: FormEvent<HTMLFormElement>) {
@@ -792,7 +847,7 @@ function MediaView({
       <section className="shea-admin-grid wide-left">
         <Panel
           title={section === "hero" ? "Before/after carousel" : section === "images" ? "Image library" : "Video library"}
-          description="Every entry here is editable by admin and saved for the live storefront in this browser."
+          description="Every entry here is editable and saved to the live Neon-backed storefront."
           action={<button type="button" onClick={startCreate}>Add media</button>}
         >
           <div className={section === "videos" ? "shea-admin-video-grid" : "shea-admin-media-grid"}>
@@ -828,6 +883,16 @@ function MediaView({
               Media URL
               <input required value={draft.src} onChange={(event) => updateDraft("src", event.target.value)} />
             </label>
+            {section !== "videos" ? (
+              <>
+                <label className={`shea-admin-upload ${imageUploadState}`}>
+                  <span>{imageUploadState === "uploading" ? "Uploading image…" : "Upload from computer"}</span>
+                  <small>{imageUploadMessage}</small>
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" onChange={uploadMediaImage} disabled={imageUploadState === "uploading"} />
+                </label>
+                {draft.src ? <img className="shea-admin-upload-preview" src={draft.src} alt="Media upload preview" /> : null}
+              </>
+            ) : null}
             <div className="shea-admin-form-row">
               <label>
                 Tag

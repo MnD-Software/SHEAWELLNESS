@@ -11864,3 +11864,46 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .shea-admin-panel-head { margin-bottom: 22px; }
   .shea-admin-product-form { gap: 18px; }
 }
+
+/* Extra-roomy admin workspace and local image upload surfaces. */
+.shea-admin-upload {
+  position: relative;
+  min-height: 116px;
+  display: grid !important;
+  place-content: center;
+  gap: 8px !important;
+  padding: 22px;
+  border: 1.5px dashed #aebcb2;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #fbfdf9, #f1f5ef);
+  color: #173d2b !important;
+  text-align: center;
+  cursor: pointer;
+}
+.shea-admin-upload:hover { border-color: #557a61; background: #f5f8f2; }
+.shea-admin-upload span { font-size: 15px; font-weight: 900; letter-spacing: 0; text-transform: none; }
+.shea-admin-upload small { max-width: 480px; color: #6b776f; font-size: 12px; font-weight: 650; letter-spacing: 0; line-height: 1.5; text-transform: none; }
+.shea-admin-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.shea-admin-upload.uploading { cursor: wait; opacity: .75; }
+.shea-admin-upload.error { border-color: #bd695d; background: #fff6f4; }
+.shea-admin-upload-preview { width: 100%; max-height: 360px; display: block; object-fit: contain; border: 1px solid #dfe6de; border-radius: 20px; background: #f4f5f0; }
+
+@media (min-width: 1180px) {
+  .shea-admin { grid-template-columns: 320px minmax(0, 1fr); }
+  .shea-admin-main { padding-inline: clamp(54px, 5vw, 88px); }
+  .shea-admin-grid.wide-left { grid-template-columns: 1fr; }
+  .shea-admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
+  .shea-admin-grid.two,
+  .shea-admin-grid.three,
+  .shea-admin-grid.four { gap: 30px; }
+  .shea-admin-product-grid,
+  .shea-admin-media-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
+  .shea-admin-video-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+  .shea-admin-panel { padding: clamp(34px, 3vw, 48px); }
+  .shea-admin-panel-head { margin-bottom: 34px; }
+  .shea-admin-product-form { max-width: 1040px; gap: 24px; }
+  .shea-admin-form-row { gap: 24px; }
+  .shea-admin-product-form input,
+  .shea-admin-product-form select { min-height: 58px; }
+  .shea-admin-product-form textarea { min-height: 150px; }
+}
