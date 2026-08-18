@@ -1,12 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { getStoreContent, saveMedia, saveProducts } from "@/server/repositories/storeContentRepository";
+import { getStoreContent, saveMedia, savePageOverrides, saveProducts } from "@/server/repositories/storeContentRepository";
 
 export const dynamic = "force-dynamic";
 
 const updateSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("products"), products: z.array(z.record(z.unknown())) }),
-  z.object({ type: z.literal("media"), media: z.record(z.unknown()) })
+  z.object({ type: z.literal("media"), media: z.record(z.unknown()) }),
+  z.object({ type: z.literal("pageOverrides"), pageOverrides: z.record(z.unknown()) })
 ]);
 
 export async function GET() {
@@ -22,7 +23,9 @@ export async function PUT(request: NextRequest) {
     const payload = updateSchema.parse(await request.json());
     const content = payload.type === "products"
       ? await saveProducts(payload.products as never)
-      : await saveMedia(payload.media as never);
+      : payload.type === "media"
+        ? await saveMedia(payload.media as never)
+        : await savePageOverrides(payload.pageOverrides as never);
     return NextResponse.json({ data: content });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unable to save content.";

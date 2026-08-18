@@ -42,11 +42,13 @@ import {
 } from "@/lib/shea-content";
 import type { PlatformSnapshot, Product, ProductStatus } from "@/lib/types";
 import type { SheaHeroSlide, SheaMediaAsset, SheaMediaConfig } from "@/lib/shea-content";
+import type { PageOverrides } from "@/server/repositories/storeContentRepository";
 
 const adminNav = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "products", label: "Products", icon: Boxes },
   { id: "media", label: "Media library", icon: Image },
+  { id: "pages", label: "Site pages", icon: FileText },
   { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "settings", label: "Settings", icon: Settings }
 ] as const;
@@ -157,6 +159,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [runtimeOrders, setRuntimeOrders] = useState<RuntimeOrder[]>([]);
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
+  const [pageOverrides, setPageOverrides] = useState<PageOverrides>({});
   const [saveState, setSaveState] = useState<"loading" | "saved" | "saving" | "error" | "setup">("loading");
   const [saveMessage, setSaveMessage] = useState("Connecting to content database…");
   const activeStore = snapshot.activeStore;
@@ -182,6 +185,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         if (!response.ok) throw new Error(payload.error ?? "Unable to load content.");
         setManagedProducts((payload.data.products as Product[]).map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
         setMediaConfig(sanitizeSheaMediaConfig(payload.data.media as SheaMediaConfig));
+        setPageOverrides((payload.data.pageOverrides as PageOverrides | undefined) ?? {});
         setSaveState(payload.data.persisted ? "saved" : "setup");
         setSaveMessage(payload.data.persisted ? "All changes are synced to Neon" : "Add DATABASE_URL to enable saving");
       })
@@ -218,6 +222,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   function saveMediaConfig(nextMediaConfig: SheaMediaConfig) {
     setMediaConfig(nextMediaConfig);
     void persistContent({ type: "media", media: nextMediaConfig });
+  }
+
+  function savePageOverridesConfig(nextPageOverrides: PageOverrides) {
+    setPageOverrides(nextPageOverrides);
+    void persistContent({ type: "pageOverrides", pageOverrides: nextPageOverrides });
   }
 
   function openNewProduct() {
@@ -272,10 +281,168 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} mediaConfig={mediaConfig} setView={setView} /> : null}
         {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} /> : null}
         {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
+        {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
       </main>
     </div>
+  );
+}
+
+const adminSitePages = [
+  { title: "Homepage", route: "/", group: "Storefront", manage: "media" as View },
+  { title: "Shop", route: "/shop", group: "Commerce", manage: "products" as View },
+  { title: "Products", route: "/products", group: "Commerce", manage: "products" as View },
+  { title: "Face care", route: "/face", group: "Departments", manage: "products" as View },
+  { title: "Skin care", route: "/skin", group: "Departments", manage: "products" as View },
+  { title: "Hair care", route: "/hair", group: "Departments", manage: "products" as View },
+  { title: "Wellness gifts", route: "/wellness-gifts", group: "Departments", manage: "products" as View },
+  { title: "Spa essentials", route: "/spa-essentials", group: "Departments", manage: "products" as View },
+  { title: "Our story", route: "/about", group: "Brand", manage: "media" as View },
+  { title: "Wellness guides", route: "/wellness-guides", group: "Content", manage: "media" as View },
+  { title: "Wholesale", route: "/wholesale", group: "Business", manage: "media" as View },
+  { title: "Sustainability", route: "/sustainability", group: "Brand", manage: "media" as View },
+  { title: "Blog", route: "/blog", group: "Content", manage: "media" as View },
+  { title: "Quality", route: "/quality", group: "Brand", manage: "media" as View },
+  { title: "Contact", route: "/contact", group: "Support", manage: "settings" as View },
+  { title: "FAQ", route: "/faq", group: "Support", manage: "settings" as View },
+  { title: "Catalogue", route: "/catalogue", group: "Business", manage: "media" as View },
+  { title: "Shipping policy", route: "/shipping-policy", group: "Policies", manage: "settings" as View },
+  { title: "Refund policy", route: "/refund-policy", group: "Policies", manage: "settings" as View },
+  { title: "Policies", route: "/policies", group: "Policies", manage: "settings" as View },
+  { title: "Customer account", route: "/account", group: "Customer", manage: "settings" as View }
+];
+
+function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => void; mediaConfig: SheaMediaConfig; saveMediaConfig: (config: SheaMediaConfig) => void }) {
+  const [pageQuery, setPageQuery] = useState("");
+  const [editingPage, setEditingPage] = useState<(typeof adminSitePages)[number] | null>(null);
+  const [elements, setElements] = useState<Array<{ kind: "text" | "image"; index: number; label: string; value: string }>>([]);
+  const [selectedElement, setSelectedElement] = useState<{ kind: "text" | "image"; index: number; label: string; value: string } | null>(null);
+  const [imagePickerElement, setImagePickerElement] = useState<{ kind: "image"; index: number; label: string; value: string } | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const visiblePages = adminSitePages.filter((page) => `${page.title} ${page.group} ${page.route}`.toLowerCase().includes(pageQuery.trim().toLowerCase()));
+
+  function inspectPage() {
+    const documentRoot = iframeRef.current?.contentDocument;
+    if (!documentRoot || !editingPage) return;
+    const textNodes = Array.from(documentRoot.querySelectorAll<HTMLElement>("main h1, main h2, main h3, main h4, main p, main li, main blockquote, main figcaption"));
+    const imageNodes = Array.from(documentRoot.querySelectorAll<HTMLImageElement>("main img"));
+    const texts = textNodes.map((node, index) => ({ kind: "text" as const, index, label: `${node.tagName} ${index + 1}`, value: pageOverrides[editingPage.route]?.texts?.[String(index)] ?? node.textContent?.trim() ?? "" }));
+    const images = imageNodes.map((node, index) => ({ kind: "image" as const, index, label: `Image ${index + 1}: ${node.alt || "Untitled"}`, value: pageOverrides[editingPage.route]?.images?.[String(index)] ?? node.getAttribute("src") ?? "" }));
+    texts.forEach((element) => { textNodes[element.index].textContent = element.value; });
+    images.forEach((element) => { imageNodes[element.index].src = element.value; });
+    setElements([...texts, ...images]);
+    setSelectedElement(null);
+
+    [...textNodes, ...imageNodes].forEach((node, combinedIndex) => {
+      const isImage = combinedIndex >= textNodes.length;
+      const index = isImage ? combinedIndex - textNodes.length : combinedIndex;
+      const element = (isImage ? images : texts)[index];
+      node.style.cursor = "pointer";
+      node.style.outlineOffset = "4px";
+      node.title = `Click to edit ${element.label}`;
+      node.addEventListener("mouseenter", () => { node.style.outline = "2px solid #008060"; });
+      node.addEventListener("mouseleave", () => { node.style.outline = ""; });
+      node.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (isImage) {
+          const imageElement = element as { kind: "image"; index: number; label: string; value: string };
+          setSelectedElement(imageElement);
+          setImagePickerElement(imageElement);
+          return;
+        }
+        const nextValue = window.prompt(`Edit ${element.label}`, element.value);
+        if (nextValue === null) return;
+        const nextElement = { ...element, value: nextValue };
+        setSelectedElement(nextElement);
+        setElements((items) => items.map((item) => item.kind === nextElement.kind && item.index === nextElement.index ? nextElement : item));
+        node.textContent = nextValue;
+      }, { capture: true });
+    });
+  }
+
+  function updateSelectedElement(value: string) {
+    if (!editingPage || !selectedElement) return;
+    const nextElement = { ...selectedElement, value };
+    setSelectedElement(nextElement);
+    setElements((items) => items.map((item) => item.kind === nextElement.kind && item.index === nextElement.index ? nextElement : item));
+    const documentRoot = iframeRef.current?.contentDocument;
+    if (!documentRoot) return;
+    if (nextElement.kind === "text") {
+      const node = documentRoot.querySelectorAll<HTMLElement>("main h1, main h2, main h3, main h4, main p, main li, main blockquote, main figcaption")[nextElement.index];
+      if (node) node.textContent = value;
+    } else {
+      const node = documentRoot.querySelectorAll<HTMLImageElement>("main img")[nextElement.index];
+      if (node) node.src = value;
+    }
+  }
+
+  function savePage() {
+    if (!editingPage) return;
+    const texts: Record<string, string> = {};
+    const images: Record<string, string> = {};
+    elements.forEach((element) => {
+      (element.kind === "text" ? texts : images)[String(element.index)] = element.value;
+    });
+    savePageOverrides({ ...pageOverrides, [editingPage.route]: { texts, images } });
+  }
+
+  function replaceImage(element: { kind: "image"; index: number; label: string; value: string }, src: string) {
+    const nextElement = { ...element, value: src };
+    setSelectedElement(nextElement);
+    setElements((items) => items.map((item) => item.kind === "image" && item.index === element.index ? nextElement : item));
+    const node = iframeRef.current?.contentDocument?.querySelectorAll<HTMLImageElement>("main img")[element.index];
+    if (node) node.src = src;
+    setImagePickerElement(null);
+  }
+
+  if (editingPage) {
+    return <section className="shea-admin-stack shea-visual-editor">
+      <AdminHeading eyebrow="Visual editor" title={editingPage.title} action={<button type="button" className="shea-admin-secondary-action" onClick={() => setEditingPage(null)}>Back to pages</button>} />
+      <div className="shea-visual-editor-toolbar"><span>{editingPage.route}</span><button type="button" onClick={savePage}>Save page changes</button></div>
+      <div className="shea-visual-editor-layout">
+        <div className="shea-visual-editor-preview"><iframe ref={iframeRef} src={`${editingPage.route}?cmsPreview=1`} title={`${editingPage.title} live preview`} onLoad={inspectPage} /></div>
+        <aside className="shea-visual-editor-controls">
+          <header><strong>Page elements</strong><span>{elements.length} editable items</span></header>
+          <div className="shea-visual-editor-elements">{elements.map((element) => <button type="button" key={`${element.kind}-${element.index}`} className={clsx(selectedElement?.kind === element.kind && selectedElement.index === element.index && "active")} onClick={() => setSelectedElement(element)}><span>{element.label}</span><small>{element.value}</small></button>)}</div>
+          {selectedElement ? <label>{selectedElement.kind === "image" ? "Image URL" : "Text content"}<textarea value={selectedElement.value} onChange={(event) => updateSelectedElement(event.target.value)} /></label> : <p>Select a text or image item to edit it. Changes appear in the preview immediately.</p>}
+        </aside>
+      </div>
+      {imagePickerElement ? <MediaLibraryPicker
+        assets={[...mediaConfig.heroSlides, ...mediaConfig.images]}
+        selectedSrc={imagePickerElement.value}
+        onClose={() => setImagePickerElement(null)}
+        onSelect={(src) => replaceImage(imagePickerElement, src)}
+        onUploadFile={async (file) => {
+          const src = await uploadAdminImage(file);
+          if (!mediaConfig.images.some((asset) => asset.src === src)) {
+            saveMediaConfig({ ...mediaConfig, images: [...mediaConfig.images, { id: `page_image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src, type: "image", tag: "Page image" }] });
+          }
+          return src;
+        }}
+      /> : null}
+    </section>;
+  }
+
+  return (
+    <section className="shea-admin-stack">
+      <AdminHeading eyebrow="Website" title="Site pages" />
+      <div className="shea-admin-page-search"><Search size={17} /><input value={pageQuery} onChange={(event) => setPageQuery(event.target.value)} placeholder="Search pages and sections" /></div>
+      <div className="shea-admin-page-grid">
+        {visiblePages.map((page) => (
+          <article key={page.route}>
+            <span>{page.group}</span>
+            <h2>{page.title}</h2>
+            <code>{page.route}</code>
+            <div>
+              <a href={page.route} target="_blank" rel="noreferrer">View page</a>
+              <button type="button" onClick={() => setEditingPage(page)}>Edit page</button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -358,6 +525,7 @@ function ProductsView({
   const [imageUploadMessage, setImageUploadMessage] = useState("Choose a JPG, PNG, WebP, GIF, or AVIF image up to 10 MB.");
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const productEditorRef = useRef<HTMLDivElement | null>(null);
   const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Body Care", "Face Care", "Hair Care", "Essential Oils"]));
 
@@ -475,7 +643,7 @@ function ProductsView({
         {!isEditorOpen ? (
         <Panel title="Product list" description="Edit a product or remove it from the storefront.">
           {products.length ? (
-            <ProductTable products={products} currency="KES" onEdit={startEdit} onDelete={deleteProduct} />
+            <ProductTable products={products} currency="KES" onView={setSelectedProduct} onEdit={startEdit} onDelete={deleteProduct} />
           ) : (
             <div className="shea-admin-empty">
               <Boxes size={28} />
@@ -575,7 +743,59 @@ function ProductsView({
           }}
         />
       ) : null}
+      {selectedProduct ? (
+        <ProductDetailsModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
+          onEdit={() => {
+            setSelectedProduct(null);
+            startEdit(selectedProduct);
+          }}
+          onDelete={() => {
+            deleteProduct(selectedProduct.id);
+            setSelectedProduct(null);
+          }}
+        />
+      ) : null}
     </section>
+  );
+}
+
+function ProductDetailsModal({ product, onClose, onEdit, onDelete }: { product: Product; onClose: () => void; onEdit: () => void; onDelete: () => void }) {
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [onClose]);
+
+  return (
+    <div className="shea-product-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="shea-product-modal" role="dialog" aria-modal="true" aria-labelledby="product-details-title">
+        <header>
+          <div><span>{product.category}</span><h2 id="product-details-title">{product.title}</h2></div>
+          <button type="button" onClick={onClose} aria-label="Close product details">×</button>
+        </header>
+        <div className="shea-product-modal-body">
+          <img src={product.imageUrl} alt={product.title} />
+          <div>
+            <span className={clsx("shea-admin-status", product.status)}>{titleCase(product.status)}</span>
+            <p>{product.description}</p>
+            <dl>
+              <div><dt>Inventory</dt><dd>{product.inventoryQty}</dd></div>
+              <div><dt>Price</dt><dd>{formatMoney(product.price, "KES")}</dd></div>
+              <div><dt>Sizes</dt><dd>{product.sizes.join(", ")}</dd></div>
+              <div><dt>Material</dt><dd>{product.material}</dd></div>
+            </dl>
+          </div>
+        </div>
+        <footer>
+          <button type="button" className="danger" onClick={onDelete}>Delete product</button>
+          <button type="button" onClick={onEdit}>Edit product</button>
+        </footer>
+      </section>
+    </div>
   );
 }
 
@@ -583,14 +803,17 @@ function MediaLibraryPicker({
   assets,
   selectedSrc,
   onSelect,
-  onClose
+  onClose,
+  onUploadFile
 }: {
   assets: Array<SheaMediaAsset | SheaHeroSlide>;
   selectedSrc: string;
   onSelect: (src: string) => void;
   onClose: () => void;
+  onUploadFile?: (file: File) => Promise<string>;
 }) {
   const [search, setSearch] = useState("");
+  const [uploading, setUploading] = useState(false);
   const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image").map((asset) => [asset.src, asset])).values());
   const visibleAssets = uniqueAssets.filter((asset) => `${asset.title} ${asset.tag}`.toLowerCase().includes(search.trim().toLowerCase()));
 
@@ -611,6 +834,7 @@ function MediaLibraryPicker({
         </header>
         <div className="shea-media-picker-tools">
           <label><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search media library" autoFocus /></label>
+          {onUploadFile ? <label className="shea-media-picker-upload">{uploading ? "Uploading…" : "Upload from computer"}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" disabled={uploading} onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; setUploading(true); try { onSelect(await onUploadFile(file)); } finally { setUploading(false); event.target.value = ""; } }} /></label> : null}
           <strong>{visibleAssets.length} images</strong>
         </div>
         <div className="shea-media-picker-grid">
@@ -920,13 +1144,13 @@ function MediaView({
           </button>
         ))}
       </div>
-      <section className="shea-admin-grid wide-left">
+      <section className="shea-admin-grid wide-left shea-admin-media-layout">
         <Panel
           title={section === "hero" ? "Before/after carousel" : section === "images" ? "Image library" : "Video library"}
           description="Every entry here is editable and saved to the live Neon-backed storefront."
           action={<button type="button" onClick={startCreate}>Add media</button>}
         >
-          <div className={section === "videos" ? "shea-admin-video-grid" : "shea-admin-media-grid"}>
+          <div className={section === "videos" ? "shea-admin-video-grid" : clsx("shea-admin-media-grid", section === "hero" && "hero-cards")}>
             {visibleItems.map((asset) => (
               <article key={asset.id}>
                 {asset.type === "video" ? (
@@ -1140,11 +1364,13 @@ function ProductFilter({
 function ProductTable({
   products,
   currency,
+  onView,
   onEdit,
   onDelete
 }: {
   products: PlatformSnapshot["products"];
   currency: string;
+  onView?: (product: Product) => void;
   onEdit?: (product: Product) => void;
   onDelete?: (productId: string) => void;
 }) {
@@ -1166,13 +1392,13 @@ function ProductTable({
           {products.map((product) => (
             <tr key={product.id}>
               <td>
-                <div className="shea-admin-product-cell">
+                <button type="button" className="shea-admin-product-cell" onClick={() => onView?.(product)} disabled={!onView} aria-label={onView ? `View ${product.title} details` : undefined}>
                   <img src={product.imageUrl} alt="" />
                   <div>
                     <strong>{product.title}</strong>
                     <small>{product.deliveryBadge}</small>
                   </div>
-                </div>
+                </button>
               </td>
               <td>{product.category}</td>
               <td><span className={clsx("shea-admin-status", product.status)}>{titleCase(product.status)}</span></td>

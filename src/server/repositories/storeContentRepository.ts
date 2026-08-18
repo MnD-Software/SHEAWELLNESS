@@ -6,9 +6,12 @@ import type { Product } from "@/lib/types";
 export type StoreContent = {
   products: Product[];
   media: SheaMediaConfig;
+  pageOverrides: PageOverrides;
   persisted: boolean;
   updatedAt: string | null;
 };
+
+export type PageOverrides = Record<string, { texts?: Record<string, string>; images?: Record<string, string> }>;
 
 const STORE_KEY = "shea-wellness";
 const VERIFIED_PRODUCT_IMAGES: Record<string, string> = {
@@ -35,6 +38,7 @@ function defaults(): StoreContent {
   return {
     products: withoutUnverifiedPrices(platformSnapshot.products),
     media: sheaDefaultMediaConfig,
+    pageOverrides: {},
     persisted: false,
     updatedAt: null
   };
@@ -58,6 +62,7 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
       `;
+      await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS page_overrides JSONB NOT NULL DEFAULT '{}'::jsonb`;
     })().catch((error) => {
       tableReady = null;
       throw error;
@@ -72,7 +77,7 @@ export async function getStoreContent(): Promise<StoreContent> {
 
   await ensureTable(sql);
   const rows = await sql`
-    SELECT products, media, updated_at
+    SELECT products, media, page_overrides, updated_at
     FROM storefront_content
     WHERE store_key = ${STORE_KEY}
     LIMIT 1
@@ -82,6 +87,7 @@ export async function getStoreContent(): Promise<StoreContent> {
   return {
     products: withoutUnverifiedPrices(rows[0].products as Product[]),
     media: sanitizeSheaMediaConfig(rows[0].media as SheaMediaConfig),
+    pageOverrides: (rows[0].page_overrides as PageOverrides | null) ?? {},
     persisted: true,
     updatedAt: new Date(rows[0].updated_at as string).toISOString()
   };
@@ -112,6 +118,20 @@ export async function saveMedia(media: SheaMediaConfig) {
     VALUES (${STORE_KEY}, ${JSON.stringify(withoutUnverifiedPrices(platformSnapshot.products))}::jsonb, ${JSON.stringify(safeMedia)}::jsonb)
     ON CONFLICT (store_key) DO UPDATE
     SET media = EXCLUDED.media, updated_at = NOW()
+    RETURNING updated_at
+  `;
+  return { persisted: true, updatedAt: new Date(rows[0].updated_at as string).toISOString() };
+}
+
+export async function savePageOverrides(pageOverrides: PageOverrides) {
+  const sql = database();
+  if (!sql) throw new Error("DATABASE_URL is not configured.");
+  await ensureTable(sql);
+  const rows = await sql`
+    INSERT INTO storefront_content (store_key, products, media, page_overrides)
+    VALUES (${STORE_KEY}, ${JSON.stringify(withoutUnverifiedPrices(platformSnapshot.products))}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb, ${JSON.stringify(pageOverrides)}::jsonb)
+    ON CONFLICT (store_key) DO UPDATE
+    SET page_overrides = EXCLUDED.page_overrides, updated_at = NOW()
     RETURNING updated_at
   `;
   return { persisted: true, updatedAt: new Date(rows[0].updated_at as string).toISOString() };

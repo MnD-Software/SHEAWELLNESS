@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { SheaMotion } from "@/components/storefront/SheaMotion";
+import { PageOverrideRuntime } from "@/components/storefront/PageOverrideRuntime";
 import "@/app/globals.css";
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     <html lang="en">
       <body>
         <SheaMotion />
+        <PageOverrideRuntime />
         {children}
       </body>
     </html>

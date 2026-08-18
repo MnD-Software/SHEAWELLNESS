@@ -392,6 +392,10 @@ export function CommerceStorefront({
     return reviews.filter((review) => review.productId === productId);
   }
 
+  function viewProduct(productId: string) {
+    window.location.assign(`/products/${encodeURIComponent(productId)}`);
+  }
+
   return (
     <main className="commerce-site">
       <SheaGlobalHeader cartCount={cartCount} onCartOpen={() => setCartOpen(true)} searchValue={query} onSearchChange={setQuery} />
@@ -574,18 +578,13 @@ export function CommerceStorefront({
 
         <div className="commerce-product-grid">
           {displayedProducts.map((product) => {
-            const productReviews = getProductReviews(product.id);
-            const reviewCount = product.reviewCount + productReviews.length;
-            const averageRating = reviewCount
-              ? ((product.rating * product.reviewCount) + productReviews.reduce((totalRating, review) => totalRating + review.rating, 0)) / reviewCount
-              : product.rating;
             const lowStock = product.status === "low_stock" || product.inventoryQty <= 10;
             const wished = wishlist.includes(product.id);
             return (
             <article className="commerce-product-card" key={product.id}>
               <a className="commerce-product-image" href={`/products/${encodeURIComponent(product.id)}`}>
                 <img src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
-                <span className="commerce-card-badges"><em>{product.badge || "Best seller"}</em>{product.sales >= 80 ? <em className="sale">Sale</em> : null}{lowStock ? <em className="stock">Low stock</em> : null}</span>
+                <span className="commerce-card-badges"><em>{product.category}</em>{lowStock ? <em className="stock">Low stock</em> : null}</span>
                 <b>View product</b>
               </a>
               <button type="button" className={clsx("commerce-card-wishlist", wished && "active")} onClick={() => toggleWishlist(product.id)} aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}><Heart size={18} fill={wished ? "currentColor" : "none"} /></button>
@@ -594,27 +593,12 @@ export function CommerceStorefront({
                   <strong>{product.title}</strong>
                   <p>{product.description}</p>
                 </div>
-                <div className="commerce-rating">
-                  <span><Star size={14} fill="currentColor" /> {averageRating ? averageRating.toFixed(1) : "New"}</span>
-                  <small>{reviewCount ? `${reviewCount} customer reviews` : "Be first to review"}</small>
-                </div>
-                <div className={clsx("commerce-stock-status", lowStock && "low")}><i />{lowStock ? `Only ${product.inventoryQty} left` : "In stock and ready to ship"}</div>
-                <div className="commerce-price-row">
-                  <span>{formatMoney(product.price, store.currency)}</span>
-                </div>
-                <div className="commerce-card-actions">
-                  <button type="button" onClick={() => addToCart(product)}>
-                    <ShoppingCart size={17} />
-                    Add
-                  </button>
-                  <a className="secondary" href={`/products/${encodeURIComponent(product.id)}`}>
+                <div className="commerce-card-footer">
+                  <span className={clsx("commerce-stock-status", lowStock && "low")}><i />{lowStock ? `${product.inventoryQty} left` : "In stock"}</span>
+                  <button type="button" onClick={() => viewProduct(product.id)} aria-label={`View ${product.title}`}>
                     <Eye size={17} />
-                    View
-                  </a>
-                  <a className="secondary review" href={`/products/${encodeURIComponent(product.id)}#reviews`}>
-                    <Star size={17} />
-                    Review
-                  </a>
+                    View product
+                  </button>
                 </div>
               </div>
             </article>
