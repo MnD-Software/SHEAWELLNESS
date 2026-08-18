@@ -1,4 +1,5 @@
 export function formatMoney(value: number, currency = "USD") {
+  if (value <= 0) return "Price pending";
   if (currency === "KES") {
     return `KSh ${new Intl.NumberFormat("en-KE", {
       maximumFractionDigits: value % 1 === 0 ? 0 : 2

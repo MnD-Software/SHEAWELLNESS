@@ -12,6 +12,8 @@ import {
   Mail,
   Megaphone,
   PackagePlus,
+  PanelLeftClose,
+  PanelLeftOpen,
   Search,
   Settings,
   ShieldCheck,
@@ -148,6 +150,7 @@ async function uploadAdminImage(file: File) {
 export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [view, setView] = useState<View>("overview");
   const [createProductRequest, setCreateProductRequest] = useState(0);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof productFilters)[number]>("all");
   const [managedProducts, setManagedProducts] = useState<Product[]>(snapshot.products);
@@ -225,13 +228,18 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const adminOrders = runtimeOrders;
 
   return (
-    <div className="shea-admin">
+    <div className={clsx("shea-admin", sidebarCollapsed && "sidebar-collapsed")}>
       <aside className="shea-admin-sidebar">
         <div className="shea-admin-brand">
           <div>S</div>
           <span>Shea Wellness LTD</span>
           <small>Store administration</small>
         </div>
+
+        <button type="button" className="shea-admin-sidebar-toggle" onClick={() => setSidebarCollapsed((collapsed) => !collapsed)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}>
+          {sidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          <span>{sidebarCollapsed ? "Expand" : "Collapse"}</span>
+        </button>
 
         <nav aria-label="Shea Wellness admin navigation">
           {adminNav.map((item) => {
@@ -349,6 +357,7 @@ function ProductsView({
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Choose a JPG, PNG, WebP, GIF, or AVIF image up to 10 MB.");
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const productEditorRef = useRef<HTMLDivElement | null>(null);
   const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Body Care", "Face Care", "Hair Care", "Essential Oils"]));
 
@@ -359,6 +368,7 @@ function ProductsView({
   function startCreate() {
     setEditingId(null);
     setDraft(productToDraft());
+    setIsEditorOpen(true);
     window.setTimeout(() => productEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
@@ -369,6 +379,7 @@ function ProductsView({
   function startEdit(product: Product) {
     setEditingId(product.id);
     setDraft(productToDraft(product));
+    setIsEditorOpen(true);
     window.setTimeout(() => productEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
@@ -439,7 +450,8 @@ function ProductsView({
 
     saveProducts(allProducts.filter((product) => product.id !== productId));
     if (editingId === productId) {
-      startCreate();
+      setEditingId(null);
+      setIsEditorOpen(false);
     }
   }
 
@@ -447,17 +459,20 @@ function ProductsView({
     <section className="shea-admin-stack">
       <AdminHeading
         eyebrow="Products"
-        title="Manage your catalogue"
-        action={<button type="button" className="shea-admin-primary-action" onClick={startCreate}><PackagePlus size={17} /> Add new product</button>}
+        title={isEditorOpen ? (editingId ? "Edit product" : "Add product") : "Manage your catalogue"}
+        action={isEditorOpen
+          ? <button type="button" className="shea-admin-secondary-action" onClick={() => setIsEditorOpen(false)}>Back to products</button>
+          : <button type="button" className="shea-admin-primary-action" onClick={startCreate}><PackagePlus size={17} /> Add new product</button>}
       />
-      <div className="shea-admin-catalogue-tools">
+      {!isEditorOpen ? <div className="shea-admin-catalogue-tools">
         <div>
           <strong>{allProducts.length} products</strong>
           <span>{products.length === allProducts.length ? "All products are shown" : `${products.length} match your search and filter`}</span>
         </div>
         <ProductFilter filter={filter} setFilter={setFilter} />
-      </div>
-      <section className="shea-admin-grid wide-left">
+      </div> : null}
+      <section className={clsx("shea-admin-products-page", isEditorOpen && "editor-open")}>
+        {!isEditorOpen ? (
         <Panel title="Product list" description="Edit a product or remove it from the storefront.">
           {products.length ? (
             <ProductTable products={products} currency="KES" onEdit={startEdit} onDelete={deleteProduct} />
@@ -470,10 +485,12 @@ function ProductsView({
             </div>
           )}
         </Panel>
+        ) : null}
+        {isEditorOpen ? (
         <Panel
           title={editingId ? "Modify product" : "Add product"}
           description="Changes save to Neon and publish to the customer storefront."
-          action={<button type="button" onClick={startCreate}>New product</button>}
+          action={editingId ? <button type="button" onClick={startCreate}>New product</button> : undefined}
         >
           <div ref={productEditorRef} className="shea-admin-editor-anchor">
           <div className="shea-admin-editing-banner" aria-live="polite">
@@ -503,16 +520,10 @@ function ProductsView({
                 </select>
               </label>
             </div>
-            <div className="shea-admin-form-row">
-              <label>
-                Price
-                <input required type="number" min="0" value={draft.price} onChange={(event) => updateDraft("price", event.target.value)} />
-              </label>
-              <label>
-                Inventory
-                <input required type="number" min="0" value={draft.inventoryQty} onChange={(event) => updateDraft("inventoryQty", event.target.value)} />
-              </label>
-            </div>
+            <label>
+              Inventory
+              <input required type="number" min="0" value={draft.inventoryQty} onChange={(event) => updateDraft("inventoryQty", event.target.value)} />
+            </label>
             <div className="shea-admin-image-field">
               <span>Product image</span>
               {draft.imageUrl ? <img src={draft.imageUrl} alt="Selected product" /> : null}
@@ -526,7 +537,6 @@ function ProductsView({
               <small>{imageUploadMessage}</small>
               <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" onChange={uploadProductImage} disabled={imageUploadState === "uploading"} />
             </label>
-            {draft.imageUrl ? <img className="shea-admin-upload-preview" src={draft.imageUrl} alt="Product upload preview" /> : null}
             <details className="shea-admin-advanced-fields">
               <summary>More product details <span>Optional</span></summary>
               <div>
@@ -548,6 +558,7 @@ function ProductsView({
           </form>
           </div>
         </Panel>
+        ) : null}
       </section>
       {isMediaLibraryOpen ? (
         <MediaLibraryPicker
@@ -763,9 +774,13 @@ function MediaView({
   const [editingId, setEditingId] = useState<string | null>(mediaConfig.heroSlides[0]?.id ?? null);
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Upload an image from this computer or keep using a hosted URL.");
+  const [mediaPage, setMediaPage] = useState(0);
   const mediaEditorRef = useRef<HTMLDivElement | null>(null);
 
   const activeItems = section === "hero" ? mediaConfig.heroSlides : section === "images" ? mediaConfig.images : mediaConfig.videos;
+  const mediaPageSize = 20;
+  const mediaPageCount = Math.max(1, Math.ceil(activeItems.length / mediaPageSize));
+  const visibleItems = activeItems.slice(mediaPage * mediaPageSize, (mediaPage + 1) * mediaPageSize);
 
   function updateDraft(field: keyof MediaFormState, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -774,6 +789,7 @@ function MediaView({
   function switchSection(nextSection: MediaSection) {
     const nextItems = nextSection === "hero" ? mediaConfig.heroSlides : nextSection === "images" ? mediaConfig.images : mediaConfig.videos;
     setSection(nextSection);
+    setMediaPage(0);
     setEditingId(nextItems[0]?.id ?? null);
     setDraft(mediaToDraft(nextItems[0]));
   }
@@ -911,7 +927,7 @@ function MediaView({
           action={<button type="button" onClick={startCreate}>Add media</button>}
         >
           <div className={section === "videos" ? "shea-admin-video-grid" : "shea-admin-media-grid"}>
-            {activeItems.map((asset) => (
+            {visibleItems.map((asset) => (
               <article key={asset.id}>
                 {asset.type === "video" ? (
                   <video src={asset.src} muted loop playsInline preload="metadata" />
@@ -929,6 +945,11 @@ function MediaView({
               </article>
             ))}
           </div>
+          {mediaPageCount > 1 ? <div className="shea-admin-pagination">
+            <button type="button" disabled={mediaPage === 0} onClick={() => setMediaPage((page) => Math.max(0, page - 1))}>Previous</button>
+            <span>Page {mediaPage + 1} of {mediaPageCount}</span>
+            <button type="button" disabled={mediaPage >= mediaPageCount - 1} onClick={() => setMediaPage((page) => Math.min(mediaPageCount - 1, page + 1))}>Next</button>
+          </div> : null}
         </Panel>
         <Panel
           title={editingId ? "Edit media" : "Add media"}

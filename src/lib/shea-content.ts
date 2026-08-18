@@ -46,10 +46,18 @@ export function replaceRetiredSyntheticImage(src: string) {
 }
 
 export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfig {
+  const storedImageSources = new Set(config.images.map((item) => item.src));
+  const storedVideoSources = new Set(config.videos.map((item) => item.src));
   return {
     heroSlides: config.heroSlides.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
-    images: config.images.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
-    videos: config.videos
+    images: [
+      ...config.images.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
+      ...sheaDefaultMediaConfig.images.filter((item) => !storedImageSources.has(item.src))
+    ],
+    videos: [
+      ...config.videos,
+      ...sheaDefaultMediaConfig.videos.filter((item) => !storedVideoSources.has(item.src))
+    ]
   };
 }
 
@@ -168,6 +176,16 @@ const whatsappVideoFiles = [
   "WhatsApp Video 2026-07-07 at 11.50.14.mp4"
 ];
 
+const august2026ImageFiles = [
+  ...Array.from({ length: 62 }, (_, index) => `aug-2026-${String(index + 1).padStart(3, "0")}.jpeg`),
+  "shea-wellness-face-care-routine.png"
+];
+
+const august2026VideoFiles = Array.from(
+  { length: 8 },
+  (_, index) => `aug-2026-video-${String(index + 1).padStart(2, "0")}.mp4`
+);
+
 export const sheaHeroSlides: SheaHeroSlide[] = [
   {
     id: "skin_hair_face_spa",
@@ -263,6 +281,12 @@ export const sheaImageMedia: SheaMediaAsset[] = [
   src: `/assets/${file}`,
   type: "image" as const,
   tag: index < 7 ? "Brand asset" : "Skin routine"
+}))).concat(august2026ImageFiles.map((file, index) => ({
+  id: `august_2026_image_${index + 1}`,
+  title: file === "shea-wellness-face-care-routine.png" ? "Shea Wellness Face Care Routine" : `August 2026 media ${index + 1}`,
+  src: `/assets/media-library/aug-2026/${file}`,
+  type: "image" as const,
+  tag: file === "shea-wellness-face-care-routine.png" ? "Face care routine" : "Product media"
 })));
 
 export const sheaNav = [
@@ -605,6 +629,13 @@ export const sheaVideos: SheaMediaAsset[] = [
     src: `/assets/${file}`,
     type: "video" as const,
     tag: "New media"
+  })),
+  ...august2026VideoFiles.map((file, index) => ({
+    id: `august_2026_video_${index + 1}`,
+    title: `August 2026 video ${index + 1}`,
+    src: `/assets/media-library/aug-2026/${file}`,
+    type: "video" as const,
+    tag: "Product media"
   }))
 ];
 
