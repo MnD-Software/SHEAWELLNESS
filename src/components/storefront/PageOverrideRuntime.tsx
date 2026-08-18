@@ -23,7 +23,12 @@ export function applyPageOverrides(pageOverrides: PageOverrides, path = window.l
 
 export function PageOverrideRuntime() {
   useEffect(() => {
-    if (window.location.pathname.startsWith("/admin") || new URLSearchParams(window.location.search).has("cmsPreview")) return;
+    if (window.location.pathname.startsWith("/admin")) return;
+    if (new URLSearchParams(window.location.search).has("cmsPreview")) {
+      document.documentElement.dataset.cmsHydrated = "true";
+      window.dispatchEvent(new Event("shea-cms-hydrated"));
+      return;
+    }
     let active = true;
     let observer: MutationObserver | null = null;
     void fetch("/api/storefront/content", { cache: "no-store" })

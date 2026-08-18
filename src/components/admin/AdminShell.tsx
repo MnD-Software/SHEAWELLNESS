@@ -338,6 +338,8 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMedi
       const isImage = combinedIndex >= textNodes.length;
       const index = isImage ? combinedIndex - textNodes.length : combinedIndex;
       const element = (isImage ? images : texts)[index];
+      if (node.dataset.cmsEditable === "true") return;
+      node.dataset.cmsEditable = "true";
       node.style.cursor = "pointer";
       node.style.outlineOffset = "4px";
       node.title = `Click to edit ${element.label}`;
@@ -360,6 +362,17 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMedi
         node.textContent = nextValue;
       }, { capture: true });
     });
+  }
+
+  function handlePreviewLoad() {
+    const previewWindow = iframeRef.current?.contentWindow;
+    const previewDocument = iframeRef.current?.contentDocument;
+    if (!previewWindow || !previewDocument) return;
+    if (previewDocument.documentElement.dataset.cmsHydrated === "true") {
+      inspectPage();
+      return;
+    }
+    previewWindow.addEventListener("shea-cms-hydrated", inspectPage, { once: true });
   }
 
   function updateSelectedElement(value: string) {
@@ -402,7 +415,7 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMedi
       <AdminHeading eyebrow="Visual editor" title={editingPage.title} action={<button type="button" className="shea-admin-secondary-action" onClick={() => setEditingPage(null)}>Back to pages</button>} />
       <div className="shea-visual-editor-toolbar"><span>{editingPage.route}</span><button type="button" onClick={savePage}>Save page changes</button></div>
       <div className="shea-visual-editor-layout">
-        <div className="shea-visual-editor-preview"><iframe ref={iframeRef} src={`${editingPage.route}?cmsPreview=1`} title={`${editingPage.title} live preview`} onLoad={inspectPage} /></div>
+        <div className="shea-visual-editor-preview"><iframe ref={iframeRef} src={`${editingPage.route}?cmsPreview=1`} title={`${editingPage.title} live preview`} onLoad={handlePreviewLoad} /></div>
         <aside className="shea-visual-editor-controls">
           <header><strong>Page elements</strong><span>{elements.length} editable items</span></header>
           <div className="shea-visual-editor-elements">{elements.map((element) => <button type="button" key={`${element.kind}-${element.index}`} className={clsx(selectedElement?.kind === element.kind && selectedElement.index === element.index && "active")} onClick={() => setSelectedElement(element)}><span>{element.label}</span><small>{element.value}</small></button>)}</div>
