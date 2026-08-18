@@ -5,7 +5,6 @@ import {
   BookOpen,
   Boxes,
   CheckCircle2,
-  ClipboardList,
   FileText,
   Image,
   LayoutDashboard,
@@ -17,7 +16,6 @@ import {
   Settings,
   ShieldCheck,
   ShoppingCart,
-  Sparkles,
   Star,
   Store,
   Truck,
@@ -38,22 +36,16 @@ import {
   sheaQuality,
   sheaSocialProof,
   sheaSustainability,
-  sheaVideos,
   sheaWholesale
 } from "@/lib/shea-content";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import type { PlatformSnapshot, Product, ProductStatus } from "@/lib/types";
 import type { SheaHeroSlide, SheaMediaAsset, SheaMediaConfig } from "@/lib/shea-content";
 
 const adminNav = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "products", label: "Products", icon: Boxes },
-  { id: "reviews", label: "Reviews", icon: Star },
-  { id: "wholesale", label: "Wholesale", icon: Store },
-  { id: "content", label: "Content", icon: FileText },
-  { id: "quality", label: "Quality", icon: ShieldCheck },
-  { id: "media", label: "Media", icon: Image },
+  { id: "media", label: "Media library", icon: Image },
+  { id: "orders", label: "Orders", icon: ShoppingCart },
   { id: "settings", label: "Settings", icon: Settings }
 ] as const;
 
@@ -233,14 +225,12 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const adminOrders = runtimeOrders;
 
   return (
-    <>
-      <SheaGlobalHeader />
-      <div className="shea-admin">
+    <div className="shea-admin">
       <aside className="shea-admin-sidebar">
         <div className="shea-admin-brand">
           <div>S</div>
           <span>Shea Wellness LTD</span>
-          <small>Enterprise commerce dashboard</small>
+          <small>Store administration</small>
         </div>
 
         <nav aria-label="Shea Wellness admin navigation">
@@ -255,11 +245,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
           })}
         </nav>
 
-        <div className="shea-admin-contact">
-          <span>Business enquiries</span>
-          <strong>{sheaBrand.phone}</strong>
-          <small>{sheaBrand.email}</small>
-        </div>
+        <a className="shea-admin-store-link" href="/" target="_blank" rel="noreferrer">View live store</a>
       </aside>
 
       <main className="shea-admin-main">
@@ -268,7 +254,6 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
             <Search size={18} />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Shea products, orders, buyers" />
           </label>
-          <a href="/" target="_blank" rel="noreferrer">View Storefront</a>
           <span className={clsx("shea-admin-sync", saveState)}>
             <i aria-hidden="true" />
             {saveMessage}
@@ -278,16 +263,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
 
         {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} mediaConfig={mediaConfig} setView={setView} /> : null}
         {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} /> : null}
-        {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} /> : null}
-        {view === "reviews" ? <ReviewsView products={managedProducts} reviews={runtimeReviews} /> : null}
-        {view === "wholesale" ? <WholesaleView /> : null}
-        {view === "content" ? <ContentView /> : null}
-        {view === "quality" ? <QualityView /> : null}
+        {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
       </main>
-      </div>
-    </>
+    </div>
   );
 }
 
@@ -309,17 +289,17 @@ function OverviewView({
   return (
     <section className="shea-admin-stack">
       <AdminHeading
-        eyebrow="Today"
-        title="Shea Wellness command center"
-        action={<span className="shea-admin-health"><Sparkles size={16} /> Shea-only dashboard</span>}
+        eyebrow="Dashboard"
+        title="Welcome back"
+        action={<button className="shea-admin-primary-action" onClick={() => setView("products")}><PackagePlus size={17} /> Add product</button>}
       />
 
       <div className="shea-admin-metrics">
         {[
-          { label: "Storefront products", value: String(products.length), detail: "Live products currently shown in Shea Wellness." },
-          { label: "Orders captured", value: String(orders.length), detail: "Checkout orders available to this dashboard." },
-          { label: "Customer reviews", value: String(reviews.length), detail: "Reviews submitted from the storefront." },
-          { label: "Gross sales", value: formatMoney(orders.reduce((sum, order) => sum + order.totalPrice, 0), snapshot.activeStore.currency), detail: "Total from captured and current order queue." }
+          { label: "Products", value: String(products.length), detail: "In your catalogue" },
+          { label: "Orders", value: String(orders.length), detail: "Captured orders" },
+          { label: "Reviews", value: String(reviews.length), detail: "Customer feedback" },
+          { label: "Sales", value: formatMoney(orders.reduce((sum, order) => sum + order.totalPrice, 0), snapshot.activeStore.currency), detail: "Gross sales" }
         ].map((metric) => (
           <article key={metric.label}>
             <span>{metric.label}</span>
@@ -329,45 +309,16 @@ function OverviewView({
         ))}
       </div>
 
-      <section className="shea-admin-grid wide-left">
-        <Panel title="Product health" description="Retail, spa, and distributor catalogue status." action={<button onClick={() => setView("products")}>Manage</button>}>
-          <ProductTable products={products.slice(0, 7)} currency={snapshot.activeStore.currency} />
+      <section className="shea-admin-grid two shea-admin-home-panels">
+        <Panel title="Recent products" description="Your latest catalogue items." action={<button onClick={() => setView("products")}>View all</button>}>
+          <ProductTable products={products.slice(0, 5)} currency={snapshot.activeStore.currency} />
         </Panel>
-        <Panel title="Fulfillment queue" description="Priority Shea Wellness orders.">
-          <div className="shea-admin-list">
-            {orders.map((order) => (
-              <article key={`${order.orderNumber}-${order.createdAt}`}>
-                <div>
-                  <strong>{order.orderNumber}</strong>
-                  <span>{order.customerName}</span>
-                </div>
-                <div>
-                  <strong>{formatMoney(order.totalPrice, snapshot.activeStore.currency)}</strong>
-                  <span>{titleCase(order.fulfillmentStatus)}</span>
-                </div>
-              </article>
-            ))}
+        <Panel title="Media library" description={`${mediaConfig.images.length} images and ${mediaConfig.videos.length} videos available.`} action={<button onClick={() => setView("media")}>Open library</button>}>
+          <div className="shea-admin-media-preview">
+            {mediaConfig.images.slice(0, 6).map((asset) => <img key={asset.id} src={asset.src} alt={asset.title} />)}
           </div>
         </Panel>
       </section>
-
-      <section className="shea-admin-grid three">
-        <MiniPanel icon={<Store size={20} />} title="Wholesale ready" body="International retailers, wellness spas, organic beauty stores, and distributors are all covered." />
-        <MiniPanel icon={<Leaf size={20} />} title="Sustainability covered" body="Women cooperatives, ethical sourcing, natural ingredients, and eco packaging are live." />
-        <MiniPanel icon={<ClipboardList size={20} />} title="Content complete" body="Homepage, About, Products, Wholesale, Sustainability, Blog, Quality, Contact, Catalogue, and Social Proof routes exist." />
-      </section>
-
-      <Panel title="Product films" description="Actual Shea Wellness videos are available inside the dashboard, not just the public catalogue." action={<button onClick={() => setView("media")}>Open media</button>}>
-        <div className="shea-video-slider overview">
-          {(mediaConfig.videos.length ? mediaConfig.videos : sheaVideos).slice(0, 3).map((video) => (
-            <article key={video.src}>
-              <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
-              <span>{video.tag}</span>
-              <strong>{video.title}</strong>
-            </article>
-          ))}
-        </div>
-      </Panel>
     </section>
   );
 }
@@ -379,7 +330,9 @@ function ProductsView({
   filter,
   setFilter,
   saveProducts,
-  createRequest
+  createRequest,
+  mediaConfig,
+  saveMediaConfig
 }: {
   products: PlatformSnapshot["products"];
   allProducts: PlatformSnapshot["products"];
@@ -388,11 +341,14 @@ function ProductsView({
   setFilter: (filter: (typeof productFilters)[number]) => void;
   saveProducts: (products: Product[]) => void;
   createRequest: number;
+  mediaConfig: SheaMediaConfig;
+  saveMediaConfig: (mediaConfig: SheaMediaConfig) => void;
 }) {
   const [draft, setDraft] = useState<ProductFormState>(() => productToDraft());
   const [editingId, setEditingId] = useState<string | null>(null);
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Choose a JPG, PNG, WebP, GIF, or AVIF image up to 10 MB.");
+  const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
   const productEditorRef = useRef<HTMLDivElement | null>(null);
   const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Body Care", "Face Care", "Hair Care", "Essential Oils"]));
 
@@ -424,6 +380,12 @@ function ProductsView({
     try {
       const imageUrl = await uploadAdminImage(file);
       updateDraft("imageUrl", imageUrl);
+      if (!mediaConfig.images.some((asset) => asset.src === imageUrl)) {
+        saveMediaConfig({
+          ...mediaConfig,
+          images: [...mediaConfig.images, { id: `image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src: imageUrl, type: "image", tag: "Product image", objectPosition: "50% 50%" }]
+        });
+      }
       setImageUploadState("idle");
       setImageUploadMessage("Upload complete. Save the product to publish this image.");
     } catch (error) {
@@ -551,10 +513,14 @@ function ProductsView({
                 <input required type="number" min="0" value={draft.inventoryQty} onChange={(event) => updateDraft("inventoryQty", event.target.value)} />
               </label>
             </div>
-            <label>
-              Image URL
-              <input required value={draft.imageUrl} onChange={(event) => updateDraft("imageUrl", event.target.value)} placeholder="/assets/sheawellness/product.jpeg" />
-            </label>
+            <div className="shea-admin-image-field">
+              <span>Product image</span>
+              {draft.imageUrl ? <img src={draft.imageUrl} alt="Selected product" /> : null}
+              <div>
+                <button type="button" onClick={() => setIsMediaLibraryOpen(true)}><Image size={16} /> Choose from media library</button>
+                <small>Pick an existing image or upload a new one below.</small>
+              </div>
+            </div>
             <label className={`shea-admin-upload ${imageUploadState}`}>
               <span>{imageUploadState === "uploading" ? "Uploading image…" : "Upload from computer"}</span>
               <small>{imageUploadMessage}</small>
@@ -583,7 +549,70 @@ function ProductsView({
           </div>
         </Panel>
       </section>
+      {isMediaLibraryOpen ? (
+        <MediaLibraryPicker
+          assets={[
+            ...mediaConfig.heroSlides,
+            ...mediaConfig.images,
+            ...allProducts.map((product) => ({ id: `product_${product.id}`, title: product.title, src: product.imageUrl, type: "image" as const, tag: "Product image" }))
+          ]}
+          selectedSrc={draft.imageUrl}
+          onClose={() => setIsMediaLibraryOpen(false)}
+          onSelect={(src) => {
+            updateDraft("imageUrl", src);
+            setIsMediaLibraryOpen(false);
+          }}
+        />
+      ) : null}
     </section>
+  );
+}
+
+function MediaLibraryPicker({
+  assets,
+  selectedSrc,
+  onSelect,
+  onClose
+}: {
+  assets: Array<SheaMediaAsset | SheaHeroSlide>;
+  selectedSrc: string;
+  onSelect: (src: string) => void;
+  onClose: () => void;
+}) {
+  const [search, setSearch] = useState("");
+  const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image").map((asset) => [asset.src, asset])).values());
+  const visibleAssets = uniqueAssets.filter((asset) => `${asset.title} ${asset.tag}`.toLowerCase().includes(search.trim().toLowerCase()));
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [onClose]);
+
+  return (
+    <div className="shea-media-picker-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
+      <section className="shea-media-picker" role="dialog" aria-modal="true" aria-labelledby="media-library-title">
+        <header>
+          <div><span>Media</span><h2 id="media-library-title">Choose an image</h2></div>
+          <button type="button" onClick={onClose} aria-label="Close media library">×</button>
+        </header>
+        <div className="shea-media-picker-tools">
+          <label><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search media library" autoFocus /></label>
+          <strong>{visibleAssets.length} images</strong>
+        </div>
+        <div className="shea-media-picker-grid">
+          {visibleAssets.map((asset) => (
+            <button type="button" key={asset.src} className={clsx(asset.src === selectedSrc && "selected")} onClick={() => onSelect(asset.src)} title={asset.title}>
+              <img src={asset.src} alt={asset.title} />
+              <span>{asset.title}</span>
+            </button>
+          ))}
+        </div>
+        {!visibleAssets.length ? <div className="shea-admin-empty"><Image size={28} /><strong>No images found</strong><p>Try a different search.</p></div> : null}
+      </section>
+    </div>
   );
 }
 

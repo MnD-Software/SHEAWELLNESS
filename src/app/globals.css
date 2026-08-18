@@ -11908,24 +11908,122 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .shea-admin-primary-action { width: 100%; }
 }
 
+/* Compact standalone admin workspace */
+.shea-admin { grid-template-columns: 220px minmax(0, 1fr); background: #f5f6f4; font-family: Arial, sans-serif; }
+.shea-admin-sidebar { gap: 14px; padding: 18px 14px; background: #173d2b; }
+.shea-admin-brand { grid-template-columns: 38px 1fr; column-gap: 10px; padding: 2px 4px 16px; }
+.shea-admin-brand div { grid-row: 1 / 3; width: 38px; height: 38px; border-radius: 10px; font-size: 20px; }
+.shea-admin-brand span { align-self: end; margin: 0; font-family: Arial, sans-serif; font-size: 14px; font-weight: 800; }
+.shea-admin-brand small { align-self: start; font-size: 10px; }
+.shea-admin-sidebar nav { gap: 4px; }
+.shea-admin-sidebar nav button { min-height: 40px; padding: 0 11px; border-radius: 8px; font-size: 13px; }
+.shea-admin-store-link { margin-top: auto; padding: 11px 12px; border: 1px solid rgba(255,255,255,.18); border-radius: 8px; color: #fff; font-size: 12px; font-weight: 800; text-align: center; text-decoration: none; }
+.shea-admin-main { width: 100%; max-width: 1500px; padding: 0 24px 40px; }
+.shea-admin-topbar { grid-template-columns: minmax(260px, 560px) 1fr auto; min-height: 64px; padding: 10px 0; background: rgba(245,246,244,.96); }
+.shea-admin-topbar label { height: 40px; border-radius: 8px; box-shadow: none; }
+.shea-admin-topbar button, .shea-admin-panel-head button { min-height: 36px; border-radius: 8px; font-size: 12px; }
+.shea-admin-sync { justify-self: end; }
+.shea-admin-stack { gap: 14px; }
+.shea-admin-heading { align-items: center; margin: 14px 0 2px; }
+.shea-admin-heading span:first-child { font-size: 10px; }
+.shea-admin-heading h1 { margin-top: 3px; font-family: Arial, sans-serif; font-size: clamp(24px, 2.3vw, 34px); line-height: 1.15; }
+.shea-admin-metrics { gap: 12px; }
+.shea-admin-metrics article { min-height: 104px; padding: 16px; border-radius: 12px; background: #fff; box-shadow: none; }
+.shea-admin-metrics span { font-size: 11px; }
+.shea-admin-metrics strong { margin: 9px 0 4px; font-size: clamp(23px, 2vw, 31px); }
+.shea-admin-metrics small { font-size: 11px; }
+.shea-admin-panel { padding: 16px; border-radius: 12px; background: #fff; box-shadow: none; }
+.shea-admin-panel-head { align-items: center; margin-bottom: 14px; }
+.shea-admin-panel-head h2 { font-family: Arial, sans-serif; font-size: 16px; }
+.shea-admin-panel-head p { font-size: 12px; }
+.shea-admin-grid.wide-left { grid-template-columns: minmax(0, 1.35fr) minmax(330px, .65fr); }
+.shea-admin-home-panels { grid-template-columns: minmax(0, 1.4fr) minmax(280px, .6fr); }
+.shea-admin-table-wrap table { min-width: 680px; font-size: 12px; }
+.shea-admin-table-wrap th, .shea-admin-table-wrap td { padding: 11px 10px !important; }
+.shea-admin-product-cell img { width: 40px; height: 40px; border-radius: 8px; }
+.shea-admin-media-preview { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.shea-admin-media-preview img { width: 100%; aspect-ratio: 1; border-radius: 8px; object-fit: cover; }
+.shea-admin-product-form { gap: 13px; }
+.shea-admin-product-form label { gap: 6px; font-size: 11px; }
+.shea-admin-product-form input, .shea-admin-product-form select { min-height: 42px !important; border-radius: 8px; }
+.shea-admin-product-form textarea { min-height: 84px; border-radius: 8px; }
+.shea-admin-editing-banner { padding: 12px 14px; border-radius: 9px; }
+.shea-admin-editing-banner strong { font-family: Arial, sans-serif; font-size: 15px; }
+.shea-admin-upload { min-height: 88px; border-radius: 10px; }
+.shea-admin-upload-preview { max-height: 220px; border-radius: 10px; }
+.shea-admin-image-field { display: grid; grid-template-columns: 72px 1fr; gap: 6px 12px; align-items: center; }
+.shea-admin-image-field > span { grid-column: 1 / -1; color: #27352e; font-size: 11px; font-weight: 850; }
+.shea-admin-image-field img { width: 72px; height: 72px; border: 1px solid #dfe6de; border-radius: 9px; object-fit: cover; }
+.shea-admin-image-field > div { display: grid; justify-items: start; gap: 6px; }
+.shea-admin-image-field button { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; padding: 0 12px; border: 1px solid #173d2b; border-radius: 8px; background: #fff; color: #173d2b; font-size: 11px; font-weight: 850; cursor: pointer; }
+.shea-admin-image-field small { color: #6b776f; font-size: 10px; }
+.shea-admin-media-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.shea-admin-video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.shea-admin-media-grid article, .shea-admin-video-grid article { border-radius: 10px; box-shadow: none; overflow: hidden; }
+.shea-admin-media-grid img, .shea-admin-video-grid video { height: 125px; }
+.shea-admin-media-grid article > span, .shea-admin-media-grid strong, .shea-admin-video-grid span, .shea-admin-video-grid strong { padding-inline: 10px !important; }
+.shea-admin-table-actions { padding: 8px 10px 10px; }
+.shea-media-picker-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 24px; background: rgba(10,22,16,.62); }
+.shea-media-picker { width: min(1080px, 100%); height: min(760px, calc(100vh - 48px)); display: grid; grid-template-rows: auto auto 1fr; overflow: hidden; border-radius: 14px; background: #fff; box-shadow: 0 28px 90px rgba(0,0,0,.28); }
+.shea-media-picker > header { display: flex; align-items: center; justify-content: space-between; padding: 17px 20px; border-bottom: 1px solid #e2e6e2; }
+.shea-media-picker > header span { color: #718078; font-size: 10px; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.shea-media-picker > header h2 { margin: 2px 0 0; font: 700 20px/1.2 Arial, sans-serif; }
+.shea-media-picker > header button { width: 36px; height: 36px; border: 0; border-radius: 8px; background: #eef1ee; color: #173d2b; font-size: 25px; cursor: pointer; }
+.shea-media-picker-tools { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; border-bottom: 1px solid #e8ebe8; }
+.shea-media-picker-tools label { width: min(420px, 100%); height: 38px; display: flex; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid #ccd5ce; border-radius: 8px; }
+.shea-media-picker-tools input { width: 100%; border: 0; outline: 0; }
+.shea-media-picker-tools strong { color: #6a776f; font-size: 11px; }
+.shea-media-picker-grid { align-content: start; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; overflow-y: auto; padding: 18px 20px 24px; }
+.shea-media-picker-grid button { min-width: 0; padding: 0; overflow: hidden; border: 2px solid transparent; border-radius: 8px; background: #f1f3f1; cursor: pointer; text-align: left; }
+.shea-media-picker-grid button.selected { border-color: #008060; box-shadow: 0 0 0 2px rgba(0,128,96,.15); }
+.shea-media-picker-grid img { width: 100%; aspect-ratio: 1; display: block; object-fit: cover; }
+.shea-media-picker-grid span { display: block; overflow: hidden; padding: 7px 8px; font-size: 10px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 960px) {
+  .shea-admin { grid-template-columns: 76px minmax(0, 1fr); }
+  .shea-admin-brand { display: block; padding-inline: 5px; }
+  .shea-admin-brand span, .shea-admin-brand small, .shea-admin-sidebar nav span, .shea-admin-store-link { display: none; }
+  .shea-admin-sidebar nav button { justify-content: center; padding: 0; }
+  .shea-admin-grid.wide-left, .shea-admin-home-panels { grid-template-columns: 1fr; }
+  .shea-admin-media-picker-grid, .shea-media-picker-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 620px) {
+  .shea-admin { display: block; }
+  .shea-admin-sidebar { position: sticky; z-index: 30; top: 0; width: 100%; height: auto; display: flex; padding: 8px 10px; }
+  .shea-admin-brand { display: none; }
+  .shea-admin-sidebar nav { display: flex; justify-content: space-between; }
+  .shea-admin-sidebar nav button { width: 44px; }
+  .shea-admin-main { padding: 0 12px 28px; }
+  .shea-admin-topbar { position: static; grid-template-columns: 1fr auto; }
+  .shea-admin-topbar label { grid-column: 1 / -1; }
+  .shea-admin-sync { justify-self: start; }
+  .shea-admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .shea-admin-heading { align-items: stretch; flex-direction: column; }
+  .shea-media-picker-backdrop { padding: 8px; }
+  .shea-media-picker { height: calc(100vh - 16px); }
+  .shea-media-picker-tools { align-items: stretch; flex-direction: column; }
+  .shea-media-picker-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 12px; }
+}
+
 @media (min-width: 1180px) {
-  .shea-admin { grid-template-columns: 320px minmax(0, 1fr); }
-  .shea-admin-main { padding-inline: clamp(54px, 5vw, 88px); }
-  .shea-admin-grid.wide-left { grid-template-columns: 1fr; }
-  .shea-admin-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
+  .shea-admin { grid-template-columns: 220px minmax(0, 1fr); }
+  .shea-admin-main { padding-inline: 24px; }
+  .shea-admin-grid.wide-left { grid-template-columns: minmax(0, 1.35fr) minmax(330px, .65fr); }
+  .shea-admin-metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
   .shea-admin-grid.two,
   .shea-admin-grid.three,
-  .shea-admin-grid.four { gap: 30px; }
+  .shea-admin-grid.four { gap: 14px; }
   .shea-admin-product-grid,
-  .shea-admin-media-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; }
-  .shea-admin-video-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
-  .shea-admin-panel { padding: clamp(34px, 3vw, 48px); }
-  .shea-admin-panel-head { margin-bottom: 34px; }
-  .shea-admin-product-form { max-width: 1040px; gap: 24px; }
-  .shea-admin-form-row { gap: 24px; }
+  .shea-admin-media-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+  .shea-admin-video-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .shea-admin-panel { padding: 16px; }
+  .shea-admin-panel-head { margin-bottom: 14px; }
+  .shea-admin-product-form { max-width: none; gap: 13px; }
+  .shea-admin-form-row { gap: 12px; }
   .shea-admin-product-form input,
-  .shea-admin-product-form select { min-height: 58px; }
-  .shea-admin-product-form textarea { min-height: 150px; }
+  .shea-admin-product-form select { min-height: 42px; }
+  .shea-admin-product-form textarea { min-height: 84px; }
 }
 
 @media (max-width: 760px) {
