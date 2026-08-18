@@ -155,6 +155,7 @@ async function uploadAdminImage(file: File) {
 
 export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [view, setView] = useState<View>("overview");
+  const [createProductRequest, setCreateProductRequest] = useState(0);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<(typeof productFilters)[number]>("all");
   const [managedProducts, setManagedProducts] = useState<Product[]>(snapshot.products);
@@ -224,6 +225,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     void persistContent({ type: "media", media: nextMediaConfig });
   }
 
+  function openNewProduct() {
+    setView("products");
+    setCreateProductRequest((request) => request + 1);
+  }
+
   const adminOrders = runtimeOrders;
 
   return (
@@ -267,12 +273,12 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
             <i aria-hidden="true" />
             {saveMessage}
           </span>
-          <button type="button" onClick={() => setView("products")}><PackagePlus size={17} /> Add product</button>
+          <button type="button" onClick={openNewProduct}><PackagePlus size={17} /> Add product</button>
         </header>
 
         {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} mediaConfig={mediaConfig} setView={setView} /> : null}
         {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} /> : null}
-        {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} /> : null}
+        {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} /> : null}
         {view === "reviews" ? <ReviewsView products={managedProducts} reviews={runtimeReviews} /> : null}
         {view === "wholesale" ? <WholesaleView /> : null}
         {view === "content" ? <ContentView /> : null}
@@ -372,7 +378,8 @@ function ProductsView({
   storeId,
   filter,
   setFilter,
-  saveProducts
+  saveProducts,
+  createRequest
 }: {
   products: PlatformSnapshot["products"];
   allProducts: PlatformSnapshot["products"];
@@ -380,6 +387,7 @@ function ProductsView({
   filter: (typeof productFilters)[number];
   setFilter: (filter: (typeof productFilters)[number]) => void;
   saveProducts: (products: Product[]) => void;
+  createRequest: number;
 }) {
   const [draft, setDraft] = useState<ProductFormState>(() => productToDraft());
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -397,6 +405,10 @@ function ProductsView({
     setDraft(productToDraft());
     window.setTimeout(() => productEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
+
+  useEffect(() => {
+    if (createRequest > 0) startCreate();
+  }, [createRequest]);
 
   function startEdit(product: Product) {
     setEditingId(product.id);
@@ -472,13 +484,29 @@ function ProductsView({
   return (
     <section className="shea-admin-stack">
       <AdminHeading
-        eyebrow="Catalogue"
-        title="Shea Wellness storefront CRUD"
-        action={<ProductFilter filter={filter} setFilter={setFilter} />}
+        eyebrow="Products"
+        title="Manage your catalogue"
+        action={<button type="button" className="shea-admin-primary-action" onClick={startCreate}><PackagePlus size={17} /> Add new product</button>}
       />
+      <div className="shea-admin-catalogue-tools">
+        <div>
+          <strong>{allProducts.length} products</strong>
+          <span>{products.length === allProducts.length ? "All products are shown" : `${products.length} match your search and filter`}</span>
+        </div>
+        <ProductFilter filter={filter} setFilter={setFilter} />
+      </div>
       <section className="shea-admin-grid wide-left">
-        <Panel title="Live storefront products" description="Create, edit, archive, and remove products that customers see in the shop.">
-          <ProductTable products={products} currency="KES" onEdit={startEdit} onDelete={deleteProduct} />
+        <Panel title="Product list" description="Edit a product or remove it from the storefront.">
+          {products.length ? (
+            <ProductTable products={products} currency="KES" onEdit={startEdit} onDelete={deleteProduct} />
+          ) : (
+            <div className="shea-admin-empty">
+              <Boxes size={28} />
+              <strong>No products found</strong>
+              <p>Try another search or filter, or add a new product.</p>
+              <button type="button" onClick={startCreate}>Add product</button>
+            </div>
+          )}
         </Panel>
         <Panel
           title={editingId ? "Modify product" : "Add product"}
@@ -533,37 +561,28 @@ function ProductsView({
               <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" onChange={uploadProductImage} disabled={imageUploadState === "uploading"} />
             </label>
             {draft.imageUrl ? <img className="shea-admin-upload-preview" src={draft.imageUrl} alt="Product upload preview" /> : null}
-            <label>
-              Sizes
-              <input value={draft.sizes} onChange={(event) => updateDraft("sizes", event.target.value)} placeholder="100g, 250g, 500g" />
-            </label>
-            <label>
-              Ingredients / material
-              <input value={draft.material} onChange={(event) => updateDraft("material", event.target.value)} />
-            </label>
-            <label>
-              Storefront badge
-              <input value={draft.deliveryBadge} onChange={(event) => updateDraft("deliveryBadge", event.target.value)} />
-            </label>
+            <details className="shea-admin-advanced-fields">
+              <summary>More product details <span>Optional</span></summary>
+              <div>
+                <label>
+                  Sizes
+                  <input value={draft.sizes} onChange={(event) => updateDraft("sizes", event.target.value)} placeholder="100g, 250g, 500g" />
+                </label>
+                <label>
+                  Ingredients / material
+                  <input value={draft.material} onChange={(event) => updateDraft("material", event.target.value)} />
+                </label>
+                <label>
+                  Storefront badge
+                  <input value={draft.deliveryBadge} onChange={(event) => updateDraft("deliveryBadge", event.target.value)} />
+                </label>
+              </div>
+            </details>
             <button type="submit">{editingId ? "Save product changes" : "Create product"}</button>
           </form>
           </div>
         </Panel>
       </section>
-      <div className="shea-admin-product-grid">
-        {products.map((product) => (
-          <article key={product.id}>
-            <img src={product.imageUrl} alt={product.title} />
-            <span>{product.category}</span>
-            <strong>{product.title}</strong>
-            <p>{product.description}</p>
-            <div>
-              <button type="button" onClick={() => startEdit(product)}>Edit</button>
-              <button type="button" className="danger" onClick={() => deleteProduct(product.id)}>Delete</button>
-            </div>
-          </article>
-        ))}
-      </div>
     </section>
   );
 }

@@ -11892,6 +11892,21 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .shea-admin-editing-banner { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 18px 20px; border: 1px solid #d9e4da; border-radius: 18px; background: #edf4ec; color: #173d2b; }
 .shea-admin-editing-banner span { color: #617168; font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .shea-admin-editing-banner strong { overflow-wrap: anywhere; font-family: var(--font-display), Georgia, serif; font-size: 20px; }
+.shea-admin-primary-action { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 46px; padding: 0 18px; border: 0; border-radius: 12px; background: #173d2b; color: #fff; font-weight: 850; cursor: pointer; }
+.shea-admin-catalogue-tools { display: flex; align-items: center; justify-content: space-between; gap: 22px; padding: 18px 22px; border: 1px solid #dfe6de; border-radius: 18px; background: #fff; }
+.shea-admin-catalogue-tools > div:first-child { display: grid; gap: 4px; }
+.shea-admin-catalogue-tools strong { color: #173d2b; font-size: 16px; }
+.shea-admin-catalogue-tools span { color: #6b776f; font-size: 12px; }
+.shea-admin-advanced-fields { border: 1px solid #dfe6de; border-radius: 15px; background: #f8faf7; }
+.shea-admin-advanced-fields summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; color: #173d2b; font-size: 13px; font-weight: 850; cursor: pointer; }
+.shea-admin-advanced-fields summary span { color: #7a867e; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+.shea-admin-advanced-fields > div { display: grid; gap: 18px; padding: 4px 18px 18px; }
+.shea-admin-empty button { min-height: 42px; margin-top: 6px; padding: 0 16px; border: 0; border-radius: 11px; background: #173d2b; color: #fff; font-weight: 800; cursor: pointer; }
+
+@media (max-width: 700px) {
+  .shea-admin-catalogue-tools { align-items: stretch; flex-direction: column; padding: 16px; }
+  .shea-admin-primary-action { width: 100%; }
+}
 
 @media (min-width: 1180px) {
   .shea-admin { grid-template-columns: 320px minmax(0, 1fr); }
