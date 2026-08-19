@@ -185,6 +185,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(emptyMediaConfig);
   const [pageOverrides, setPageOverrides] = useState<PageOverrides>({});
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [saveState, setSaveState] = useState<"loading" | "saved" | "saving" | "error" | "setup">("loading");
   const [saveMessage, setSaveMessage] = useState("Connecting to content database…");
   const activeStore = snapshot.activeStore;
@@ -213,10 +214,12 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         setPageOverrides((payload.data.pageOverrides as PageOverrides | undefined) ?? {});
         setSaveState(payload.data.persisted ? "saved" : "setup");
         setSaveMessage(payload.data.persisted ? "All changes are synced to Neon" : "Add DATABASE_URL to enable saving");
+        setContentLoaded(true);
       })
       .catch((error: Error) => {
         setSaveState("error");
         setSaveMessage(error.message);
+        setContentLoaded(true);
       });
   }, []);
 
@@ -309,8 +312,8 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
 
         {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} mediaConfig={mediaConfig} setView={setView} /> : null}
         {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} /> : null}
-        {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
-        {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
+        {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
+        {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
       </main>
@@ -342,7 +345,7 @@ const adminSitePages = [
   { title: "Customer account", route: "/account", group: "Customer", manage: "settings" as View }
 ];
 
-function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => void; mediaConfig: SheaMediaConfig; saveMediaConfig: (config: SheaMediaConfig) => Promise<ContentSaveResult> }) {
+function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaReady, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => void; mediaConfig: SheaMediaConfig; mediaReady: boolean; saveMediaConfig: (config: SheaMediaConfig) => Promise<ContentSaveResult> }) {
   const [pageQuery, setPageQuery] = useState("");
   const [editingPage, setEditingPage] = useState<(typeof adminSitePages)[number] | null>(null);
   const [elements, setElements] = useState<Array<{ kind: "text" | "image"; index: number; label: string; value: string }>>([]);
@@ -453,6 +456,7 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMedi
       </div>
       {imagePickerElement ? <MediaLibraryPicker
         assets={[...mediaConfig.heroSlides, ...mediaConfig.images]}
+        isLoading={!mediaReady}
         selectedSrc={imagePickerElement.value}
         onClose={() => setImagePickerElement(null)}
         onSelect={(src) => replaceImage(imagePickerElement, src)}
@@ -550,6 +554,7 @@ function ProductsView({
   saveProducts,
   createRequest,
   mediaConfig,
+  mediaReady,
   saveMediaConfig
 }: {
   products: PlatformSnapshot["products"];
@@ -560,6 +565,7 @@ function ProductsView({
   saveProducts: (products: Product[]) => void;
   createRequest: number;
   mediaConfig: SheaMediaConfig;
+  mediaReady: boolean;
   saveMediaConfig: (mediaConfig: SheaMediaConfig) => Promise<ContentSaveResult>;
 }) {
   const [draft, setDraft] = useState<ProductFormState>(() => productToDraft());
@@ -779,6 +785,7 @@ function ProductsView({
             ...mediaConfig.images,
             ...allProducts.map((product) => ({ id: `product_${product.id}`, title: product.title, src: product.imageUrl, type: "image" as const, tag: "Product image" }))
           ]}
+          isLoading={!mediaReady}
           selectedSrc={draft.imageUrl}
           onClose={() => setIsMediaLibraryOpen(false)}
           onSelect={(src) => {
@@ -848,13 +855,15 @@ function MediaLibraryPicker({
   selectedSrc,
   onSelect,
   onClose,
-  onUploadFile
+  onUploadFile,
+  isLoading = false
 }: {
   assets: Array<SheaMediaAsset | SheaHeroSlide>;
   selectedSrc: string;
   onSelect: (src: string) => void;
   onClose: () => void;
   onUploadFile?: (file: File) => Promise<string>;
+  isLoading?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -891,7 +900,7 @@ function MediaLibraryPicker({
         </div>
         {uploadError ? <p className="shea-media-picker-error" role="alert">{uploadError}</p> : null}
         <div className="shea-media-picker-grid">
-          {pageAssets.map((asset) => (
+          {isLoading ? <p className="shea-media-picker-loading">Loading your saved media library…</p> : pageAssets.map((asset) => (
             <button type="button" key={asset.src} className={clsx(asset.src === selectedSrc && "selected")} onClick={() => onSelect(asset.src)} title={asset.title}>
               <img src={asset.src} alt={asset.title} loading="lazy" decoding="async" />
               <span>{asset.title}</span>
@@ -899,12 +908,12 @@ function MediaLibraryPicker({
             </button>
           ))}
         </div>
-        {visibleAssets.length > pageSize ? <footer className="shea-media-picker-pagination">
+        {!isLoading && visibleAssets.length > pageSize ? <footer className="shea-media-picker-pagination">
           <button type="button" onClick={() => setPage((value) => Math.max(0, value - 1))} disabled={currentPage === 0}>Previous</button>
           <span>Showing {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, visibleAssets.length)} of {visibleAssets.length}</span>
           <button type="button" onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))} disabled={currentPage >= pageCount - 1}>Next</button>
         </footer> : null}
-        {!visibleAssets.length ? <div className="shea-admin-empty"><Image size={28} /><strong>No images found</strong><p>Try a different search.</p></div> : null}
+        {!isLoading && !visibleAssets.length ? <div className="shea-admin-empty"><Image size={28} /><strong>No images found</strong><p>Upload an image or try a different search.</p></div> : null}
       </section>
     </div>
   );
