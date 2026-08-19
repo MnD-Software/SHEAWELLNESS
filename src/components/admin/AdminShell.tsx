@@ -108,7 +108,7 @@ type MediaFormState = {
 };
 
 type ContentSaveResult =
-  | { success: true }
+  | { success: true; data?: { media?: SheaMediaConfig } }
   | { success: false; message: string };
 
 function productToDraft(product?: Product): ProductFormState {
@@ -231,7 +231,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
       if (!response.ok) throw new Error(payload.error ?? "Unable to save changes.");
       setSaveState("saved");
       setSaveMessage("Saved to Neon");
-      return { success: true };
+      return { success: true, data: payload.data as { media?: SheaMediaConfig } };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to save changes.";
       setSaveState("error");
@@ -247,7 +247,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
 
   async function saveMediaConfig(nextMediaConfig: SheaMediaConfig): Promise<ContentSaveResult> {
     const result = await persistContent({ type: "media", media: nextMediaConfig });
-    if (result.success) setMediaConfig(nextMediaConfig);
+    if (result.success) setMediaConfig(sanitizeSheaMediaConfig(result.data?.media ?? nextMediaConfig));
     return result;
   }
 
@@ -857,8 +857,15 @@ function MediaLibraryPicker({
   const [search, setSearch] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [page, setPage] = useState(0);
   const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image").map((asset) => [asset.src, asset])).values());
   const visibleAssets = uniqueAssets.filter((asset) => `${asset.title} ${asset.tag}`.toLowerCase().includes(search.trim().toLowerCase()));
+  const pageSize = 24;
+  const pageCount = Math.max(1, Math.ceil(visibleAssets.length / pageSize));
+  const currentPage = Math.min(page, pageCount - 1);
+  const pageAssets = visibleAssets.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+
+  useEffect(() => setPage(0), [search]);
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
@@ -882,14 +889,19 @@ function MediaLibraryPicker({
         </div>
         {uploadError ? <p className="shea-media-picker-error" role="alert">{uploadError}</p> : null}
         <div className="shea-media-picker-grid">
-          {visibleAssets.map((asset) => (
+          {pageAssets.map((asset) => (
             <button type="button" key={asset.src} className={clsx(asset.src === selectedSrc && "selected")} onClick={() => onSelect(asset.src)} title={asset.title}>
-              <img src={asset.src} alt={asset.title} />
+              <img src={asset.src} alt={asset.title} loading="lazy" decoding="async" />
               <span>{asset.title}</span>
               <small>{mediaFilename(asset.src)}</small>
             </button>
           ))}
         </div>
+        {visibleAssets.length > pageSize ? <footer className="shea-media-picker-pagination">
+          <button type="button" onClick={() => setPage((value) => Math.max(0, value - 1))} disabled={currentPage === 0}>Previous</button>
+          <span>Showing {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, visibleAssets.length)} of {visibleAssets.length}</span>
+          <button type="button" onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))} disabled={currentPage >= pageCount - 1}>Next</button>
+        </footer> : null}
         {!visibleAssets.length ? <div className="shea-admin-empty"><Image size={28} /><strong>No images found</strong><p>Try a different search.</p></div> : null}
       </section>
     </div>

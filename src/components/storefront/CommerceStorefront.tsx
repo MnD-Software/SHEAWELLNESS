@@ -404,29 +404,33 @@ export function CommerceStorefront({
         <>
           <section className="commerce-hero" id="top">
             <div className="commerce-hero-card shea-carousel-shell" aria-label="Shea Wellness campaign carousel">
-              {heroSlide ? (
-                <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" style={{ objectFit: "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
-              ) : (
-                <Image src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" fill priority sizes="100vw" style={{ objectFit: "cover" }} />
-              )}
-              <div className="commerce-hero-overlay" />
-
               <div className="commerce-hero-copy">
-                <span>{heroSlide?.kicker ?? "Pure Nilotica Shea"}</span>
-                <h1>{heroSlide?.title ?? "Modern wellness essentials"}</h1>
-                {heroSlide?.body ? <p>{heroSlide.body}</p> : null}
-                <div className="commerce-hero-actions">
-                  {heroSlide ? <a href={heroSlide.ctaHref}>{heroSlide.ctaLabel}</a> : null}
-                  <a className="ghost" href="/wellness-guides">Explore wellness guides</a>
+                <div>
+                  <span>{heroSlide?.kicker ?? "Pure Nilotica Shea"}</span>
+                  <h1>{heroSlide?.title ?? "Modern wellness essentials"}</h1>
+                  {heroSlide?.body ? <p>{heroSlide.body}</p> : null}
+                  <div className="commerce-hero-actions">
+                    {heroSlide ? <a href={heroSlide.ctaHref}>{heroSlide.ctaLabel}</a> : null}
+                    <a className="ghost" href="/wellness-guides">Explore wellness guides</a>
+                  </div>
                 </div>
               </div>
 
-              {heroSlide ? (
-                <div className="commerce-hero-meta">
-                  <span>{heroSlide.tag}</span>
-                  <strong>Before / After</strong>
+              <div className="commerce-hero-media">
+                <div className="commerce-hero-image-frame">
+                  {heroSlide ? (
+                    <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="(max-width: 900px) 100vw, 56vw" style={{ objectFit: "contain", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
+                  ) : (
+                    <Image src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" fill priority sizes="(max-width: 900px) 100vw, 56vw" style={{ objectFit: "contain" }} />
+                  )}
                 </div>
-              ) : null}
+                {heroSlide ? (
+                  <div className="commerce-hero-meta">
+                    <span>{heroSlide.tag}</span>
+                    <strong>Before / After</strong>
+                  </div>
+                ) : null}
+              </div>
 
               <button type="button" className="commerce-carousel-arrow shea-carousel-control previous" onClick={() => moveHero(-1)} aria-label="Previous campaign slide">
                 <ArrowLeft size={20} />

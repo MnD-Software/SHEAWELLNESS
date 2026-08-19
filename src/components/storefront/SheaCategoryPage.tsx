@@ -13,12 +13,15 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
-    const parsedProducts = savedProducts ? (JSON.parse(savedProducts) as Product[]) : platformSnapshot.products;
     const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity: number }>;
-
-    setProducts(Array.isArray(parsedProducts) && parsedProducts.length ? parsedProducts : platformSnapshot.products);
     setCartCount(savedCart.reduce((total, line) => total + line.quantity, 0));
+    void fetch("/api/storefront/content", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (Array.isArray(payload.data?.products)) setProducts(payload.data.products as Product[]);
+      })
+      .catch(() => undefined);
   }, []);
 
   const categories = useMemo(() => Array.from(new Set(products.map((product) => product.category))), [products]);

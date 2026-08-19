@@ -64,14 +64,16 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
   const [wishlist, setWishlist] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
     const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity: number }>;
-    if (savedProducts) {
-      const parsed = JSON.parse(savedProducts) as Product[];
-      if (Array.isArray(parsed) && parsed.length) setProducts(parsed);
-    }
     setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
     setWishlist(JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[]);
+    void fetch("/api/storefront/content", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = await response.json();
+        if (Array.isArray(payload.data?.products)) setProducts(payload.data.products as Product[]);
+      })
+      .catch(() => undefined);
   }, []);
 
   const departmentProducts = useMemo(() => products.filter((product) => content.categories.includes(product.category) && product.status !== "draft"), [content.categories, products]);

@@ -118,9 +118,13 @@ export async function saveMedia(media: SheaMediaConfig) {
     VALUES (${STORE_KEY}, ${JSON.stringify(withoutUnverifiedPrices(platformSnapshot.products))}::jsonb, ${JSON.stringify(safeMedia)}::jsonb)
     ON CONFLICT (store_key) DO UPDATE
     SET media = EXCLUDED.media, updated_at = NOW()
-    RETURNING updated_at
+    RETURNING media, updated_at
   `;
-  return { persisted: true, updatedAt: new Date(rows[0].updated_at as string).toISOString() };
+  return {
+    persisted: true,
+    media: sanitizeSheaMediaConfig(rows[0].media as SheaMediaConfig),
+    updatedAt: new Date(rows[0].updated_at as string).toISOString()
+  };
 }
 
 export async function savePageOverrides(pageOverrides: PageOverrides) {
