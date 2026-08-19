@@ -111,6 +111,8 @@ type ContentSaveResult =
   | { success: true; data?: { media?: SheaMediaConfig } }
   | { success: false; message: string };
 
+const emptyMediaConfig: SheaMediaConfig = { heroSlides: [], images: [], videos: [] };
+
 function productToDraft(product?: Product): ProductFormState {
   return {
     id: product?.id ?? "",
@@ -181,7 +183,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [managedProducts, setManagedProducts] = useState<Product[]>(snapshot.products);
   const [runtimeOrders, setRuntimeOrders] = useState<RuntimeOrder[]>([]);
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
-  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
+  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(emptyMediaConfig);
   const [pageOverrides, setPageOverrides] = useState<PageOverrides>({});
   const [saveState, setSaveState] = useState<"loading" | "saved" | "saving" | "error" | "setup">("loading");
   const [saveMessage, setSaveMessage] = useState("Connecting to content database…");

@@ -25,7 +25,7 @@ import clsx from "clsx";
 import Image from "next/image";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
-import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
+import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import type { Product, Store } from "@/lib/types";
@@ -66,6 +66,8 @@ type CheckoutForm = {
   deliveryMethod: "standard" | "express";
   paymentMethod: "card" | "paypal";
 };
+
+const emptyMediaConfig: SheaMediaConfig = { heroSlides: [], images: [], videos: [] };
 
 const defaultForm: CheckoutForm = {
   email: "",
@@ -202,7 +204,7 @@ export function CommerceStorefront({
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [saleSeconds, setSaleSeconds] = useState(47 * 60 * 60 + 36 * 60);
-  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
+  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(emptyMediaConfig);
   const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
 
   const heroSlides = mediaConfig.heroSlides;
