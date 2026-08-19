@@ -42,16 +42,9 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const [recentProductIds, setRecentProductIds] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedProducts = window.localStorage.getItem("sheaWellnessProducts");
-    const parsedProducts = savedProducts ? (JSON.parse(savedProducts) as Product[]) : platformSnapshot.products;
-    const nextProducts = Array.isArray(parsedProducts) && parsedProducts.length ? parsedProducts : platformSnapshot.products;
-    const nextProduct = nextProducts.find((item) => item.id === productId) ?? platformSnapshot.products.find((item) => item.id === productId) ?? null;
     const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as ProductReview[];
     const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as StoredCartLine[];
 
-    setProducts(nextProducts);
-    setProduct(nextProduct);
-    setSize(nextProduct?.sizes[0] ?? "100g");
     setReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
     setCartCount(savedCart.reduce((total, line) => total + line.quantity, 0));
     const savedWishlist = JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[];
@@ -60,6 +53,17 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     const nextRecent = [productId, ...savedRecent.filter((id) => id !== productId)].slice(0, 8);
     window.localStorage.setItem("sheaWellnessRecentlyViewed", JSON.stringify(nextRecent));
     setRecentProductIds(nextRecent.filter((id) => id !== productId));
+    void fetch("/api/storefront/content", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = await response.json();
+        const nextProducts = Array.isArray(payload.data?.products) ? payload.data.products as Product[] : [];
+        const nextProduct = nextProducts.find((item) => item.id === productId) ?? null;
+        setProducts(nextProducts);
+        setProduct(nextProduct);
+        setSize(nextProduct?.sizes[0] ?? "100g");
+      })
+      .catch(() => undefined);
   }, [productId]);
 
   const productReviews = product ? reviews.filter((review) => review.productId === product.id) : [];

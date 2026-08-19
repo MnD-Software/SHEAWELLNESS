@@ -205,9 +205,9 @@ export function CommerceStorefront({
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(sheaDefaultMediaConfig);
   const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
 
-  const heroSlides = mediaConfig.heroSlides.length ? mediaConfig.heroSlides : sheaDefaultMediaConfig.heroSlides;
+  const heroSlides = mediaConfig.heroSlides;
   const heroSlide = heroSlides[heroIndex] ?? heroSlides[0];
-  const mediaVideos = mediaConfig.videos.length ? mediaConfig.videos : sheaDefaultMediaConfig.videos;
+  const mediaVideos = mediaConfig.videos;
 
   function moveHero(direction: 1 | -1) {
     if (heroSlides.length < 2) return;
@@ -420,9 +420,7 @@ export function CommerceStorefront({
                 <div className="commerce-hero-image-frame">
                   {heroSlide ? (
                     <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="(max-width: 900px) 100vw, 56vw" style={{ objectFit: "contain", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
-                  ) : (
-                    <Image src="/assets/storefront-hero.png" alt="Curated retail products in a premium ecommerce campaign" fill priority sizes="(max-width: 900px) 100vw, 56vw" style={{ objectFit: "contain" }} />
-                  )}
+                  ) : null}
                 </div>
                 {heroSlide ? (
                   <div className="commerce-hero-meta">

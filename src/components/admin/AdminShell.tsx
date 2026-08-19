@@ -240,9 +240,9 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     }
   }
 
-  function saveManagedProducts(nextProducts: Product[]) {
-    setManagedProducts(nextProducts);
-    void persistContent({ type: "products", products: nextProducts });
+  async function saveManagedProducts(nextProducts: Product[]) {
+    const result = await persistContent({ type: "products", products: nextProducts });
+    if (result.success) setManagedProducts(nextProducts);
   }
 
   async function saveMediaConfig(nextMediaConfig: SheaMediaConfig): Promise<ContentSaveResult> {
