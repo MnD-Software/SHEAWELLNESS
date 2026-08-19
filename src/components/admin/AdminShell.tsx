@@ -107,6 +107,10 @@ type MediaFormState = {
   objectPosition: string;
 };
 
+type ContentSaveResult =
+  | { success: true }
+  | { success: false; message: string };
+
 function productToDraft(product?: Product): ProductFormState {
   return {
     id: product?.id ?? "",
@@ -140,13 +144,32 @@ function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
   };
 }
 
+function mediaFilename(src: string) {
+  const filename = src.split("?")[0].split("/").pop() || src;
+  try {
+    return decodeURIComponent(filename);
+  } catch {
+    return filename;
+  }
+}
+
 async function uploadAdminImage(file: File) {
   const form = new FormData();
   form.set("file", file);
   const response = await fetch("/api/admin/upload", { method: "POST", body: form });
-  const payload = await response.json();
-  if (!response.ok) throw new Error(payload.error ?? "Unable to upload image.");
-  return payload.data.url as string;
+  const responseText = await response.text();
+  let payload: { data?: { url?: unknown }; error?: unknown } = {};
+
+  try {
+    payload = responseText ? JSON.parse(responseText) as { data?: { url?: unknown }; error?: unknown } : {};
+  } catch {
+    // The HTTP status remains useful if a proxy returns a non-JSON error page.
+  }
+
+  const errorMessage = typeof payload.error === "string" ? payload.error : "Unable to upload image.";
+  const url = typeof payload.data?.url === "string" ? payload.data.url : null;
+  if (!response.ok || !url) throw new Error(errorMessage);
+  return url;
 }
 
 export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
@@ -195,7 +218,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
       });
   }, []);
 
-  async function persistContent(body: object) {
+  async function persistContent(body: object): Promise<ContentSaveResult> {
     setSaveState("saving");
     setSaveMessage("Saving changes…");
     try {
@@ -208,9 +231,12 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
       if (!response.ok) throw new Error(payload.error ?? "Unable to save changes.");
       setSaveState("saved");
       setSaveMessage("Saved to Neon");
+      return { success: true };
     } catch (error) {
+      const message = error instanceof Error ? error.message : "Unable to save changes.";
       setSaveState("error");
-      setSaveMessage(error instanceof Error ? error.message : "Unable to save changes.");
+      setSaveMessage(message);
+      return { success: false, message };
     }
   }
 
@@ -219,9 +245,10 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     void persistContent({ type: "products", products: nextProducts });
   }
 
-  function saveMediaConfig(nextMediaConfig: SheaMediaConfig) {
-    setMediaConfig(nextMediaConfig);
-    void persistContent({ type: "media", media: nextMediaConfig });
+  async function saveMediaConfig(nextMediaConfig: SheaMediaConfig): Promise<ContentSaveResult> {
+    const result = await persistContent({ type: "media", media: nextMediaConfig });
+    if (result.success) setMediaConfig(nextMediaConfig);
+    return result;
   }
 
   function savePageOverridesConfig(nextPageOverrides: PageOverrides) {
@@ -313,7 +340,7 @@ const adminSitePages = [
   { title: "Customer account", route: "/account", group: "Customer", manage: "settings" as View }
 ];
 
-function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => void; mediaConfig: SheaMediaConfig; saveMediaConfig: (config: SheaMediaConfig) => void }) {
+function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => void; mediaConfig: SheaMediaConfig; saveMediaConfig: (config: SheaMediaConfig) => Promise<ContentSaveResult> }) {
   const [pageQuery, setPageQuery] = useState("");
   const [editingPage, setEditingPage] = useState<(typeof adminSitePages)[number] | null>(null);
   const [elements, setElements] = useState<Array<{ kind: "text" | "image"; index: number; label: string; value: string }>>([]);
@@ -430,7 +457,8 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, saveMedi
         onUploadFile={async (file) => {
           const src = await uploadAdminImage(file);
           if (!mediaConfig.images.some((asset) => asset.src === src)) {
-            saveMediaConfig({ ...mediaConfig, images: [...mediaConfig.images, { id: `page_image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src, type: "image", tag: "Page image" }] });
+            const result = await saveMediaConfig({ ...mediaConfig, images: [...mediaConfig.images, { id: `page_image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src, type: "image", tag: "Page image" }] });
+            if (!result.success) throw new Error(result.message);
           }
           return src;
         }}
@@ -530,7 +558,7 @@ function ProductsView({
   saveProducts: (products: Product[]) => void;
   createRequest: number;
   mediaConfig: SheaMediaConfig;
-  saveMediaConfig: (mediaConfig: SheaMediaConfig) => void;
+  saveMediaConfig: (mediaConfig: SheaMediaConfig) => Promise<ContentSaveResult>;
 }) {
   const [draft, setDraft] = useState<ProductFormState>(() => productToDraft());
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -573,10 +601,11 @@ function ProductsView({
       const imageUrl = await uploadAdminImage(file);
       updateDraft("imageUrl", imageUrl);
       if (!mediaConfig.images.some((asset) => asset.src === imageUrl)) {
-        saveMediaConfig({
+        const result = await saveMediaConfig({
           ...mediaConfig,
           images: [...mediaConfig.images, { id: `image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src: imageUrl, type: "image", tag: "Product image", objectPosition: "50% 50%" }]
         });
+        if (!result.success) throw new Error(result.message);
       }
       setImageUploadState("idle");
       setImageUploadMessage("Upload complete. Save the product to publish this image.");
@@ -827,6 +856,7 @@ function MediaLibraryPicker({
 }) {
   const [search, setSearch] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
   const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image").map((asset) => [asset.src, asset])).values());
   const visibleAssets = uniqueAssets.filter((asset) => `${asset.title} ${asset.tag}`.toLowerCase().includes(search.trim().toLowerCase()));
 
@@ -847,14 +877,16 @@ function MediaLibraryPicker({
         </header>
         <div className="shea-media-picker-tools">
           <label><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search media library" autoFocus /></label>
-          {onUploadFile ? <label className="shea-media-picker-upload">{uploading ? "Uploading…" : "Upload from computer"}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" disabled={uploading} onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; setUploading(true); try { onSelect(await onUploadFile(file)); } finally { setUploading(false); event.target.value = ""; } }} /></label> : null}
+          {onUploadFile ? <label className="shea-media-picker-upload">{uploading ? "Uploading…" : "Upload from computer"}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" disabled={uploading} onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; setUploading(true); setUploadError(""); try { onSelect(await onUploadFile(file)); } catch (error) { setUploadError(error instanceof Error ? error.message : "Unable to upload image."); } finally { setUploading(false); event.target.value = ""; } }} /></label> : null}
           <strong>{visibleAssets.length} images</strong>
         </div>
+        {uploadError ? <p className="shea-media-picker-error" role="alert">{uploadError}</p> : null}
         <div className="shea-media-picker-grid">
           {visibleAssets.map((asset) => (
             <button type="button" key={asset.src} className={clsx(asset.src === selectedSrc && "selected")} onClick={() => onSelect(asset.src)} title={asset.title}>
               <img src={asset.src} alt={asset.title} />
               <span>{asset.title}</span>
+              <small>{mediaFilename(asset.src)}</small>
             </button>
           ))}
         </div>
@@ -1004,13 +1036,15 @@ function MediaView({
   saveMediaConfig
 }: {
   mediaConfig: SheaMediaConfig;
-  saveMediaConfig: (mediaConfig: SheaMediaConfig) => void;
+  saveMediaConfig: (mediaConfig: SheaMediaConfig) => Promise<ContentSaveResult>;
 }) {
   const [section, setSection] = useState<MediaSection>("hero");
   const [draft, setDraft] = useState<MediaFormState>(() => mediaToDraft(mediaConfig.heroSlides[0]));
   const [editingId, setEditingId] = useState<string | null>(mediaConfig.heroSlides[0]?.id ?? null);
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Upload an image from this computer or keep using a hosted URL.");
+  const [mediaSaveState, setMediaSaveState] = useState<"idle" | "saving" | "error">("idle");
+  const [mediaSaveMessage, setMediaSaveMessage] = useState("Changes are saved only after Neon confirms them.");
   const [mediaPage, setMediaPage] = useState(0);
   const mediaEditorRef = useRef<HTMLDivElement | null>(null);
 
@@ -1018,6 +1052,22 @@ function MediaView({
   const mediaPageSize = 20;
   const mediaPageCount = Math.max(1, Math.ceil(activeItems.length / mediaPageSize));
   const visibleItems = activeItems.slice(mediaPage * mediaPageSize, (mediaPage + 1) * mediaPageSize);
+  const isSavingMedia = mediaSaveState === "saving";
+
+  async function commitMediaConfig(nextMediaConfig: SheaMediaConfig) {
+    setMediaSaveState("saving");
+    setMediaSaveMessage("Saving media changes...");
+    const result = await saveMediaConfig(nextMediaConfig);
+    if (result.success) {
+      setMediaSaveState("idle");
+      setMediaSaveMessage("Media changes are saved to Neon.");
+      return true;
+    }
+
+    setMediaSaveState("error");
+    setMediaSaveMessage(result.message);
+    return false;
+  }
 
   function updateDraft(field: keyof MediaFormState, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -1061,8 +1111,9 @@ function MediaView({
     }
   }
 
-  function saveDraft(event: FormEvent<HTMLFormElement>) {
+  async function saveDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isSavingMedia) return;
     const mediaId = editingId ?? `${section}_${Date.now()}`;
 
     if (section === "hero") {
@@ -1081,7 +1132,8 @@ function MediaView({
       const nextSlides = editingId
         ? mediaConfig.heroSlides.map((slide) => (slide.id === editingId ? nextSlide : slide))
         : [...mediaConfig.heroSlides, nextSlide];
-      saveMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+      const saved = await commitMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+      if (!saved) return;
       setEditingId(nextSlide.id);
       setDraft(mediaToDraft(nextSlide));
       return;
@@ -1099,18 +1151,21 @@ function MediaView({
     const nextItems = editingId
       ? mediaConfig[listKey].map((item) => (item.id === editingId ? nextAsset : item))
       : [...mediaConfig[listKey], nextAsset];
-    saveMediaConfig({ ...mediaConfig, [listKey]: nextItems });
+    const saved = await commitMediaConfig({ ...mediaConfig, [listKey]: nextItems });
+    if (!saved) return;
     setEditingId(nextAsset.id);
     setDraft(mediaToDraft(nextAsset));
   }
 
-  function deleteMedia(mediaId: string) {
+  async function deleteMedia(mediaId: string) {
+    if (isSavingMedia) return;
     const confirmed = window.confirm("Remove this media entry from the Shea Wellness site?");
     if (!confirmed) return;
 
     if (section === "hero") {
       const nextSlides = mediaConfig.heroSlides.filter((slide) => slide.id !== mediaId);
-      saveMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+      const saved = await commitMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+      if (!saved) return;
       setEditingId(nextSlides[0]?.id ?? null);
       setDraft(mediaToDraft(nextSlides[0]));
       return;
@@ -1118,12 +1173,14 @@ function MediaView({
 
     const listKey = section === "images" ? "images" : "videos";
     const nextItems = mediaConfig[listKey].filter((item) => item.id !== mediaId);
-    saveMediaConfig({ ...mediaConfig, [listKey]: nextItems });
+    const saved = await commitMediaConfig({ ...mediaConfig, [listKey]: nextItems });
+    if (!saved) return;
     setEditingId(nextItems[0]?.id ?? null);
     setDraft(mediaToDraft(nextItems[0]));
   }
 
-  function moveHeroSlide(mediaId: string, direction: -1 | 1) {
+  async function moveHeroSlide(mediaId: string, direction: -1 | 1) {
+    if (isSavingMedia) return;
     const currentIndex = mediaConfig.heroSlides.findIndex((slide) => slide.id === mediaId);
     const nextIndex = currentIndex + direction;
     if (currentIndex < 0 || nextIndex < 0 || nextIndex >= mediaConfig.heroSlides.length) return;
@@ -1131,13 +1188,15 @@ function MediaView({
     const nextSlides = [...mediaConfig.heroSlides];
     const [slide] = nextSlides.splice(currentIndex, 1);
     nextSlides.splice(nextIndex, 0, slide);
-    saveMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
+    await commitMediaConfig({ ...mediaConfig, heroSlides: nextSlides });
   }
 
-  function resetMedia() {
+  async function resetMedia() {
+    if (isSavingMedia) return;
     const confirmed = window.confirm("Reset all Shea Wellness media entries to the default site media?");
     if (!confirmed) return;
-    saveMediaConfig(sheaDefaultMediaConfig);
+    const saved = await commitMediaConfig(sheaDefaultMediaConfig);
+    if (!saved) return;
     setSection("hero");
     setEditingId(sheaDefaultMediaConfig.heroSlides[0]?.id ?? null);
     setDraft(mediaToDraft(sheaDefaultMediaConfig.heroSlides[0]));
@@ -1148,20 +1207,21 @@ function MediaView({
       <AdminHeading
         eyebrow="Brand media"
         title="Editable storefront media"
-        action={<button type="button" onClick={resetMedia}>Reset defaults</button>}
+        action={<button type="button" onClick={resetMedia} disabled={isSavingMedia}>Reset defaults</button>}
       />
       <div className="shea-admin-segments">
         {(["hero", "images", "videos"] as MediaSection[]).map((item) => (
-          <button key={item} type="button" className={clsx(section === item && "active")} onClick={() => switchSection(item)}>
+          <button key={item} type="button" className={clsx(section === item && "active")} onClick={() => switchSection(item)} disabled={isSavingMedia}>
             {item === "hero" ? "Before/after carousel" : titleCase(item)}
           </button>
         ))}
       </div>
+      <p className={clsx("shea-admin-save-notice", mediaSaveState)} role={mediaSaveState === "error" ? "alert" : "status"}>{mediaSaveMessage}</p>
       <section className="shea-admin-grid wide-left shea-admin-media-layout">
         <Panel
           title={section === "hero" ? "Before/after carousel" : section === "images" ? "Image library" : "Video library"}
           description="Every entry here is editable and saved to the live Neon-backed storefront."
-          action={<button type="button" onClick={startCreate}>Add media</button>}
+          action={<button type="button" onClick={startCreate} disabled={isSavingMedia}>Add media</button>}
         >
           <div className={section === "videos" ? "shea-admin-video-grid" : clsx("shea-admin-media-grid", section === "hero" && "hero-cards")}>
             {visibleItems.map((asset) => (
@@ -1174,10 +1234,10 @@ function MediaView({
                 <span>{asset.tag}</span>
                 <strong>{asset.title}</strong>
                 <div className="shea-admin-table-actions">
-                  <button type="button" onClick={() => startEdit(asset)}>Edit</button>
-                  {section === "hero" ? <button type="button" onClick={() => moveHeroSlide(asset.id, -1)}>Up</button> : null}
-                  {section === "hero" ? <button type="button" onClick={() => moveHeroSlide(asset.id, 1)}>Down</button> : null}
-                  <button type="button" className="danger" onClick={() => deleteMedia(asset.id)}>Delete</button>
+                  <button type="button" onClick={() => startEdit(asset)} disabled={isSavingMedia}>Edit</button>
+                  {section === "hero" ? <button type="button" onClick={() => moveHeroSlide(asset.id, -1)} disabled={isSavingMedia}>Up</button> : null}
+                  {section === "hero" ? <button type="button" onClick={() => moveHeroSlide(asset.id, 1)} disabled={isSavingMedia}>Down</button> : null}
+                  <button type="button" className="danger" onClick={() => deleteMedia(asset.id)} disabled={isSavingMedia}>Delete</button>
                 </div>
               </article>
             ))}
@@ -1248,7 +1308,7 @@ function MediaView({
                 </div>
               </>
             ) : null}
-            <button type="submit">{editingId ? "Save media changes" : "Create media"}</button>
+            <button type="submit" disabled={isSavingMedia}>{isSavingMedia ? "Saving..." : editingId ? "Save media changes" : "Create media"}</button>
           </form>
           </div>
         </Panel>

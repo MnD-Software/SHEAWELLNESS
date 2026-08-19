@@ -46,18 +46,16 @@ export function replaceRetiredSyntheticImage(src: string) {
 }
 
 export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfig {
-  const storedImageSources = new Set(config.images.map((item) => item.src));
-  const storedVideoSources = new Set(config.videos.map((item) => item.src));
+  const heroSlides = Array.isArray(config?.heroSlides) ? config.heroSlides : [];
+  const images = Array.isArray(config?.images) ? config.images : [];
+  const videos = Array.isArray(config?.videos) ? config.videos : [];
+
   return {
-    heroSlides: config.heroSlides.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
-    images: [
-      ...config.images.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
-      ...sheaDefaultMediaConfig.images.filter((item) => !storedImageSources.has(item.src))
-    ],
-    videos: [
-      ...config.videos,
-      ...sheaDefaultMediaConfig.videos.filter((item) => !storedVideoSources.has(item.src))
-    ]
+    heroSlides: heroSlides.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
+    // An empty collection is a valid editorial decision. Do not merge defaults
+    // back into saved content, otherwise deleted media returns on the next load.
+    images: images.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
+    videos: videos.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) }))
   };
 }
 
