@@ -155,7 +155,7 @@ function mediaFilename(src: string) {
   }
 }
 
-async function uploadAdminImage(file: File) {
+async function uploadAdminMedia(file: File) {
   const form = new FormData();
   form.set("file", file);
   const response = await fetch("/api/admin/upload", { method: "POST", body: form });
@@ -168,7 +168,7 @@ async function uploadAdminImage(file: File) {
     // The HTTP status remains useful if a proxy returns a non-JSON error page.
   }
 
-  const errorMessage = typeof payload.error === "string" ? payload.error : "Unable to upload image.";
+  const errorMessage = typeof payload.error === "string" ? payload.error : "Unable to upload media.";
   const url = typeof payload.data?.url === "string" ? payload.data.url : null;
   if (!response.ok || !url) throw new Error(errorMessage);
   return url;
@@ -461,7 +461,7 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaRea
         onClose={() => setImagePickerElement(null)}
         onSelect={(src) => replaceImage(imagePickerElement, src)}
         onUploadFile={async (file) => {
-          const src = await uploadAdminImage(file);
+          const src = await uploadAdminMedia(file);
           if (!mediaConfig.images.some((asset) => asset.src === src)) {
             const result = await saveMediaConfig({ ...mediaConfig, images: [...mediaConfig.images, { id: `page_image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src, type: "image", tag: "Page image" }] });
             if (!result.success) throw new Error(result.message);
@@ -606,7 +606,7 @@ function ProductsView({
     setImageUploadState("uploading");
     setImageUploadMessage(`Uploading ${file.name}…`);
     try {
-      const imageUrl = await uploadAdminImage(file);
+      const imageUrl = await uploadAdminMedia(file);
       updateDraft("imageUrl", imageUrl);
       if (!mediaConfig.images.some((asset) => asset.src === imageUrl)) {
         const result = await saveMediaConfig({
@@ -1116,19 +1116,20 @@ function MediaView({
     window.setTimeout(() => mediaEditorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
   }
 
-  async function uploadMediaImage(event: ChangeEvent<HTMLInputElement>) {
+  async function uploadMediaFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
+    const mediaLabel = section === "videos" ? "video" : "image";
     setImageUploadState("uploading");
-    setImageUploadMessage(`Uploading ${file.name}…`);
+    setImageUploadMessage(`Uploading ${mediaLabel} ${file.name}…`);
     try {
-      const imageUrl = await uploadAdminImage(file);
-      updateDraft("src", imageUrl);
+      const mediaUrl = await uploadAdminMedia(file);
+      updateDraft("src", mediaUrl);
       setImageUploadState("idle");
-      setImageUploadMessage("Upload complete. Save the media entry to publish it.");
+      setImageUploadMessage(`${mediaLabel === "video" ? "Video" : "Image"} upload complete. Save the media entry to publish it.`);
     } catch (error) {
       setImageUploadState("error");
-      setImageUploadMessage(error instanceof Error ? error.message : "Unable to upload image.");
+      setImageUploadMessage(error instanceof Error ? error.message : "Unable to upload media.");
     } finally {
       event.target.value = "";
     }
@@ -1289,16 +1290,14 @@ function MediaView({
               Media URL
               <input required value={draft.src} onChange={(event) => updateDraft("src", event.target.value)} />
             </label>
-            {section !== "videos" ? (
-              <>
-                <label className={`shea-admin-upload ${imageUploadState}`}>
-                  <span>{imageUploadState === "uploading" ? "Uploading image…" : "Upload from computer"}</span>
-                  <small>{imageUploadMessage}</small>
-                  <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" onChange={uploadMediaImage} disabled={imageUploadState === "uploading"} />
-                </label>
-                {draft.src ? <img className="shea-admin-upload-preview" src={draft.src} alt="Media upload preview" /> : null}
-              </>
-            ) : null}
+            <>
+              <label className={`shea-admin-upload ${imageUploadState}`}>
+                <span>{imageUploadState === "uploading" ? `Uploading ${section === "videos" ? "video" : "image"}…` : `Upload ${section === "videos" ? "video" : "image"} from computer`}</span>
+                <small>{imageUploadMessage}</small>
+                <input type="file" accept={section === "videos" ? "video/mp4,video/webm,video/quicktime" : "image/jpeg,image/png,image/webp,image/gif,image/avif"} onChange={uploadMediaFile} disabled={imageUploadState === "uploading"} />
+              </label>
+              {draft.src ? section === "videos" ? <video className="shea-admin-upload-preview" src={draft.src} controls preload="metadata" /> : <img className="shea-admin-upload-preview" src={draft.src} alt="Media upload preview" /> : null}
+            </>
             <div className="shea-admin-form-row">
               <label>
                 Tag
