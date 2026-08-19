@@ -12353,6 +12353,11 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .commerce-product-card:hover { transform: translateY(-3px) !important; box-shadow: 0 16px 38px rgba(23,61,43,.11) !important; }
 .commerce-product-image { aspect-ratio: 1 / .86 !important; background: #f3f4f0 !important; }
 .commerce-product-image img { width: 100%; height: 100%; object-fit: contain !important; padding: 14px; }
+.commerce-hero-image-frame { background: #f3f5f0 !important; }
+.commerce-hero-image-frame img { object-fit: contain !important; object-position: center !important; background: #f3f5f0; }
+.department-carousel-stage > a { background: #f3f5f0 !important; }
+.department-carousel-stage > a img { object-fit: contain !important; object-position: center !important; background: #f3f5f0; }
+.shea-category-product-grid img, .shea-product-main-image img, .shea-product-detail-card img, .shea-product-related img { object-fit: contain !important; background: #f3f5f0; }
 .commerce-product-body { min-height: 0 !important; display: grid !important; gap: 18px !important; padding: 22px !important; }
 .commerce-product-body > div:first-child { display: grid; gap: 9px; }
 .commerce-product-body strong { min-height: 0 !important; font-size: clamp(20px,1.55vw,26px) !important; line-height: 1.08 !important; }
