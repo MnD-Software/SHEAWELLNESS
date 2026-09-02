@@ -421,7 +421,7 @@ export function CommerceStorefront({
               <div className="commerce-hero-media">
                 <div className="commerce-hero-image-frame">
                   {heroSlide ? (
-                    <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" style={{ objectFit: "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
+                    <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" unoptimized style={{ objectFit: "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
                   ) : null}
                 </div>
                 {heroSlide ? (
