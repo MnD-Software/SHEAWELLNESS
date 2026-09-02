@@ -12351,24 +12351,24 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 /* Homepage campaign carousel: smaller contained editorial split. */
 .commerce-hero {
-  padding: 24px max(16px, calc((100% - 1360px) / 2)) 38px !important;
+  padding: 16px max(16px, calc((100% - 1180px) / 2)) 28px !important;
   background: #f4f5f0 !important;
 }
 
 .commerce-hero-card {
   position: relative !important;
   display: grid !important;
-  grid-template-columns: minmax(0, .95fr) minmax(300px, .72fr) !important;
+  grid-template-columns: minmax(0, .95fr) minmax(240px, .58fr) !important;
   align-items: center !important;
-  gap: 28px !important;
-  max-width: 1320px !important;
-  min-height: clamp(440px, 56vh, 600px) !important;
+  gap: 20px !important;
+  max-width: 1160px !important;
+  min-height: clamp(320px, 42vh, 430px) !important;
   overflow: hidden;
-  padding: 38px 44px !important;
+  padding: 24px 30px !important;
   border: 1px solid rgba(23, 61, 43, .16) !important;
-  border-radius: 24px !important;
+  border-radius: 20px !important;
   background: linear-gradient(135deg, #173d2b 0%, #285a40 66%, #8f894d 100%) !important;
-  box-shadow: 0 22px 60px rgba(23, 61, 43, .12) !important;
+  box-shadow: 0 16px 42px rgba(23, 61, 43, .1) !important;
 }
 
 .commerce-hero-card::before { display: none !important; }
@@ -12387,7 +12387,7 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
   align-items: center !important;
   justify-items: end !important;
   width: 100% !important;
-  max-width: 500px !important;
+  max-width: 360px !important;
   justify-self: end !important;
   overflow: hidden;
   padding: 0 !important;
@@ -12398,20 +12398,20 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 }
 
 .commerce-hero-image-frame {
-  width: min(100%, 470px) !important;
+  width: min(100%, 340px) !important;
   aspect-ratio: 4 / 5 !important;
-  max-height: 500px !important;
+  max-height: 360px !important;
   overflow: hidden !important;
   border: 1px solid rgba(255, 255, 255, .64) !important;
-  border-radius: 20px !important;
+  border-radius: 16px !important;
   background: #f3f5f0 !important;
-  box-shadow: 0 18px 44px rgba(10, 28, 18, .24) !important;
+  box-shadow: 0 12px 30px rgba(10, 28, 18, .2) !important;
 }
 
 .commerce-hero-image-frame img {
-  inset: 14px !important;
-  width: calc(100% - 28px) !important;
-  height: calc(100% - 28px) !important;
+  inset: 12px !important;
+  width: calc(100% - 24px) !important;
+  height: calc(100% - 24px) !important;
   min-height: 0 !important;
   padding: 0 !important;
   object-fit: contain !important;
@@ -12430,10 +12430,10 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
   bottom: auto !important;
   left: auto !important;
   width: auto !important;
-  max-width: 660px;
-  padding: 28px !important;
+  max-width: 560px;
+  padding: 22px !important;
   border: 1px solid rgba(255, 255, 255, .2);
-  border-radius: 18px;
+  border-radius: 16px;
   color: #fff !important;
   background: rgba(255, 255, 255, .12) !important;
   box-shadow: none !important;
@@ -12443,39 +12443,40 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 }
 
 .commerce-hero .commerce-hero-copy span { color: #f4cf72 !important; text-shadow: 0 2px 16px rgba(0, 0, 0, .24) !important; }
-.commerce-hero .commerce-hero-copy h1 { max-width: 580px; color: #fff !important; font-size: 58px !important; line-height: .98; text-shadow: 0 4px 24px rgba(0, 0, 0, .28) !important; }
-.commerce-hero .commerce-hero-copy p { max-width: 510px; color: rgba(255, 255, 255, .9) !important; font-size: 16px !important; line-height: 1.62; text-shadow: 0 2px 14px rgba(0, 0, 0, .22); }
+.commerce-hero .commerce-hero-copy h1 { max-width: 500px; color: #fff !important; font-size: 44px !important; line-height: 1; text-shadow: 0 4px 24px rgba(0, 0, 0, .28) !important; }
+.commerce-hero .commerce-hero-copy p { max-width: 450px; color: rgba(255, 255, 255, .9) !important; font-size: 14px !important; line-height: 1.55; text-shadow: 0 2px 14px rgba(0, 0, 0, .22); }
 .commerce-hero .commerce-hero-actions a { color: #173d2b !important; background: #fff !important; box-shadow: 0 12px 28px rgba(0, 0, 0, .16); }
 .commerce-hero .commerce-hero-actions .ghost { color: #fff !important; border-color: rgba(255, 255, 255, .66) !important; background: rgba(255, 255, 255, .12) !important; }
-.commerce-hero-meta { z-index: 3; right: 16px !important; bottom: 16px !important; }
-.commerce-carousel-arrow { z-index: 4 !important; top: 50% !important; width: 42px; height: 42px; }
-.commerce-carousel-arrow.previous { left: 16px !important; }
-.commerce-carousel-arrow.next { right: 16px !important; }
-.commerce-carousel-dots { z-index: 4 !important; bottom: 18px !important; }
+.commerce-hero-meta { z-index: 3; right: 12px !important; bottom: 12px !important; }
+.commerce-carousel-arrow { z-index: 4 !important; top: 50% !important; width: 36px; height: 36px; }
+.commerce-carousel-arrow.previous { left: 12px !important; }
+.commerce-carousel-arrow.next { right: 12px !important; }
+.commerce-carousel-dots { z-index: 4 !important; bottom: 12px !important; }
 
 @media (max-width: 900px) {
   .commerce-hero-card {
     grid-template-columns: 1fr !important;
     min-height: 0 !important;
-    padding: 18px 18px 68px !important;
-    gap: 18px !important;
+    padding: 14px 14px 56px !important;
+    gap: 14px !important;
   }
   .commerce-hero-media { order: 1; max-width: none !important; justify-items: stretch !important; }
-  .commerce-hero-image-frame { width: 100% !important; aspect-ratio: 16 / 11 !important; max-height: 350px !important; }
-  .commerce-hero .commerce-hero-copy { order: 2; padding: 20px !important; }
-  .commerce-hero .commerce-hero-copy h1 { font-size: 42px !important; }
+  .commerce-hero-image-frame { width: 100% !important; aspect-ratio: 16 / 10 !important; max-height: 260px !important; }
+  .commerce-hero .commerce-hero-copy { order: 2; padding: 16px !important; }
+  .commerce-hero .commerce-hero-copy h1 { font-size: 34px !important; }
   .commerce-hero-meta { right: 12px !important; bottom: 12px !important; }
   .commerce-carousel-arrow { top: 32% !important; }
 }
 
 @media (max-width: 760px) {
   .commerce-hero { padding: 8px; }
-  .commerce-hero-card { border-radius: 18px !important; }
-  .commerce-hero .commerce-hero-copy h1 { font-size: 36px !important; }
+  .commerce-hero-card { border-radius: 16px !important; }
+  .commerce-hero .commerce-hero-copy h1 { font-size: 30px !important; }
   .commerce-hero .commerce-hero-copy p { display: block; }
-  .commerce-hero .commerce-hero-actions { margin-top: 16px; }
-  .commerce-carousel-arrow { width: 40px; height: 40px; }
-  .commerce-carousel-dots { bottom: 22px !important; }
+  .commerce-hero .commerce-hero-copy p { font-size: 13px !important; }
+  .commerce-hero .commerce-hero-actions { margin-top: 12px; }
+  .commerce-carousel-arrow { width: 34px; height: 34px; }
+  .commerce-carousel-dots { bottom: 18px !important; }
 }
 
 /* Calm, product-led storefront cards */
