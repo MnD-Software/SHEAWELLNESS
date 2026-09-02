@@ -24,19 +24,42 @@ const VERIFIED_PRODUCT_IMAGES: Record<string, string> = {
   prod_distributor_offer: "/assets/media-library/aug-2026/aug-2026-031.jpeg"
 };
 
-function withoutUnverifiedPrices(products: Product[]): Product[] {
-  return products.map((product) => ({
-    ...product,
-    imageUrl: VERIFIED_PRODUCT_IMAGES[product.id] ?? product.imageUrl,
-    status: product.id === "prod_chebe_butter" ? "draft" : product.status,
-    price: 0,
-    sizePrices: undefined
-  }));
+function normalizeStoredProducts(products: Product[]): Product[] {
+  return products.map((product) => {
+    const sizes = product.sizes?.map((size) => size.trim()).filter(Boolean);
+    const safeSizes = sizes?.length ? sizes : ["One size"];
+    const sizePrices = Object.fromEntries(
+      Object.entries(product.sizePrices ?? {})
+        .map(([size, price]) => [size.trim(), Number(price)] as const)
+        .filter(([size, price]) => safeSizes.includes(size) && Number.isFinite(price) && price >= 0)
+    );
+    const fallbackPrice = Object.values(sizePrices)[0] ?? 0;
+    const price = Number(product.price);
+
+    return {
+      ...product,
+      imageUrl: VERIFIED_PRODUCT_IMAGES[product.id] ?? product.imageUrl,
+      status: product.id === "prod_chebe_butter" ? "draft" : product.status,
+      sizes: safeSizes,
+      price: Number.isFinite(price) && price >= 0 ? price : fallbackPrice,
+      sizePrices: Object.keys(sizePrices).length ? sizePrices : undefined
+    };
+  });
+}
+
+function defaultProducts() {
+  return normalizeStoredProducts(platformSnapshot.products);
+}
+
+function productsOrDefaults(products: unknown): Product[] {
+  if (!Array.isArray(products)) return defaultProducts();
+  const normalizedProducts = normalizeStoredProducts(products as Product[]);
+  return normalizedProducts.length ? normalizedProducts : defaultProducts();
 }
 
 function defaults(): StoreContent {
   return {
-    products: withoutUnverifiedPrices(platformSnapshot.products),
+    products: defaultProducts(),
     media: sheaDefaultMediaConfig,
     pageOverrides: {},
     persisted: false,
@@ -85,7 +108,7 @@ export async function getStoreContent(): Promise<StoreContent> {
 
   if (!rows.length) return defaults();
   return {
-    products: withoutUnverifiedPrices(rows[0].products as Product[]),
+    products: productsOrDefaults(rows[0].products),
     media: sanitizeSheaMediaConfig(rows[0].media as SheaMediaConfig),
     pageOverrides: (rows[0].page_overrides as PageOverrides | null) ?? {},
     persisted: true,
@@ -97,7 +120,7 @@ export async function saveProducts(products: Product[]) {
   const sql = database();
   if (!sql) throw new Error("DATABASE_URL is not configured.");
   await ensureTable(sql);
-  const safeProducts = withoutUnverifiedPrices(products);
+  const safeProducts = normalizeStoredProducts(products);
   const rows = await sql`
     INSERT INTO storefront_content (store_key, products, media)
     VALUES (${STORE_KEY}, ${JSON.stringify(safeProducts)}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb)
@@ -115,7 +138,7 @@ export async function saveMedia(media: SheaMediaConfig) {
   const safeMedia = sanitizeSheaMediaConfig(media);
   const rows = await sql`
     INSERT INTO storefront_content (store_key, products, media)
-    VALUES (${STORE_KEY}, ${JSON.stringify(withoutUnverifiedPrices(platformSnapshot.products))}::jsonb, ${JSON.stringify(safeMedia)}::jsonb)
+    VALUES (${STORE_KEY}, ${JSON.stringify(defaultProducts())}::jsonb, ${JSON.stringify(safeMedia)}::jsonb)
     ON CONFLICT (store_key) DO UPDATE
     SET media = EXCLUDED.media, updated_at = NOW()
     RETURNING media, updated_at
@@ -133,7 +156,7 @@ export async function savePageOverrides(pageOverrides: PageOverrides) {
   await ensureTable(sql);
   const rows = await sql`
     INSERT INTO storefront_content (store_key, products, media, page_overrides)
-    VALUES (${STORE_KEY}, ${JSON.stringify(withoutUnverifiedPrices(platformSnapshot.products))}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb, ${JSON.stringify(pageOverrides)}::jsonb)
+    VALUES (${STORE_KEY}, ${JSON.stringify(defaultProducts())}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb, ${JSON.stringify(pageOverrides)}::jsonb)
     ON CONFLICT (store_key) DO UPDATE
     SET page_overrides = EXCLUDED.page_overrides, updated_at = NOW()
     RETURNING updated_at

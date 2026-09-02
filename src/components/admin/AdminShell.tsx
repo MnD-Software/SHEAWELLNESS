@@ -14,19 +14,21 @@ import {
   PackagePlus,
   PanelLeftClose,
   PanelLeftOpen,
+  Plus,
   Search,
   Settings,
   ShieldCheck,
   ShoppingCart,
   Star,
   Store,
+  Trash2,
   Truck,
   Users
 } from "lucide-react";
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import { formatMoney, titleCase } from "@/lib/format";
+import { formatMoney, productPriceForSize, titleCase } from "@/lib/format";
 import {
   sheaBlogTopics,
   sheaBrand,
@@ -91,9 +93,16 @@ type ProductFormState = {
   price: string;
   inventoryQty: string;
   status: ProductStatus;
+  variations: ProductVariationDraft[];
 };
 
 type MediaSection = "hero" | "images" | "videos";
+
+type ProductVariationDraft = {
+  id: string;
+  label: string;
+  price: string;
+};
 
 type MediaFormState = {
   id: string;
@@ -113,7 +122,74 @@ type ContentSaveResult =
 
 const emptyMediaConfig: SheaMediaConfig = { heroSlides: [], images: [], videos: [] };
 
+function parseCurrencyInput(value: string) {
+  const parsed = Number(value.replaceAll(",", "").trim());
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+function productVariationRows(product?: Product): ProductVariationDraft[] {
+  const sizes = product?.sizes?.length ? product.sizes : ["100g"];
+  const basePrice = product?.price ?? 2000;
+
+  return sizes.map((size, index) => ({
+    id: `variation_${index}_${size.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
+    label: size,
+    price: String(product?.sizePrices?.[size] ?? basePrice)
+  }));
+}
+
+function normalizeVariationRows(variations: ProductVariationDraft[], fallbackPrice: string) {
+  const seen = new Set<string>();
+  const rows = variations
+    .map((variation) => ({
+      label: variation.label.trim(),
+      price: parseCurrencyInput(variation.price || fallbackPrice)
+    }))
+    .filter((variation) => variation.label)
+    .filter((variation) => {
+      const key = variation.label.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  const safeRows = rows.length ? rows : [{ label: "One size", price: parseCurrencyInput(fallbackPrice) }];
+  const sizePrices = Object.fromEntries(safeRows.map((variation) => [variation.label, variation.price]));
+
+  return {
+    sizes: safeRows.map((variation) => variation.label),
+    price: safeRows[0]?.price ?? 0,
+    sizePrices
+  };
+}
+
+function syncVariationFields(current: ProductFormState, variations: ProductVariationDraft[]) {
+  return {
+    ...current,
+    variations,
+    sizes: variations.map((variation) => variation.label.trim()).filter(Boolean).join(", "),
+    price: variations[0]?.price ?? current.price
+  };
+}
+
+function productDisplayPrice(product: Product, currency: string) {
+  const sizes = product.sizes?.length ? product.sizes : ["One size"];
+  const prices = sizes.map((size) => productPriceForSize(product, size)).filter((price) => price > 0);
+  if (!prices.length) return formatMoney(product.price, currency);
+  const lowest = Math.min(...prices);
+  const highest = Math.max(...prices);
+  return lowest === highest ? formatMoney(lowest, currency) : `From ${formatMoney(lowest, currency)} to ${formatMoney(highest, currency)}`;
+}
+
+function productVariationSummary(product: Product, currency: string) {
+  const sizes = product.sizes?.length ? product.sizes : ["One size"];
+  return sizes
+    .map((size) => `${size}: ${formatMoney(productPriceForSize(product, size), currency)}`)
+    .join(", ");
+}
+
 function productToDraft(product?: Product): ProductFormState {
+  const variations = productVariationRows(product);
+
   return {
     id: product?.id ?? "",
     title: product?.title ?? "",
@@ -121,12 +197,13 @@ function productToDraft(product?: Product): ProductFormState {
     category: product?.category ?? "Body Care",
     badge: product?.badge ?? "Shea Wellness",
     imageUrl: product?.imageUrl ?? "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-    sizes: product?.sizes.join(", ") ?? "100g, 250g, 500g",
+    sizes: variations.map((variation) => variation.label).join(", "),
     material: product?.material ?? "Raw Shea Butter",
     deliveryBadge: product?.deliveryBadge ?? "Handcrafted skincare",
     price: String(product?.price ?? 2000),
     inventoryQty: String(product?.inventoryQty ?? 24),
-    status: product?.status ?? "draft"
+    status: product?.status ?? "draft",
+    variations
   };
 }
 
@@ -247,7 +324,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
 
   async function saveManagedProducts(nextProducts: Product[]) {
     const result = await persistContent({ type: "products", products: nextProducts });
-    if (result.success) setManagedProducts(nextProducts);
+    if (result.success) {
+      setManagedProducts(nextProducts);
+      return true;
+    }
+    return false;
   }
 
   async function saveMediaConfig(nextMediaConfig: SheaMediaConfig): Promise<ContentSaveResult> {
@@ -562,7 +643,7 @@ function ProductsView({
   storeId: string;
   filter: (typeof productFilters)[number];
   setFilter: (filter: (typeof productFilters)[number]) => void;
-  saveProducts: (products: Product[]) => void;
+  saveProducts: (products: Product[]) => Promise<boolean>;
   createRequest: number;
   mediaConfig: SheaMediaConfig;
   mediaReady: boolean;
@@ -580,6 +661,26 @@ function ProductsView({
 
   function updateDraft(field: keyof ProductFormState, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateVariation(variationId: string, field: keyof ProductVariationDraft, value: string) {
+    setDraft((current) => syncVariationFields(current, current.variations.map((variation) => (
+      variation.id === variationId ? { ...variation, [field]: value } : variation
+    ))));
+  }
+
+  function addVariation() {
+    setDraft((current) => syncVariationFields(current, [
+      ...current.variations,
+      { id: `variation_${Date.now()}_${current.variations.length}`, label: "", price: current.variations.at(-1)?.price ?? current.price }
+    ]));
+  }
+
+  function removeVariation(variationId: string) {
+    setDraft((current) => {
+      const nextVariations = current.variations.filter((variation) => variation.id !== variationId);
+      return syncVariationFields(current, nextVariations.length ? nextVariations : [{ id: `variation_${Date.now()}_0`, label: "One size", price: current.price }]);
+    });
   }
 
   function startCreate() {
@@ -625,11 +726,11 @@ function ProductsView({
     }
   }
 
-  function saveDraft(event: FormEvent<HTMLFormElement>) {
+  async function saveDraft(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const existingProduct = allProducts.find((product) => product.id === editingId);
     const productId = existingProduct?.id ?? `prod_${Date.now()}`;
-    const parsedSizes = draft.sizes.split(",").map((size) => size.trim()).filter(Boolean);
+    const normalizedVariations = normalizeVariationRows(draft.variations, draft.price);
     const nextProduct: Product = {
       id: productId,
       storeId,
@@ -642,11 +743,11 @@ function ProductsView({
       rating: existingProduct?.rating ?? 0,
       reviewCount: existingProduct?.reviewCount ?? 0,
       colors: [],
-      sizes: parsedSizes.length ? parsedSizes : ["100g"],
+      sizes: normalizedVariations.sizes,
       material: draft.material.trim() || "Raw Shea Butter",
       deliveryBadge: draft.deliveryBadge.trim() || "Handcrafted skincare",
-      price: Number(draft.price) || 0,
-      sizePrices: existingProduct?.sizePrices,
+      price: normalizedVariations.price,
+      sizePrices: normalizedVariations.sizePrices,
       inventoryQty: Number(draft.inventoryQty) || 0,
       status: draft.status,
       channel: existingProduct?.channel ?? "both",
@@ -657,16 +758,18 @@ function ProductsView({
       ? allProducts.map((product) => (product.id === existingProduct.id ? nextProduct : product))
       : [nextProduct, ...allProducts];
 
-    saveProducts(nextProducts);
+    const saved = await saveProducts(nextProducts);
+    if (!saved) return;
     setEditingId(nextProduct.id);
     setDraft(productToDraft(nextProduct));
   }
 
-  function deleteProduct(productId: string) {
+  async function deleteProduct(productId: string) {
     const confirmed = window.confirm("Remove this product from the Shea Wellness storefront?");
     if (!confirmed) return;
 
-    saveProducts(allProducts.filter((product) => product.id !== productId));
+    const saved = await saveProducts(allProducts.filter((product) => product.id !== productId));
+    if (!saved) return;
     if (editingId === productId) {
       setEditingId(null);
       setIsEditorOpen(false);
@@ -720,16 +823,13 @@ function ProductsView({
               Product name
               <input required value={draft.title} onChange={(event) => updateDraft("title", event.target.value)} placeholder="Lavender Shea Body Butter" />
             </label>
-            <label>
-              Description
-              <textarea required value={draft.description} onChange={(event) => updateDraft("description", event.target.value)} placeholder="Short storefront product description" />
-            </label>
             <div className="shea-admin-form-row">
               <label>
                 Category
-                <select value={draft.category} onChange={(event) => updateDraft("category", event.target.value)}>
-                  {categoryOptions.map((category) => <option key={category} value={category}>{category}</option>)}
-                </select>
+                <input list="shea-product-category-options" value={draft.category} onChange={(event) => updateDraft("category", event.target.value)} />
+                <datalist id="shea-product-category-options">
+                  {categoryOptions.map((category) => <option key={category} value={category} />)}
+                </datalist>
               </label>
               <label>
                 Status
@@ -739,9 +839,45 @@ function ProductsView({
               </label>
             </div>
             <label>
-              Inventory
-              <input required type="number" min="0" value={draft.inventoryQty} onChange={(event) => updateDraft("inventoryQty", event.target.value)} />
+              Description
+              <textarea required value={draft.description} onChange={(event) => updateDraft("description", event.target.value)} placeholder="Short storefront product description" />
             </label>
+            <section className="shea-admin-variation-editor" aria-labelledby="shea-product-variations-heading">
+              <header>
+                <div>
+                  <span>Product variations</span>
+                  <strong id="shea-product-variations-heading">{draft.variations.length} {draft.variations.length === 1 ? "option" : "options"}</strong>
+                </div>
+                <button type="button" onClick={addVariation}><Plus size={16} /> Add variation</button>
+              </header>
+              <div className="shea-admin-variation-list">
+                {draft.variations.map((variation, index) => (
+                  <div className="shea-admin-variation-row" key={variation.id}>
+                    <label>
+                      <span>Option</span>
+                      <input required value={variation.label} onChange={(event) => updateVariation(variation.id, "label", event.target.value)} placeholder={index === 0 ? "100g" : "250g"} />
+                    </label>
+                    <label>
+                      <span>Price</span>
+                      <input required type="number" min="0" step="1" value={variation.price} onChange={(event) => updateVariation(variation.id, "price", event.target.value)} placeholder="2000" />
+                    </label>
+                    <button type="button" onClick={() => removeVariation(variation.id)} disabled={draft.variations.length === 1} aria-label={`Remove ${variation.label || "variation"}`}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+            <div className="shea-admin-form-row">
+              <label>
+                Inventory
+                <input required type="number" min="0" value={draft.inventoryQty} onChange={(event) => updateDraft("inventoryQty", event.target.value)} />
+              </label>
+              <label>
+                Storefront badge
+                <input value={draft.deliveryBadge} onChange={(event) => updateDraft("deliveryBadge", event.target.value)} />
+              </label>
+            </div>
             <div className="shea-admin-image-field">
               <span>Product image</span>
               {draft.imageUrl ? <img src={draft.imageUrl} alt="Selected product" /> : null}
@@ -759,16 +895,12 @@ function ProductsView({
               <summary>More product details <span>Optional</span></summary>
               <div>
                 <label>
-                  Sizes
-                  <input value={draft.sizes} onChange={(event) => updateDraft("sizes", event.target.value)} placeholder="100g, 250g, 500g" />
+                  Product tag
+                  <input value={draft.badge} onChange={(event) => updateDraft("badge", event.target.value)} />
                 </label>
                 <label>
                   Ingredients / material
                   <input value={draft.material} onChange={(event) => updateDraft("material", event.target.value)} />
-                </label>
-                <label>
-                  Storefront badge
-                  <input value={draft.deliveryBadge} onChange={(event) => updateDraft("deliveryBadge", event.target.value)} />
                 </label>
               </div>
             </details>
@@ -835,8 +967,8 @@ function ProductDetailsModal({ product, onClose, onEdit, onDelete }: { product: 
             <p>{product.description}</p>
             <dl>
               <div><dt>Inventory</dt><dd>{product.inventoryQty}</dd></div>
-              <div><dt>Price</dt><dd>{formatMoney(product.price, "KES")}</dd></div>
-              <div><dt>Sizes</dt><dd>{product.sizes.join(", ")}</dd></div>
+              <div><dt>Price</dt><dd>{productDisplayPrice(product, "KES")}</dd></div>
+              <div><dt>Variations</dt><dd>{productVariationSummary(product, "KES")}</dd></div>
               <div><dt>Material</dt><dd>{product.material}</dd></div>
             </dl>
           </div>
@@ -1498,7 +1630,10 @@ function ProductTable({
               <td>{product.category}</td>
               <td><span className={clsx("shea-admin-status", product.status)}>{titleCase(product.status)}</span></td>
               <td>{product.inventoryQty}</td>
-              <td>{formatMoney(product.price, currency)}</td>
+              <td className="shea-admin-price-cell">
+                <strong>{productDisplayPrice(product, currency)}</strong>
+                <small>{product.sizes.length} {product.sizes.length === 1 ? "option" : "options"}</small>
+              </td>
               <td>{product.sales}</td>
               {onEdit || onDelete ? (
                 <td>
