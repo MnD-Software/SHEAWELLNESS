@@ -31,6 +31,16 @@ export type Product = {
   deliveryBadge: string;
   price: number;
   sizePrices?: Record<string, number>;
+  /**
+   * Optional asset overrides for a specific purchasable option.  Keeping this
+   * with the option means changing the selected size can update the product
+   * image/video without changing the catalogue-wide primary image.
+   */
+  sizeMedia?: Record<string, {
+    imageUrl?: string;
+    videoUrl?: string;
+    imagePosition?: string;
+  }>;
   inventoryQty: number;
   status: ProductStatus;
   channel: "online" | "pos" | "both";

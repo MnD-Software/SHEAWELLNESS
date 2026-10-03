@@ -16,6 +16,7 @@ export default async function CategoryRoute({ params }: { params: CategoryParams
   const departmentRoutes = {
     "face-care": "/face",
     "body-care": "/skin",
+    "skin-care": "/skin",
     "hair-care": "/hair",
     "gift-sets": "/wellness-gifts",
     "spa-essentials": "/spa-essentials",

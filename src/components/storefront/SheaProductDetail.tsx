@@ -5,7 +5,6 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
-import { sheaVideos } from "@/lib/shea-content";
 import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
@@ -80,6 +79,10 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const matchingPairings = product
     ? productPairings.filter((pairing) => pairing.products.some((item) => item.toLowerCase().includes(product.title.replace("Cold-Pressed ", "").replace("Cold Pressed ", "").toLowerCase().split(" ").slice(0, 2).join(" ")))).slice(0, 3)
     : [];
+  const selectedMedia = product?.sizeMedia?.[size];
+  const selectedImage = selectedMedia?.imageUrl ?? product?.imageUrl ?? "";
+  const selectedImagePosition = selectedMedia?.imagePosition ?? product?.imagePosition;
+  const selectedVideo = selectedMedia?.videoUrl;
 
   function toggleWishlist() {
     if (!product) return;
@@ -95,7 +98,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     const existingIndex = savedCart.findIndex((line) => line.productId === product.id && line.size === size);
     const nextCart = existingIndex >= 0
       ? savedCart.map((line, index) => index === existingIndex ? { ...line, quantity: line.quantity + 1 } : line)
-      : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: productPriceForSize(product, size), size, quantity: 1 }, ...savedCart];
+      : [{ productId: product.id, title: product.title, imageUrl: selectedImage, price: productPriceForSize(product, size), size, quantity: 1 }, ...savedCart];
 
     window.localStorage.setItem("sheaWellnessCart", JSON.stringify(nextCart));
     setCartCount(nextCart.reduce((total, line) => total + line.quantity, 0));
@@ -143,11 +146,11 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
       <section className="shea-product-detail-hero">
         <div className="shea-product-gallery">
           <div className="shea-product-main-image">
-            <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
+            <img src={selectedImage} alt={`${product.title}${size ? ` — ${size}` : ""}`} style={{ objectPosition: selectedImagePosition }} />
           </div>
           <div className="shea-product-thumbs">
-            <img src={product.imageUrl} alt="" style={{ objectPosition: product.imagePosition }} />
-            <video src={sheaVideos[0].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
+            <img src={selectedImage} alt="" style={{ objectPosition: selectedImagePosition }} />
+            {selectedVideo ? <video src={selectedVideo} autoPlay muted loop playsInline preload="metadata" poster={selectedImage} /> : null}
           </div>
         </div>
 
@@ -172,8 +175,9 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           <fieldset className="shea-product-size">
             <legend>Size</legend>
             {product.sizes.map((item) => (
-              <button type="button" key={item} className={size === item ? "active" : ""} onClick={() => setSize(item)}>{item}</button>
+              <button type="button" key={item} className={size === item ? "active" : ""} aria-pressed={size === item} onClick={() => setSize(item)}>{item}</button>
             ))}
+            <small>{selectedMedia?.imageUrl || selectedMedia?.videoUrl ? `${size} media selected` : `${size} uses the primary product media`}</small>
           </fieldset>
 
           <div className="shea-product-primary-actions"><button type="button" className="shea-product-add" onClick={addToCart}>
@@ -271,7 +275,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
       <SheaTrustGrid />
       <SheaCommerceFooter />
       <SheaWhatsApp />
-      <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart}><ShoppingCart size={18} /> Add to cart</button></div>
+      <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(productPriceForSize(product, size), platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart}><ShoppingCart size={18} /> Add to cart</button></div>
     </main>
   );
 }

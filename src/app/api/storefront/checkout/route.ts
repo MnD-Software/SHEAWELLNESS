@@ -5,11 +5,12 @@ const checkoutSchema = z.object({
   customer: z.object({
     email: z.string().email(),
     fullName: z.string().min(2),
+    phone: z.string().min(6),
     address: z.string().min(4),
+    country: z.string().min(2),
     city: z.string().min(2),
-    postalCode: z.string().optional(),
-    deliveryMethod: z.enum(["standard", "express"]),
-    paymentMethod: z.enum(["card", "paypal"])
+    deliveryMethod: z.enum(["kenya", "international"]),
+    paymentMethod: z.enum(["card", "paypal", "mpesa"])
   }),
   items: z.array(
     z.object({
@@ -35,7 +36,9 @@ export async function POST(request: Request) {
   return NextResponse.json({
     data: {
       orderNumber: `SHEA-${suffix}`,
-      paymentStatus: "authorized",
+      // This endpoint records an order request only. A gateway/PayBill
+      // integration must confirm payment before an order can be marked paid.
+      paymentStatus: "pending",
       fulfillmentStatus: "unfulfilled",
       customerEmail: checkout.customer.email,
       itemCount: checkout.items.reduce((total, item) => total + item.quantity, 0),

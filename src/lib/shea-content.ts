@@ -204,9 +204,9 @@ export const sheaHeroSlides: SheaHeroSlide[] = [
     body: "Gentle routines designed to cleanse, nourish, moisturize, and protect the skin's natural barrier.",
     src: "/assets/website-edits/spa-facial.jpg",
     type: "image",
-    tag: "Body Care",
-    ctaLabel: "View body care",
-    ctaHref: "/collections/body-care",
+    tag: "Skin Care",
+    ctaLabel: "View skin care",
+    ctaHref: "/collections/skin-care",
     objectPosition: "50% 50%"
   },
   {
@@ -302,7 +302,7 @@ export const sheaNav = [
 
 export const sheaProductCategories = [
   {
-    name: "Body Care",
+    name: "Skin Care",
     summary: "Shea body butter infusions for deep hydration, dry skin repair, elasticity, and daily glow.",
     products: [
       {
@@ -588,7 +588,7 @@ const baseSheaVideos: Array<Omit<SheaMediaAsset, "id">> = [
     title: "Lavender butter texture",
     src: "/assets/sheawellness/product-video-01.mp4",
     type: "video",
-    tag: "Body Care"
+    tag: "Skin Care"
   },
   {
     title: "Shea Wellness jar detail",

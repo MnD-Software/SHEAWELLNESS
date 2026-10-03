@@ -16,13 +16,23 @@ export type PageOverrides = Record<string, { texts?: Record<string, string>; ima
 const STORE_KEY = "shea-wellness";
 const VERIFIED_PRODUCT_IMAGES: Record<string, string> = {
   prod_chebe_serum: "/assets/media-library/aug-2026/aug-2026-026.jpeg",
+  prod_chebe_butter: "/assets/media-library/aug-2026/aug-2026-043.jpeg",
   prod_yellow_castor_oil: "/assets/media-library/aug-2026/aug-2026-028.jpeg",
   prod_essential_oils: "/assets/media-library/aug-2026/aug-2026-025.jpeg",
   prod_aromatherapy: "/assets/media-library/aug-2026/aug-2026-030.jpeg",
-  prod_spa_essentials: "/assets/media-library/aug-2026/aug-2026-035.jpeg",
-  prod_gift_set: "/assets/media-library/aug-2026/aug-2026-025.jpeg",
-  prod_distributor_offer: "/assets/media-library/aug-2026/aug-2026-031.jpeg"
+  prod_spa_essentials: "/assets/media-library/aug-2026/aug-2026-057.jpeg",
+  prod_gift_set: "/assets/media-library/aug-2026/aug-2026-025.jpeg"
 };
+
+// These catalogue records previously displayed lifestyle/result images as if
+// they were product pack shots. Keep them out of the public catalogue until a
+// verified, product-specific asset is supplied by Shea Wellness.
+const PRODUCTS_AWAITING_VERIFIED_MEDIA = new Set([
+  "prod_rosehip_facial_oil",
+  "prod_cucumber_mint_sunscreen",
+  "prod_baobab_oil",
+  "prod_distributor_offer"
+]);
 
 function normalizeStoredProducts(products: Product[]): Product[] {
   return products.map((product) => {
@@ -35,14 +45,30 @@ function normalizeStoredProducts(products: Product[]): Product[] {
     );
     const fallbackPrice = Object.values(sizePrices)[0] ?? 0;
     const price = Number(product.price);
+    const sizeMedia = Object.fromEntries(
+      Object.entries(product.sizeMedia ?? {})
+        .map(([size, media]) => {
+          const imageUrl = typeof media?.imageUrl === "string" ? media.imageUrl.trim() : "";
+          const videoUrl = typeof media?.videoUrl === "string" ? media.videoUrl.trim() : "";
+          const imagePosition = typeof media?.imagePosition === "string" ? media.imagePosition.trim() : "";
+          return [size.trim(), {
+            ...(imageUrl ? { imageUrl } : {}),
+            ...(videoUrl ? { videoUrl } : {}),
+            ...(imagePosition ? { imagePosition } : {})
+          }] as const;
+        })
+        .filter(([size, media]) => safeSizes.includes(size) && Object.keys(media).length)
+    );
 
     return {
       ...product,
+      category: product.category === "Body Care" ? "Skin Care" : product.category,
       imageUrl: VERIFIED_PRODUCT_IMAGES[product.id] ?? product.imageUrl,
-      status: product.id === "prod_chebe_butter" ? "draft" : product.status,
+      status: PRODUCTS_AWAITING_VERIFIED_MEDIA.has(product.id) ? "draft" : product.status,
       sizes: safeSizes,
       price: Number.isFinite(price) && price >= 0 ? price : fallbackPrice,
-      sizePrices: Object.keys(sizePrices).length ? sizePrices : undefined
+      sizePrices: Object.keys(sizePrices).length ? sizePrices : undefined,
+      sizeMedia: Object.keys(sizeMedia).length ? sizeMedia : undefined
     };
   });
 }

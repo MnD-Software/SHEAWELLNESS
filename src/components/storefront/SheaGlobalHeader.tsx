@@ -159,17 +159,9 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       </div>
       <div className="shea-nav-bar">
         <div className="shea-nav-left">
-          <button
-            type="button"
-            className="shea-nav-mobile-toggle"
-            onClick={() => setMobileOpen((open) => !open)}
-            aria-expanded={mobileOpen}
-            aria-label="Open navigation"
-          >
-            <Menu size={21} />
-          </button>
           <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
             <img src="/assets/website-edits/shea-wellness-logo.jpg" alt={sheaBrand.name} />
+            <span className="shea-nav-brand-wordmark"><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
           </a>
         </div>
 
@@ -186,6 +178,15 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
           <a href="/account" aria-label="Open customer account"><UserRound size={18} /></a>
           <a href="/shop" aria-label="Wishlist"><Heart size={18} /></a>
           {cartAction}
+          <button
+            type="button"
+            className="shea-nav-menu-button"
+            onClick={() => setMobileOpen((open) => !open)}
+            aria-expanded={mobileOpen}
+            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
+          >
+            {mobileOpen ? <X size={19} /> : <Menu size={21} />}
+          </button>
         </div>
 
         <button type="button" className="shea-nav-search-button mobile-action" onClick={() => setSearchOpen((open) => !open)} aria-label="Search Shea Wellness">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, PackageCheck, ReceiptText, Star, UserRound } from "lucide-react";
+import { Heart, PackageCheck, ReceiptText, ShoppingCart, Star, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
@@ -18,6 +18,14 @@ type AccountOrder = {
   createdAt: string;
   paymentStatus: string;
   fulfillmentStatus: string;
+  items?: Array<{
+    productId: string;
+    title: string;
+    imageUrl: string;
+    price: number;
+    size: string;
+    quantity: number;
+  }>;
 };
 
 type AccountReview = {
@@ -32,12 +40,16 @@ type AccountReview = {
 export function SheaAccountDashboard() {
   const [orders, setOrders] = useState<AccountOrder[]>([]);
   const [reviews, setReviews] = useState<AccountReview[]>([]);
+  const [cartCount, setCartCount] = useState(0);
+  const [reorderMessage, setReorderMessage] = useState("");
 
   useEffect(() => {
     const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as AccountOrder[];
     const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as AccountReview[];
+    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity: number }>;
     setOrders(savedOrders.filter((order) => order.source === "shea_storefront_checkout"));
     setReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
+    setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
   }, []);
 
   const customerName = orders[0]?.customerName || reviews[0]?.name || "Shea Wellness customer";
@@ -46,9 +58,26 @@ export function SheaAccountDashboard() {
   const latestOrder = orders[0];
   const productsById = useMemo(() => new Map(platformSnapshot.products.map((product) => [product.id, product.title])), []);
 
+  function reorder(order: AccountOrder) {
+    if (!order.items?.length) return;
+    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
+    const nextCart = [...savedCart];
+    for (const item of order.items) {
+      const existingIndex = nextCart.findIndex((line) => line.productId === item.productId && line.size === item.size);
+      if (existingIndex >= 0) {
+        nextCart[existingIndex] = { ...nextCart[existingIndex], quantity: nextCart[existingIndex].quantity + item.quantity };
+      } else {
+        nextCart.push({ ...item });
+      }
+    }
+    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(nextCart));
+    setCartCount(nextCart.reduce((total, item) => total + item.quantity, 0));
+    setReorderMessage(`${order.orderNumber} was added to your cart.`);
+  }
+
   return (
     <main className="shea-account-page">
-      <SheaGlobalHeader />
+      <SheaGlobalHeader cartCount={cartCount} />
       <section className="shea-account-hero">
         <div>
           <span>Customer dashboard</span>
@@ -93,7 +122,7 @@ export function SheaAccountDashboard() {
           {orders.length ? (
             <div className="shea-account-list">
               {orders.map((order) => (
-                <div key={`${order.orderNumber}-${order.createdAt}`}>
+                <article className="shea-account-order" key={`${order.orderNumber}-${order.createdAt}`}>
                   <div>
                     <strong>{order.orderNumber}</strong>
                     <span>{new Date(order.createdAt).toLocaleDateString()}</span>
@@ -102,7 +131,8 @@ export function SheaAccountDashboard() {
                     <strong>{formatMoney(order.totalPrice, platformSnapshot.activeStore.currency)}</strong>
                     <span>{order.fulfillmentStatus.replace("_", " ")}</span>
                   </div>
-                </div>
+                  {order.items?.length ? <button type="button" onClick={() => reorder(order)}><ShoppingCart size={16} /> Reorder items</button> : <small>Items from this earlier order are not available to reorder yet.</small>}
+                </article>
               ))}
             </div>
           ) : (
@@ -155,6 +185,7 @@ export function SheaAccountDashboard() {
         </div>
         <a href="/shop">Open shop</a>
       </section>
+      {reorderMessage ? <p className="shea-account-reorder-notice" role="status">{reorderMessage} <a href="/shop">Open cart in shop</a></p> : null}
       <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
     </main>
   );

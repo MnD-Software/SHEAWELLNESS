@@ -3436,6 +3436,182 @@ td {
   }
 }
 
+/* October feedback completion: clear brand, option-specific media, and safe commerce states. */
+.shea-nav-brand {
+  width: auto !important;
+  height: 62px !important;
+  gap: 10px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.shea-nav-brand img {
+  width: 56px !important;
+  height: 56px !important;
+  flex: 0 0 56px;
+  border: 1px solid #dfe6dc !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+  object-position: center 16% !important;
+  transform: scale(1.08) !important;
+}
+
+.shea-nav-brand .shea-nav-brand-wordmark {
+  width: auto !important;
+  height: auto !important;
+  display: grid !important;
+  gap: 2px;
+  place-items: start !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  color: #173d2b !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.shea-nav-brand .shea-nav-brand-wordmark strong {
+  max-width: none !important;
+  overflow: visible !important;
+  color: #173d2b !important;
+  font-family: var(--font-display), Georgia, serif !important;
+  font-size: clamp(21px, 1.7vw, 28px) !important;
+  font-weight: 900 !important;
+  letter-spacing: -.025em;
+  line-height: .95 !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+
+.shea-nav-brand .shea-nav-brand-wordmark small {
+  color: #758579;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.shea-nav-menu-button {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid #d8e1d6;
+  border-radius: 50%;
+  color: #173d2b;
+  background: #f9fbf8;
+  cursor: pointer;
+}
+
+.shea-nav-menu-button:hover,
+.shea-nav-menu-button[aria-expanded="true"] {
+  color: #fff;
+  background: #173d2b;
+}
+
+/* The full navigation now opens from the utility side of the header. */
+.shea-desktop-sidebar {
+  left: auto !important;
+  right: 0 !important;
+  transform: translateX(105%) !important;
+  border-left: 1px solid rgba(217, 227, 214, .92) !important;
+  border-right: 0 !important;
+  box-shadow: -28px 0 90px rgba(9, 30, 19, .28) !important;
+}
+
+.shea-desktop-sidebar.open { transform: translateX(0) !important; }
+
+.commerce-marquee-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain !important;
+  object-position: center;
+  image-orientation: from-image;
+}
+
+.commerce-marquee-track .commerce-marquee-logo {
+  flex-basis: 196px;
+  width: 196px;
+  height: 126px;
+  padding: 12px 16px;
+}
+
+.guide-product-image--pending {
+  min-height: 218px;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 22px;
+  border: 1px dashed #b6c7b5;
+  color: #426451;
+  background: #f4f8f2;
+  text-align: center;
+}
+
+.guide-product-image--pending span { max-width: 19ch; font-size: 12px; font-weight: 800; line-height: 1.35; }
+.guide-product-link { display: inline-flex; width: fit-content; margin-top: 13px; color: #173d2b; font-size: 12px; font-weight: 900; text-decoration: underline; text-underline-offset: 4px; }
+.guide-product-link.pending { color: #68766c; text-decoration: none; }
+
+.shea-product-size small {
+  display: block;
+  margin-top: 9px;
+  color: #65756a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.shea-admin-variation-row {
+  grid-template-columns: minmax(120px, .8fr) minmax(100px, .42fr) minmax(190px, 1fr) minmax(190px, 1fr) 38px;
+}
+
+.shea-admin-variation-media-field input { min-width: 0; }
+.shea-admin-variation-row label span em { color: #77857a; font-style: normal; font-weight: 700; }
+.shea-admin-variation-help { margin: 0; color: #68776d; font-size: 11px; line-height: 1.45; }
+
+.shea-account-order {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px 18px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(17, 24, 22, .09);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.shea-account-order > div { display: grid; gap: 4px; }
+.shea-account-order > div:nth-child(2) { justify-items: end; }
+.shea-account-order > button { grid-column: 1 / -1; width: fit-content; min-height: 38px; display: inline-flex; align-items: center; gap: 7px; padding: 0 13px; border: 0; border-radius: 999px; color: #fff; background: #173d2b; font: inherit; font-size: 12px; font-weight: 850; cursor: pointer; }
+.shea-account-order > small { grid-column: 1 / -1; color: #718076; font-size: 11px; line-height: 1.4; }
+.shea-account-reorder-notice { width: min(1380px, calc(100% - 32px)); margin: 16px auto 0; padding: 13px 16px; border: 1px solid #bfd6bd; border-radius: 12px; color: #224f35; background: #f2f8f1; font-weight: 750; }
+.shea-account-reorder-notice a { color: inherit; font-weight: 900; }
+
+@media (max-width: 1099px) {
+  .shea-nav-brand { height: 56px !important; }
+  .shea-nav-brand img { width: 52px !important; height: 52px !important; flex-basis: 52px; }
+  .shea-nav-brand .shea-nav-brand-wordmark strong { font-size: 22px !important; }
+}
+
+@media (max-width: 680px) {
+  .shea-nav-brand { height: 52px !important; }
+  .shea-nav-brand img { width: 50px !important; height: 50px !important; flex-basis: 50px; }
+  .shea-nav-brand .shea-nav-brand-wordmark { display: none !important; }
+  .shea-nav-actions > .shea-nav-menu-button { display: grid !important; }
+  .shea-nav-menu-button { width: 46px; height: 46px; }
+  .commerce-marquee-track .commerce-marquee-logo { flex-basis: 150px; width: 150px; height: 100px; padding: 10px 12px; }
+  .shea-account-order { grid-template-columns: 1fr; }
+  .shea-account-order > div:nth-child(2) { justify-items: start; }
+  .shea-account-reorder-notice { width: calc(100% - 18px); }
+}
+
+@media (max-width: 1180px) {
+  .shea-admin-variation-row { grid-template-columns: minmax(150px, 1fr) minmax(120px, .5fr) 38px; }
+  .shea-admin-variation-media-field { grid-column: span 2; }
+}
+
 /* Shop catalogue: editorial filter sidebar with a spacious results grid. */
 .commerce-products-section.shop-only {
   width: min(1500px, calc(100% - 40px)) !important;

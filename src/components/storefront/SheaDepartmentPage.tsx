@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, ShoppingBag
 import { useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { platformSnapshot } from "@/lib/platform-data";
-import { formatMoney } from "@/lib/format";
+import { formatMoney, productPriceForSize } from "@/lib/format";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
@@ -23,9 +23,9 @@ const departmentContent: Record<DepartmentKind, {
     benefits: ["Gentle daily cleansing", "Moisture-barrier support", "Soft, healthy-looking glow"]
   },
   skin: {
-    eyebrow: "Skin and body care", title: "Comfort for dry, sensitive, and glow-seeking skin.",
+    eyebrow: "Skin care collection", title: "Comfort for dry, sensitive, and glow-seeking skin.",
     intro: "Pure shea butter and botanical infusions designed for dry patches, sensitive-feeling skin, body moisture, massage, and everyday radiance.",
-    categories: ["Body Care"],
+    categories: ["Skin Care"],
     promise: "Choose a butter by concern, texture, and the kind of daily routine you want to create.",
     routines: [{ title: "Dry & flaky", copy: "Layer Vanilla-Mint Shea Butter over damp skin and seal rough areas with body oil." }, { title: "Fresh body glow", copy: "Use Grapefruit Shea Butter after bathing, then finish with a light oil layer." }],
     benefits: ["Long-lasting moisture", "Comfort for rough areas", "Naturally radiant finish"]
@@ -76,7 +76,7 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
       .catch(() => undefined);
   }, []);
 
-  const departmentProducts = useMemo(() => products.filter((product) => content.categories.includes(product.category) && product.status !== "draft"), [content.categories, products]);
+  const departmentProducts = useMemo(() => products.filter((product) => content.categories.includes(product.category) && (product.status === "active" || product.status === "low_stock")), [content.categories, products]);
   const featuredProducts = departmentProducts.slice(0, 8);
 
   useEffect(() => {
@@ -102,8 +102,9 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
 
   function quickAdd(product: Product) {
     const saved = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
-    const index = saved.findIndex((line) => line.productId === product.id && line.size === product.sizes[0]);
-    const next = index >= 0 ? saved.map((line, itemIndex) => itemIndex === index ? { ...line, quantity: line.quantity + 1 } : line) : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: product.price, size: product.sizes[0], quantity: 1 }, ...saved];
+    const size = product.sizes[0] ?? "One size";
+    const index = saved.findIndex((line) => line.productId === product.id && line.size === size);
+    const next = index >= 0 ? saved.map((line, itemIndex) => itemIndex === index ? { ...line, quantity: line.quantity + 1 } : line) : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: productPriceForSize(product, size), size, quantity: 1 }, ...saved];
     window.localStorage.setItem("sheaWellnessCart", JSON.stringify(next));
     setCartCount(next.reduce((total, line) => total + line.quantity, 0));
   }
@@ -139,15 +140,6 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
         </div>
       </section>
 
-      <section className="department-benefits">
-        {content.benefits.map((benefit) => <article key={benefit}><CheckCircle2 size={19} /><strong>{benefit}</strong></article>)}
-      </section>
-
-      <section className="department-routines">
-        <div><span>How to use the collection</span><h2>Build a routine, not a crowded shelf.</h2></div>
-        {content.routines.map((routine, index) => <article key={routine.title}><b>0{index + 1}</b><Sparkles size={20} /><strong>{routine.title}</strong><p>{routine.copy}</p></article>)}
-      </section>
-
       <section className="department-products" id="department-products">
         <header><div><span>{content.eyebrow}</span><h2>Products for this routine.</h2></div><a href="/shop">View complete shop <ArrowRight size={17} /></a></header>
         <div>
@@ -157,6 +149,15 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
             <div><span>{product.badge}</span><h3>{product.title}</h3><div className="department-card-rating"><Star size={14} fill="currentColor" /> {product.rating.toFixed(1)} <small>({product.reviewCount} reviews)</small></div><p>{product.description}</p><div className="department-card-stock"><i />{product.status === "low_stock" ? `Only ${product.inventoryQty} left` : "In stock"}</div><footer><strong>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong><button type="button" onClick={() => quickAdd(product)}><ShoppingCart size={16} /> Quick add</button><a href={`/products/${encodeURIComponent(product.id)}`} aria-label={`View ${product.title}`}><ShoppingBag size={16} /></a></footer></div>
           </article>)}
         </div>
+      </section>
+
+      <section className="department-benefits">
+        {content.benefits.map((benefit) => <article key={benefit}><CheckCircle2 size={19} /><strong>{benefit}</strong></article>)}
+      </section>
+
+      <section className="department-routines">
+        <div><span>How to use the collection</span><h2>Build a routine, not a crowded shelf.</h2></div>
+        {content.routines.map((routine, index) => <article key={routine.title}><b>0{index + 1}</b><Sparkles size={20} /><strong>{routine.title}</strong><p>{routine.copy}</p></article>)}
       </section>
       <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
     </main>

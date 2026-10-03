@@ -102,6 +102,8 @@ type ProductVariationDraft = {
   id: string;
   label: string;
   price: string;
+  imageUrl: string;
+  videoUrl: string;
 };
 
 type MediaFormState = {
@@ -134,7 +136,9 @@ function productVariationRows(product?: Product): ProductVariationDraft[] {
   return sizes.map((size, index) => ({
     id: `variation_${index}_${size.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`,
     label: size,
-    price: String(product?.sizePrices?.[size] ?? basePrice)
+    price: String(product?.sizePrices?.[size] ?? basePrice),
+    imageUrl: product?.sizeMedia?.[size]?.imageUrl ?? "",
+    videoUrl: product?.sizeMedia?.[size]?.videoUrl ?? ""
   }));
 }
 
@@ -143,7 +147,9 @@ function normalizeVariationRows(variations: ProductVariationDraft[], fallbackPri
   const rows = variations
     .map((variation) => ({
       label: variation.label.trim(),
-      price: parseCurrencyInput(variation.price || fallbackPrice)
+      price: parseCurrencyInput(variation.price || fallbackPrice),
+      imageUrl: variation.imageUrl.trim(),
+      videoUrl: variation.videoUrl.trim()
     }))
     .filter((variation) => variation.label)
     .filter((variation) => {
@@ -152,13 +158,20 @@ function normalizeVariationRows(variations: ProductVariationDraft[], fallbackPri
       seen.add(key);
       return true;
     });
-  const safeRows = rows.length ? rows : [{ label: "One size", price: parseCurrencyInput(fallbackPrice) }];
+  const safeRows = rows.length ? rows : [{ label: "One size", price: parseCurrencyInput(fallbackPrice), imageUrl: "", videoUrl: "" }];
   const sizePrices = Object.fromEntries(safeRows.map((variation) => [variation.label, variation.price]));
+  const sizeMedia = Object.fromEntries(safeRows
+    .filter((variation) => variation.imageUrl || variation.videoUrl)
+    .map((variation) => [variation.label, {
+      ...(variation.imageUrl ? { imageUrl: variation.imageUrl } : {}),
+      ...(variation.videoUrl ? { videoUrl: variation.videoUrl } : {})
+    }]));
 
   return {
     sizes: safeRows.map((variation) => variation.label),
     price: safeRows[0]?.price ?? 0,
-    sizePrices
+    sizePrices,
+    sizeMedia: Object.keys(sizeMedia).length ? sizeMedia : undefined
   };
 }
 
@@ -194,7 +207,7 @@ function productToDraft(product?: Product): ProductFormState {
     id: product?.id ?? "",
     title: product?.title ?? "",
     description: product?.description ?? "",
-    category: product?.category ?? "Body Care",
+    category: product?.category ?? "Skin Care",
     badge: product?.badge ?? "Shea Wellness",
     imageUrl: product?.imageUrl ?? "/assets/sheawellness/pure-raw-shea-butter.jpeg",
     sizes: variations.map((variation) => variation.label).join(", "),
@@ -657,7 +670,7 @@ function ProductsView({
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const productEditorRef = useRef<HTMLDivElement | null>(null);
-  const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Body Care", "Face Care", "Hair Care", "Essential Oils"]));
+  const categoryOptions = Array.from(new Set([...allProducts.map((product) => product.category), "Skin Care", "Face Care", "Hair Care", "Essential Oils"]));
 
   function updateDraft(field: keyof ProductFormState, value: string) {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -672,14 +685,14 @@ function ProductsView({
   function addVariation() {
     setDraft((current) => syncVariationFields(current, [
       ...current.variations,
-      { id: `variation_${Date.now()}_${current.variations.length}`, label: "", price: current.variations.at(-1)?.price ?? current.price }
+      { id: `variation_${Date.now()}_${current.variations.length}`, label: "", price: current.variations.at(-1)?.price ?? current.price, imageUrl: "", videoUrl: "" }
     ]));
   }
 
   function removeVariation(variationId: string) {
     setDraft((current) => {
       const nextVariations = current.variations.filter((variation) => variation.id !== variationId);
-      return syncVariationFields(current, nextVariations.length ? nextVariations : [{ id: `variation_${Date.now()}_0`, label: "One size", price: current.price }]);
+      return syncVariationFields(current, nextVariations.length ? nextVariations : [{ id: `variation_${Date.now()}_0`, label: "One size", price: current.price, imageUrl: "", videoUrl: "" }]);
     });
   }
 
@@ -736,7 +749,7 @@ function ProductsView({
       storeId,
       title: draft.title.trim(),
       description: draft.description.trim(),
-      category: draft.category.trim() || "Body Care",
+      category: draft.category.trim() || "Skin Care",
       badge: draft.badge.trim() || "Shea Wellness",
       imageUrl: draft.imageUrl.trim() || "/assets/sheawellness/pure-raw-shea-butter.jpeg",
       imagePosition: existingProduct?.imagePosition ?? "50% 50%",
@@ -748,6 +761,7 @@ function ProductsView({
       deliveryBadge: draft.deliveryBadge.trim() || "Handcrafted skincare",
       price: normalizedVariations.price,
       sizePrices: normalizedVariations.sizePrices,
+      sizeMedia: normalizedVariations.sizeMedia,
       inventoryQty: Number(draft.inventoryQty) || 0,
       status: draft.status,
       channel: existingProduct?.channel ?? "both",
@@ -861,12 +875,21 @@ function ProductsView({
                       <span>Price</span>
                       <input required type="number" min="0" step="1" value={variation.price} onChange={(event) => updateVariation(variation.id, "price", event.target.value)} placeholder="2000" />
                     </label>
+                    <label className="shea-admin-variation-media-field">
+                      <span>Size image URL <em>optional</em></span>
+                      <input value={variation.imageUrl} onChange={(event) => updateVariation(variation.id, "imageUrl", event.target.value)} placeholder="/assets/product-100g.jpg" />
+                    </label>
+                    <label className="shea-admin-variation-media-field">
+                      <span>Size video URL <em>optional</em></span>
+                      <input value={variation.videoUrl} onChange={(event) => updateVariation(variation.id, "videoUrl", event.target.value)} placeholder="/assets/product-100g.mp4" />
+                    </label>
                     <button type="button" onClick={() => removeVariation(variation.id)} disabled={draft.variations.length === 1} aria-label={`Remove ${variation.label || "variation"}`}>
                       <Trash2 size={16} />
                     </button>
                   </div>
                 ))}
               </div>
+              <p className="shea-admin-variation-help">Leave size media blank to use the main product image. Add a verified image or video URL only when it belongs to that exact option.</p>
             </section>
             <div className="shea-admin-form-row">
               <label>

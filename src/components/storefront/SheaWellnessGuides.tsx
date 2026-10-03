@@ -5,6 +5,7 @@ import { productPairings } from "@/lib/shea-website-content";
 
 type ProductStep = {
   name: string;
+  productId?: string;
   image: string;
   role: string;
   benefits: string[];
@@ -35,6 +36,7 @@ const guides: Guide[] = [
     products: [
       {
         name: "African Liquid Black Soap",
+        productId: "prod_black_soap",
         image: "/assets/website-edits/black-soap-routine.jpg",
         role: "Gentle daily cleanser",
         benefits: ["Removes dirt, sweat, and impurities", "Helps maintain moisture balance", "Leaves skin ready to absorb moisture", "Suitable for daily face and body cleansing"],
@@ -43,6 +45,7 @@ const guides: Guide[] = [
       },
       {
         name: "Vanilla-Mint Shea Butter",
+        productId: "prod_vanilla_mint",
         image: "/assets/website-edits/vanilla-mint-shea-butter.jpg",
         role: "Intensive daily moisturizer",
         benefits: ["Deeply moisturizes and softens", "Supports the natural moisture barrier", "Reduces roughness and flaking", "Supports elasticity", "Leaves a refreshing vanilla-mint finish"],
@@ -70,6 +73,7 @@ const guides: Guide[] = [
     products: [
       {
         name: "African Liquid Black Soap",
+        productId: "prod_black_soap",
         image: "/assets/website-edits/black-soap-body-wash-pair.jpg",
         role: "Gentle cleansing without stripping",
         benefits: ["Cleanses without a tight, dry feeling", "Removes dirt, excess oil, and impurities", "Helps maintain moisture balance", "Suitable for daily face and body use"],
@@ -78,6 +82,7 @@ const guides: Guide[] = [
       },
       {
         name: "Lavender Shea Butter",
+        productId: "prod_lavender",
         image: "/assets/website-edits/lavender-shea-butter.jpg",
         role: "Calming daily moisturizer",
         benefits: ["Deeply moisturizes dry, sensitive skin", "Supports the protective barrier", "Softens delicate or rough skin", "Helps relieve dryness-related tightness", "Leaves skin smooth and comfortable"],
@@ -102,11 +107,11 @@ const guides: Guide[] = [
     id: "face-care",
     title: "Natural face care routine",
     intro: "Healthy, radiant skin starts with a consistent skincare routine. Shea Wellness's Face Care Collection uses nourishing, plant-based ingredients to gently cleanse, deeply moisturize, and protect your skin's natural barrier for a healthy-looking complexion.",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+    image: "/assets/website-edits/spa-facial.jpg",
     products: [
-      { name: "African Liquid Black Soap", image: "/assets/website-edits/black-soap-face-wash-pair.jpg", role: "Gentle daily face cleanser", benefits: ["Removes dirt, excess oil, sunscreen, and impurities", "Maintains moisture balance", "Leaves skin fresh and soft", "Prepares skin for oils and moisturizers"], usage: ["Wet with lukewarm water", "Massage gently in circular motions", "Avoid vigorous scrubbing", "Rinse thoroughly and pat dry"] },
-      { name: "Rosehip Facial Oil", image: "/assets/website-edits/rosehip-facial-oil.jpg", role: "Nourishing skin moisture", benefits: ["Hydrates without a heavy finish", "Softens and smooths", "Supports the moisture barrier", "Promotes a healthy-looking glow"], usage: ["Apply 2-4 drops to slightly damp skin", "Press and massage into face and neck", "Allow to absorb before sunscreen or makeup"] },
-      { name: "Lavender Shea Butter", image: "/assets/website-edits/lavender-shea-butter.jpg", role: "Overnight moisture barrier", benefits: ["Nourishes dry areas", "Helps prevent overnight moisture loss", "Softens rough patches", "Relieves dryness-related tightness"], usage: ["Warm a very small amount between fingertips", "Press onto dry areas as the final evening step", "Use sparingly on oily or combination skin"] }
+      { name: "African Liquid Black Soap", productId: "prod_black_soap", image: "/assets/website-edits/black-soap-face-wash-pair.jpg", role: "Gentle daily face cleanser", benefits: ["Removes dirt, excess oil, sunscreen, and impurities", "Maintains moisture balance", "Leaves skin fresh and soft", "Prepares skin for oils and moisturizers"], usage: ["Wet with lukewarm water", "Massage gently in circular motions", "Avoid vigorous scrubbing", "Rinse thoroughly and pat dry"] },
+      { name: "Rosehip Facial Oil", image: "", role: "Nourishing skin moisture", benefits: ["Hydrates without a heavy finish", "Softens and smooths", "Supports the moisture barrier", "Promotes a healthy-looking glow"], usage: ["Apply 2-4 drops to slightly damp skin", "Press and massage into face and neck", "Allow to absorb before sunscreen or makeup"] },
+      { name: "Lavender Shea Butter", productId: "prod_lavender", image: "/assets/website-edits/lavender-shea-butter.jpg", role: "Overnight moisture barrier", benefits: ["Nourishes dry areas", "Helps prevent overnight moisture loss", "Softens rough patches", "Relieves dryness-related tightness"], usage: ["Warm a very small amount between fingertips", "Press onto dry areas as the final evening step", "Use sparingly on oily or combination skin"] }
     ],
     morning: ["Cleanse with African Liquid Black Soap", "Apply 2-4 drops of Rosehip Facial Oil", "Finish with broad-spectrum SPF 30 or higher"],
     evening: ["Cleanse gently", "Massage Rosehip Facial Oil into clean skin", "Seal dry areas with a light layer of Lavender Shea Butter"],
@@ -121,8 +126,8 @@ const guides: Guide[] = [
     intro: "Healthy, glowing skin begins with consistent care and deep nourishment. This Fresh Body Glow routine is made for skin dulled by sun, pollution, dry weather, or everyday exposure, leaving it refreshed, soft, smooth, and naturally luminous.",
     image: "/assets/website-edits/grapefruit-shea-butter.jpg",
     products: [
-      { name: "African Liquid Black Soap", image: "/assets/website-edits/black-soap-collection.jpg", role: "Refresh and purify", benefits: ["Cleanses without stripping", "Removes dulling impurities", "Leaves skin fresh and revitalized", "Prepares skin for moisturizer"], usage: ["Massage onto wet skin", "Rinse with lukewarm water", "Pat dry but leave skin slightly damp"] },
-      { name: "Grapefruit Shea Butter", image: "/assets/website-edits/grapefruit-shea-butter.jpg", role: "Brighten and nourish", benefits: ["Deeply moisturizes", "Supports the moisture barrier", "Softens and smooths", "Promotes a fresh, healthy-looking glow", "Offers an uplifting citrus aroma"], usage: ["Massage generously over damp skin after bathing", "Focus on arms, legs, hands, elbows, knees, and feet"] },
+      { name: "African Liquid Black Soap", productId: "prod_black_soap", image: "/assets/website-edits/black-soap-collection.jpg", role: "Refresh and purify", benefits: ["Cleanses without stripping", "Removes dulling impurities", "Leaves skin fresh and revitalized", "Prepares skin for moisturizer"], usage: ["Massage onto wet skin", "Rinse with lukewarm water", "Pat dry but leave skin slightly damp"] },
+      { name: "Grapefruit Shea Butter", productId: "prod_grapefruit", image: "/assets/website-edits/grapefruit-shea-butter.jpg", role: "Brighten and nourish", benefits: ["Deeply moisturizes", "Supports the moisture barrier", "Softens and smooths", "Promotes a fresh, healthy-looking glow", "Offers an uplifting citrus aroma"], usage: ["Massage generously over damp skin after bathing", "Focus on arms, legs, hands, elbows, knees, and feet"] },
       { name: "Soothing Body Oil", image: "/assets/website-edits/body-oils-collection.jpg", role: "Seal in radiance", benefits: ["Locks in hydration", "Leaves skin silky and soft", "Enhances natural-looking glow", "Gives a healthy-looking sheen without a greasy feel"], usage: ["Massage a few drops over the body after Grapefruit Shea Butter", "Allow the oil to absorb naturally"] }
     ],
     morning: ["Cleanse", "Moisturize with Grapefruit Shea Butter", "Finish with Soothing Body Oil"],
@@ -137,8 +142,8 @@ const guides: Guide[] = [
     intro: "Beautiful, healthy hair begins with a healthy, well-nourished scalp. This routine gently cleanses, replenishes moisture, and nourishes natural, relaxed, braided, loc'd, colour-treated, or covered hair for healthier-looking, softer, and more manageable results.",
     image: "/assets/website-edits/botanical-oils.jpg",
     products: [
-      { name: "African Liquid Black Soap", image: "/assets/website-edits/black-soap-face-wash.jpg", role: "Gentle hair and scalp cleanser", benefits: ["Removes sweat, excess oil, and buildup", "Helps maintain scalp moisture balance", "Leaves the scalp fresh", "Prepares hair for nourishing oils"], usage: ["Wet hair thoroughly", "Lather in hands or apply carefully to the scalp", "Massage with fingertips", "Work through lengths and rinse thoroughly"] },
-      { name: "Cold Pressed Yellow Castor Oil", image: "/assets/website-edits/botanical-oils.jpg", role: "Deep moisture and scalp nourishment", benefits: ["Moisturizes a dry scalp", "Softens brittle hair", "Helps reduce the appearance of a flaky scalp", "Seals in moisture", "Improves manageability and shine"], usage: ["Warm a small amount between palms", "Massage into scalp and smooth through ends", "For an overnight treatment, cover with a satin bonnet", "Apply to exposed scalp between wash days"] },
+      { name: "African Liquid Black Soap", productId: "prod_black_soap", image: "/assets/website-edits/black-soap-face-wash.jpg", role: "Gentle hair and scalp cleanser", benefits: ["Removes sweat, excess oil, and buildup", "Helps maintain scalp moisture balance", "Leaves the scalp fresh", "Prepares hair for nourishing oils"], usage: ["Wet hair thoroughly", "Lather in hands or apply carefully to the scalp", "Massage with fingertips", "Work through lengths and rinse thoroughly"] },
+      { name: "Cold Pressed Yellow Castor Oil", productId: "prod_yellow_castor_oil", image: "/assets/media-library/aug-2026/aug-2026-028.jpeg", role: "Deep moisture and scalp nourishment", benefits: ["Moisturizes a dry scalp", "Softens brittle hair", "Helps reduce the appearance of a flaky scalp", "Seals in moisture", "Improves manageability and shine"], usage: ["Warm a small amount between palms", "Massage into scalp and smooth through ends", "For an overnight treatment, cover with a satin bonnet", "Apply to exposed scalp between wash days"] },
       { name: "Rosemary Essential Oil", image: "/assets/website-edits/essential-oils.jpg", role: "Diluted scalp-care boost", benefits: ["Refreshes the scalp", "Supports a clean scalp environment", "Complements regular hair care", "Adds a herbal aroma"], usage: ["Mix 2-3 drops with one tablespoon of castor oil", "Massage into the scalp for 3-5 minutes", "Leave on before styling or overnight if comfortable"], caution: "Never apply essential oil undiluted. Stop use if irritation occurs." }
     ],
     morning: ["Between wash days, apply a small amount of castor oil as needed", "Focus on dry ends", "Massage gently for even distribution"],
@@ -154,9 +159,9 @@ const guides: Guide[] = [
     intro: "True wellness goes beyond skincare—it is about creating moments of peace, relaxation, and restoration. Essential oils, aroma diffusers, and humidifiers bring calming aromatherapy into your home, office, spa, or wellness space.",
     image: "/assets/website-edits/essential-oils-collection.jpg",
     products: [
-      { name: "Shea Wellness Essential Oils", image: "/assets/website-edits/essential-oils-collection.jpg", role: "Nature-inspired aromatherapy", benefits: ["Creates an inviting atmosphere", "Freshens indoor spaces", "Complements massage when properly diluted", "Supports meditation, prayer, yoga, and mindfulness"], usage: ["Choose lemongrass, lavender, peppermint, eucalyptus, sweet orange, or rosemary", "Diffuse according to appliance instructions", "Dilute correctly before any topical use"], caution: "Keep essential oils away from children and pets and follow the individual oil's instructions." },
-      { name: "Aroma Diffusers", image: "/assets/website-edits/aroma-diffuser-wood.jpg", role: "Natural fragrance for your space", benefits: ["Disperses essential oils through a room", "Creates a calm ambience", "Refreshes stale-smelling spaces", "Adds a decorative wellness touch"], usage: ["Fill with clean water", "Add 3-8 drops of essential oil", "Switch on and enjoy", "Clean according to manufacturer instructions"] },
-      { name: "Humidifiers", image: "/assets/website-edits/aroma-diffuser-purple.jpg", role: "Indoor comfort", benefits: ["Adds moisture to dry indoor air", "Improves comfort during dry weather or air conditioning", "Supports a pleasant work, rest, or sleep environment"], usage: ["Fill with clean water", "Adjust mist level", "Clean regularly"], caution: "Only add essential oils if the specific humidifier model is designed for aromatherapy." }
+      { name: "Shea Wellness Essential Oils", productId: "prod_essential_oils", image: "/assets/website-edits/essential-oils-collection.jpg", role: "Nature-inspired aromatherapy", benefits: ["Creates an inviting atmosphere", "Freshens indoor spaces", "Complements massage when properly diluted", "Supports meditation, prayer, yoga, and mindfulness"], usage: ["Choose lemongrass, lavender, peppermint, eucalyptus, sweet orange, or rosemary", "Diffuse according to appliance instructions", "Dilute correctly before any topical use"], caution: "Keep essential oils away from children and pets and follow the individual oil's instructions." },
+      { name: "Aroma Diffusers", productId: "prod_aromatherapy", image: "/assets/website-edits/aroma-diffuser-wood.jpg", role: "Natural fragrance for your space", benefits: ["Disperses essential oils through a room", "Creates a calm ambience", "Refreshes stale-smelling spaces", "Adds a decorative wellness touch"], usage: ["Fill with clean water", "Add 3-8 drops of essential oil", "Switch on and enjoy", "Clean according to manufacturer instructions"] },
+      { name: "Humidifiers", productId: "prod_aromatherapy", image: "/assets/website-edits/aroma-diffuser-purple.jpg", role: "Indoor comfort", benefits: ["Adds moisture to dry indoor air", "Improves comfort during dry weather or air conditioning", "Supports a pleasant work, rest, or sleep environment"], usage: ["Fill with clean water", "Adjust mist level", "Clean regularly"], caution: "Only add essential oils if the specific humidifier model is designed for aromatherapy." }
     ],
     morning: ["Diffuse sweet orange or lemongrass for a bright start", "Use a humidifier where indoor air feels dry"],
     evening: ["Diffuse lavender for a calm wind-down", "Pair aroma with skincare, reading, prayer, meditation, or self-care"],
@@ -189,10 +194,11 @@ export function SheaWellnessGuides() {
           <div className="guide-products">
             {guide.products.map((product, productIndex) => (
               <section key={product.name}>
-                <img className="guide-product-image" src={product.image} alt={`Shea Wellness ${product.name}`} />
+                {product.image ? <img className="guide-product-image" src={product.image} alt={`Shea Wellness ${product.name}`} /> : <div className="guide-product-image guide-product-image--pending" role="img" aria-label={`Verified product image for ${product.name} is pending`}><ShieldCheck size={28} /><span>Verified product image pending</span></div>}
                 <span>Step {productIndex + 1}</span>
                 <h3>{product.name}</h3>
                 <strong>{product.role}</strong>
+                {product.productId ? <a className="guide-product-link" href={`/products/${encodeURIComponent(product.productId)}`}>View this product</a> : <small className="guide-product-link pending">Product media will be added after verification.</small>}
                 <div className="guide-facts">
                   <div><h4><Sparkles size={17} /> Benefits</h4><ul>{product.benefits.map((item) => <li key={item}>{item}</li>)}</ul></div>
                   <div><h4><Droplets size={17} /> How to use</h4><ol>{product.usage.map((item) => <li key={item}>{item}</li>)}</ol></div>

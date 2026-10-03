@@ -60,11 +60,12 @@ type CheckoutStep = "information" | "delivery" | "payment" | "review" | "success
 type CheckoutForm = {
   email: string;
   fullName: string;
+  phone: string;
   address: string;
+  country: string;
   city: string;
-  postalCode: string;
-  deliveryMethod: "standard" | "express";
-  paymentMethod: "card" | "paypal";
+  deliveryMethod: "kenya" | "international";
+  paymentMethod: "card" | "paypal" | "mpesa";
 };
 
 const defaultStorefrontMedia = sanitizeSheaMediaConfig(sheaDefaultMediaConfig);
@@ -72,10 +73,11 @@ const defaultStorefrontMedia = sanitizeSheaMediaConfig(sheaDefaultMediaConfig);
 const defaultForm: CheckoutForm = {
   email: "",
   fullName: "",
+  phone: "",
   address: "",
+  country: "Kenya",
   city: "",
-  postalCode: "",
-  deliveryMethod: "standard",
+  deliveryMethod: "kenya",
   paymentMethod: "card"
 };
 
@@ -83,11 +85,11 @@ const concernCards = [
   {
     title: "Dry & flaky skin",
     body: "Cleanse gently, replenish lost moisture, and seal comfort into rough or flaky patches.",
-    image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+    image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
     href: "/wellness-guides#dry-flaky-skin"
   },
   {
-    title: "Sensitive skin comfort",
+    title: "Sensitive skin solution",
     body: "Barrier-first care with African black soap, lavender shea butter, and patch-test guidance.",
     image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
     href: "/wellness-guides#sensitive-skin"
@@ -95,25 +97,25 @@ const concernCards = [
   {
     title: "Fresh body glow",
     body: "Refresh, moisturize, and finish with body oil for softer, naturally radiant skin.",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.29 (3).jpeg",
+    image: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
     href: "/wellness-guides#body-glow"
   },
   {
-    title: "Face care routine",
+    title: "Face routine",
     body: "A simple three-step routine: cleanse, nourish, and protect by day; restore by night.",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+    image: "/assets/website-edits/spa-facial.jpg",
     href: "/wellness-guides#face-care"
   },
   {
     title: "Hair & scalp moisture",
     body: "Clean scalp care, castor oil moisture, and rosemary scalp-massage support.",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (1).jpeg",
+    image: "/assets/media-library/aug-2026/aug-2026-028.jpeg",
     href: "/wellness-guides#hair-scalp"
   },
   {
     title: "Spa essentials",
     body: "Essential oils, diffusers, humidifiers, and treatment-room supplies for wellness spaces.",
-    image: "/assets/sheawellness/lavender-shea-butter-back.jpeg",
+    image: "/assets/media-library/aug-2026/aug-2026-057.jpeg",
     href: "/wellness-guides#spa-essentials"
   }
 ];
@@ -126,54 +128,27 @@ const comparisonRows = [
   ["Routine Education Included", true, false]
 ] as const;
 
-const beforeAfterSlides = [
+const routineProgressSlides = [
   {
-    title: "Shea Wellness face care routine",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
-    labels: ["Morning", "Evening"]
+    title: "Gentle cleansing",
+    image: "/assets/website-edits/black-soap-body-wash-pair.jpg",
+    labels: ["Step 1", "Cleanse"]
   },
   {
-    title: "Body tone progress",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.04.41.jpeg",
-    labels: ["Before", "After"]
+    title: "Moisture layering",
+    image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
+    labels: ["Step 2", "Moisturise"]
   },
   {
-    title: "Skin clarity progress",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
-    labels: ["Before", "After"]
+    title: "Scalp and hair moisture",
+    image: "/assets/media-library/aug-2026/aug-2026-028.jpeg",
+    labels: ["Step 3", "Nourish"]
   },
   {
-    title: "Moisture glow progress",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.30 (3).jpeg",
-    labels: ["Before", "After"]
+    title: "A calm wellness space",
+    image: "/assets/media-library/aug-2026/aug-2026-057.jpeg",
+    labels: ["Step 4", "Restore"]
   }
-];
-
-const faceRoutineSteps = [
-  {
-    title: "Morning routine",
-    promise: "Cleanse. Nourish. Protect.",
-    steps: [
-      "Cleanse with African Liquid Black Soap and lukewarm water.",
-      "Apply 2-4 drops of Rosehip Facial Oil while skin is slightly damp.",
-      "Finish with broad-spectrum sunscreen before daily sun exposure."
-    ]
-  },
-  {
-    title: "Evening routine",
-    promise: "Cleanse. Nourish. Restore.",
-    steps: [
-      "Cleanse again with African Liquid Black Soap using gentle circular motions.",
-      "Massage facial oil into clean skin and neck.",
-      "Seal dry areas with a light layer of Lavender Shea Butter where needed."
-    ]
-  }
-];
-
-const routineSupportLists = [
-  ["Suitable for", "Dry skin", "Normal skin", "Combination skin", "Mature skin", "Sensitive skin after patch test"],
-  ["What to expect", "Cleaner refreshed skin", "Better hydration", "Softer smoother feel", "Healthy natural glow", "Stronger moisture barrier"],
-  ["Best results", "Use morning and night", "Drink plenty of water", "Wear sunscreen daily", "Patch test new products"]
 ];
 
 export function CommerceStorefront({
@@ -315,9 +290,11 @@ export function CommerceStorefront({
     });
   }, [activeCategory, liveProducts, query, sort]);
 
-  const subtotal = cart.reduce((total, line) => total + line.product.price * line.quantity, 0);
-  const shipping = subtotal > 15000 || subtotal === 0 ? 0 : checkoutForm.deliveryMethod === "express" ? 900 : 450;
-  const tax = subtotal * 0.16;
+  const subtotal = cart.reduce((total, line) => total + productPriceForSize(line.product, line.size) * line.quantity, 0);
+  // Delivery fees and taxes are not quoted until the supplied Kenyan/international
+  // address is reviewed. Do not present guessed amounts as a payment total.
+  const shipping = 0;
+  const tax = 0;
   const total = subtotal + shipping + tax;
   const cartCount = cart.reduce((totalQuantity, line) => totalQuantity + line.quantity, 0);
   const isHomePage = Boolean(featuredProductLimit);
@@ -362,7 +339,7 @@ export function CommerceStorefront({
           title: line.product.title,
           quantity: line.quantity,
           size: line.size,
-          unitPrice: line.product.price
+          unitPrice: productPriceForSize(line.product, line.size)
         })),
         totals: { subtotal, shipping, tax, total }
       })
@@ -379,8 +356,16 @@ export function CommerceStorefront({
         customerEmail: checkoutForm.email,
         itemCount: cart.reduce((count, line) => count + line.quantity, 0),
         totalPrice: total,
+        items: cart.map((line) => ({
+          productId: line.product.id,
+          title: line.product.title,
+          imageUrl: line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl,
+          price: productPriceForSize(line.product, line.size),
+          size: line.size,
+          quantity: line.quantity
+        })),
         createdAt: new Date().toISOString(),
-        paymentStatus: "authorized",
+        paymentStatus: "pending",
         fulfillmentStatus: "unfulfilled"
       },
       ...savedOrders
@@ -637,42 +622,9 @@ export function CommerceStorefront({
               <i />
               <strong>{concern.title}</strong>
               <span>{concern.body}</span>
-              <b>Explore collection</b>
+              <b>View routine &amp; products</b>
             </a>
           ))}
-        </div>
-      </section>
-
-      <section className="commerce-routine-section" id="face-care-routine">
-        <figure>
-          <img src="/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg" alt="Model cleansing her face as part of a skincare routine" loading="lazy" />
-        </figure>
-        <div className="commerce-routine-copy">
-          <span>Face care routine</span>
-          <h2>Nourish. Protect. Glow naturally.</h2>
-          <p>
-            Healthy, radiant skin starts with a consistent routine. Shea Wellness face care gently cleanses,
-            deeply hydrates, and supports your skin's natural barrier every morning and evening.
-          </p>
-          <div className="commerce-routine-cards">
-            {faceRoutineSteps.map((routine) => (
-              <article key={routine.title}>
-                <strong>{routine.title}</strong>
-                <small>{routine.promise}</small>
-                <ol>
-                  {routine.steps.map((step) => <li key={step}>{step}</li>)}
-                </ol>
-              </article>
-            ))}
-          </div>
-          <div className="commerce-routine-support">
-            {routineSupportLists.map(([title, ...items]) => (
-              <article key={title}>
-                <strong>{title}</strong>
-                {items.map((item) => <span key={item}><CheckCircle2 size={15} />{item}</span>)}
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -704,24 +656,24 @@ export function CommerceStorefront({
         <span><CheckCircle2 size={19} /> Export-ready quality</span>
       </section>
 
-      <section className="commerce-before-after-section" aria-label="Before and after customer results">
+      <section className="commerce-before-after-section" aria-label="Real skin routine progress">
         <div className="commerce-before-after-proof">
-          <span><CheckCircle2 size={20} /> Dermatologist tested</span>
-          <span><CheckCircle2 size={20} /> Routine support</span>
-          <span><CheckCircle2 size={20} /> 100% natural</span>
+          <span><CheckCircle2 size={20} /> Patch-test first</span>
+          <span><CheckCircle2 size={20} /> Routine guidance</span>
+          <span><CheckCircle2 size={20} /> Care inspired by nature</span>
         </div>
         <div className="commerce-before-after-head">
           <div>
-            <span>Before and after</span>
+            <span>Routine milestones</span>
             <h2>Real skin routine progress.</h2>
           </div>
-          <p>Swipe through clear transformation-style media before choosing your Shea Wellness routine.</p>
+          <p>Build a consistent routine in clear stages. Customer before-and-after images are published only after consent and product-use verification.</p>
         </div>
         <div className="commerce-before-after-rail" aria-label="Before and after carousel">
           <div className="commerce-before-after-track">
             {[0, 1].map((groupIndex) => (
               <div className="commerce-before-after-group" key={groupIndex} aria-hidden={groupIndex === 1}>
-                {beforeAfterSlides.map((slide) => (
+                {routineProgressSlides.map((slide) => (
                   <article key={`${groupIndex}-${slide.title}`}>
                     <img src={slide.image} alt={groupIndex === 0 ? slide.title : ""} loading="lazy" />
                     <div>
@@ -1064,7 +1016,7 @@ function CheckoutFlow({
   onPlaceOrder: () => Promise<void>;
 }) {
   const steps: CheckoutStep[] = ["information", "delivery", "payment", "review"];
-  const canProceed = step !== "information" || Boolean(form.email && form.fullName && form.address && form.city);
+  const canProceed = step !== "information" || Boolean(form.email && form.fullName && form.phone && form.address && form.country && form.city);
 
   return (
     <div className="commerce-checkout-backdrop">
@@ -1076,9 +1028,9 @@ function CheckoutFlow({
           {step === "success" ? (
             <div className="commerce-success">
               <CheckCircle2 size={44} />
-              <span>Order confirmed</span>
+              <span>Order request received</span>
               <h2>{orderNumber}</h2>
-              <p>Your Shea Wellness order has been prepared for confirmation, fulfilment, and customer notification.</p>
+              <p>Shea Wellness will confirm delivery and payment details before fulfilment. No online payment has been collected by this storefront yet.</p>
               <button type="button" onClick={onClose}>Return to store</button>
             </div>
           ) : (
@@ -1094,7 +1046,7 @@ function CheckoutFlow({
                 <CheckoutInformation form={form} setForm={setForm} />
               ) : null}
               {step === "delivery" ? (
-                <CheckoutDelivery form={form} setForm={setForm} currency={currency} />
+                <CheckoutDelivery form={form} setForm={setForm} />
               ) : null}
               {step === "payment" ? (
                 <CheckoutPayment form={form} setForm={setForm} />
@@ -1121,13 +1073,13 @@ function CheckoutFlow({
           {cart.map((line) => (
             <div className="commerce-summary-line" key={`${line.product.id}-${line.size}`}>
               <span>{line.quantity}x {line.product.title}</span>
-              <strong>{formatMoney(line.product.price * line.quantity, currency)}</strong>
+              <strong>{formatMoney(productPriceForSize(line.product, line.size) * line.quantity, currency)}</strong>
             </div>
           ))}
           <div><span>Subtotal</span><strong>{formatMoney(subtotal, currency)}</strong></div>
-          <div><span>Shipping</span><strong>{shipping === 0 ? "Free" : formatMoney(shipping, currency)}</strong></div>
-          <div><span>Estimated VAT</span><strong>{formatMoney(tax, currency)}</strong></div>
-          <div className="total"><span>Total</span><strong>{formatMoney(total, currency)}</strong></div>
+          <div><span>Delivery</span><strong>Address review</strong></div>
+          <div><span>Taxes</span><strong>Confirmed before payment</strong></div>
+          <div className="total"><span>Products subtotal</span><strong>{formatMoney(total, currency)}</strong></div>
         </aside>
       </section>
     </div>
@@ -1141,23 +1093,24 @@ function CheckoutInformation({ form, setForm }: { form: CheckoutForm; setForm: (
       <h2>Contact and delivery address</h2>
       <label>Email<input value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" /></label>
       <label>Full name<input value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} placeholder="Customer name" /></label>
+      <label>Phone number<input type="tel" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="+254 7xx xxx xxx" /></label>
       <label>Address<input value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} placeholder="Street address" /></label>
       <div className="commerce-form-row">
-        <label>City<input value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} /></label>
-        <label>Postal code<input value={form.postalCode} onChange={(event) => setForm({ ...form, postalCode: event.target.value })} /></label>
+        <label>Country<input value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value })} placeholder="Kenya" /></label>
+        <label>City / county / province<input value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} placeholder="Nairobi, Mombasa, Kisumu..." /></label>
       </div>
     </div>
   );
 }
 
-function CheckoutDelivery({ form, setForm, currency }: { form: CheckoutForm; setForm: (form: CheckoutForm) => void; currency: string }) {
+function CheckoutDelivery({ form, setForm }: { form: CheckoutForm; setForm: (form: CheckoutForm) => void }) {
   return (
     <div className="commerce-checkout-panel">
       <span>Delivery</span>
-      <h2>Choose a delivery promise</h2>
+      <h2>Choose where we deliver</h2>
       {[
-        { id: "standard", title: "Standard tracked", detail: "Retail and wellness orders", price: 450 },
-        { id: "express", title: "Express courier", detail: "Priority retail or spa replenishment", price: 900 }
+        { id: "kenya", title: "Kenya delivery", detail: "Nairobi and other Kenyan destinations. The delivery route, fee, and any free-delivery eligibility are confirmed from your address." },
+        { id: "international", title: "Outside Kenya", detail: "International delivery is available by quotation after your address and order are reviewed." }
       ].map((method) => (
         <button
           type="button"
@@ -1166,7 +1119,7 @@ function CheckoutDelivery({ form, setForm, currency }: { form: CheckoutForm; set
           onClick={() => setForm({ ...form, deliveryMethod: method.id as CheckoutForm["deliveryMethod"] })}
         >
           <span><strong>{method.title}</strong><small>{method.detail}</small></span>
-          <b>{formatMoney(method.price, currency)}</b>
+          <b>Address review</b>
         </button>
       ))}
     </div>
@@ -1180,7 +1133,8 @@ function CheckoutPayment({ form, setForm }: { form: CheckoutForm; setForm: (form
       <h2>Payment method</h2>
       {[
         { id: "card", title: "Credit or debit card", detail: "Secure retail checkout", icon: CreditCard },
-        { id: "paypal", title: "PayPal", detail: "External wallet checkout", icon: ShieldCheck }
+        { id: "paypal", title: "PayPal", detail: "External wallet checkout", icon: ShieldCheck },
+        { id: "mpesa", title: "M-Pesa", detail: "A payment prompt or verified PayBill instructions are provided after order review.", icon: ShoppingCart }
       ].map((method) => {
         const Icon = method.icon;
         return (
@@ -1216,12 +1170,13 @@ function CheckoutReview({
       <div className="commerce-review-box">
         <strong>{form.fullName}</strong>
         <p>{form.email}</p>
-        <p>{form.address}, {form.city} {form.postalCode}</p>
-        <p>{form.deliveryMethod === "express" ? "Express courier" : "Standard tracked"} / {form.paymentMethod === "card" ? "Card" : "PayPal"}</p>
+        <p>{form.phone}</p>
+        <p>{form.address}, {form.city}, {form.country}</p>
+        <p>{form.deliveryMethod === "international" ? "International delivery quote" : "Kenya delivery"} / {form.paymentMethod === "card" ? "Card" : form.paymentMethod === "paypal" ? "PayPal" : "M-Pesa"}</p>
       </div>
       <div className="commerce-review-box">
         <strong>{cart.length} line items</strong>
-        <p>Total authorization: {formatMoney(total, currency)}</p>
+        <p>Products subtotal: {formatMoney(total, currency)}. Delivery, tax, and payment confirmation follow address review.</p>
       </div>
     </div>
   );
