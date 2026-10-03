@@ -12766,3 +12766,214 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
     font-size: clamp(19px, 6vw, 26px) !important;
   }
 }
+
+/* Responsive storefront proportion pass: keep the shell calm at every viewport. */
+.commerce-hero .commerce-hero-copy {
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+}
+
+@media (min-width: 1100px) {
+  :root { --shea-fixed-header: 110px; }
+
+  .shea-nav-promo {
+    min-height: 28px !important;
+    padding-block: 6px !important;
+    font-size: 10px !important;
+  }
+
+  .shea-nav-bar {
+    width: min(1440px, calc(100% - 32px)) !important;
+    min-height: 64px !important;
+    grid-template-columns: minmax(250px, 1fr) auto minmax(250px, 1fr) !important;
+    column-gap: clamp(16px, 1.8vw, 28px) !important;
+    margin: 7px auto 9px !important;
+    padding-inline: 20px !important;
+  }
+
+  .shea-nav-brand {
+    width: auto !important;
+    min-width: 0 !important;
+    height: 54px !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+  }
+
+  .shea-nav-brand img {
+    width: 52px !important;
+    height: 52px !important;
+    flex-basis: 52px !important;
+    border: 1px solid #dfe6dc !important;
+    border-radius: 50% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    background: #fff !important;
+    transform: none !important;
+  }
+
+  .shea-nav-brand .shea-nav-brand-wordmark strong {
+    font-size: clamp(20px, 1.4vw, 24px) !important;
+    line-height: 1 !important;
+  }
+
+  .shea-nav-brand .shea-nav-brand-wordmark small { font-size: 8px !important; }
+  .shea-nav-desktop { gap: clamp(12px, 1.6vw, 24px) !important; }
+  .shea-nav-desktop > a { min-height: 38px !important; padding-inline: 2px !important; font-size: 11px !important; }
+  .shea-nav-actions { gap: 6px !important; }
+
+  .shea-nav-actions > a:not(.shea-nav-cart),
+  .shea-nav-actions > .shea-nav-search-button,
+  .shea-nav-actions > .shea-nav-menu-button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .shea-nav-cart {
+    min-height: 40px !important;
+    gap: 6px !important;
+    padding-inline: 11px !important;
+    font-size: 12px !important;
+  }
+
+  .shea-nav-cart b { min-width: 20px !important; height: 20px !important; font-size: 10px !important; }
+}
+
+/* One deterministic drawer direction prevents the half-open centre overlay. */
+.shea-desktop-sidebar {
+  position: fixed !important;
+  inset: var(--shea-fixed-header) 0 0 auto !important;
+  z-index: 920 !important;
+  width: clamp(300px, 28vw, 380px) !important;
+  height: calc(100dvh - var(--shea-fixed-header)) !important;
+  padding: 0 16px 16px !important;
+  overflow-y: auto !important;
+  border-left: 1px solid rgba(217, 227, 214, .92) !important;
+  border-right: 0 !important;
+  box-shadow: -20px 0 52px rgba(9, 30, 19, .2) !important;
+  transform: translateX(105%) !important;
+}
+
+.shea-desktop-sidebar.open { transform: translateX(0) !important; }
+
+.shea-sidebar-scrim {
+  position: fixed !important;
+  inset: var(--shea-fixed-header) 0 0 0 !important;
+  z-index: 910 !important;
+}
+
+.shea-sidebar-topline { min-height: 72px !important; padding-block: 10px !important; }
+.shea-sidebar-topline > a { gap: 10px !important; }
+.shea-sidebar-topline > a img { width: 50px !important; height: 50px !important; }
+.shea-sidebar-topline > a strong { font-size: 17px !important; }
+.shea-sidebar-topline > a small { font-size: 10px !important; }
+.shea-sidebar-topline > button { width: 38px !important; height: 38px !important; }
+.shea-sidebar-feature { gap: 6px !important; margin: 12px 0 14px !important; padding: 16px !important; border-radius: 14px !important; }
+.shea-sidebar-feature > span { font-size: 9px !important; }
+.shea-sidebar-feature > strong { max-width: 27ch !important; font-size: 18px !important; line-height: 1.12 !important; }
+.shea-sidebar-feature > a { font-size: 11px !important; }
+.shea-desktop-sidebar .shea-sidebar-label { margin: 12px 1px 7px !important; font-size: 9px !important; }
+.shea-sidebar-category-grid { gap: 7px !important; }
+.shea-sidebar-category-grid a { min-height: 48px !important; padding: 6px 10px !important; font-size: 11px !important; }
+.shea-sidebar-site-grid { gap: 2px 6px !important; }
+.shea-sidebar-site-grid a { min-height: 36px !important; padding-inline: 8px !important; font-size: 11px !important; }
+.shea-desktop-sidebar .shea-sidebar-contact { margin-top: 12px !important; gap: 6px !important; padding: 10px !important; }
+
+@media (max-width: 680px) {
+  .shea-desktop-sidebar {
+    inset: 0 0 0 auto !important;
+    width: min(92vw, 360px) !important;
+    height: 100dvh !important;
+    padding-inline: 14px !important;
+  }
+
+  .shea-sidebar-scrim { inset: 0 !important; }
+}
+
+@media (min-width: 900px) {
+  .commerce-hero { padding: 10px max(16px, calc((100% - 1440px) / 2)) 24px !important; }
+
+  .commerce-hero-card {
+    max-width: 1440px !important;
+    min-height: clamp(390px, 26vw, 460px) !important;
+    border-radius: 24px !important;
+  }
+
+  .commerce-hero .commerce-hero-copy {
+    width: min(560px, 54%) !important;
+    padding: 44px clamp(32px, 4vw, 56px) 62px !important;
+  }
+
+  .commerce-hero .commerce-hero-copy h1 {
+    max-width: 540px !important;
+    font-size: clamp(42px, 3.4vw, 52px) !important;
+    line-height: 1.02 !important;
+  }
+
+  .commerce-hero .commerce-hero-copy p { max-width: 460px !important; font-size: 14px !important; }
+  .commerce-hero .commerce-hero-actions { margin-top: 18px !important; }
+  .commerce-hero .commerce-hero-actions a { min-height: 46px !important; padding-inline: 22px !important; }
+  .commerce-carousel-arrow { width: 46px !important; height: 46px !important; }
+  .commerce-carousel-dots { bottom: 14px !important; }
+  .commerce-carousel-dots button { width: 24px !important; height: 6px !important; }
+  .commerce-carousel-dots button.active { width: 38px !important; }
+}
+
+@media (max-width: 680px) {
+  /* Keep the compact header useful: logo, cart, and menu stay in one row. */
+  .shea-nav-shell .shea-nav-bar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    min-height: 70px !important;
+    gap: 10px !important;
+    padding: 6px 10px !important;
+  }
+  .shea-nav-shell .shea-nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+  }
+  .shea-nav-shell .shea-nav-actions > a:not(.shea-nav-cart),
+  .shea-nav-shell .shea-nav-actions > .shea-nav-search-button { display: none !important; }
+  .shea-nav-shell .shea-nav-actions > .shea-nav-cart,
+  .shea-nav-shell .shea-nav-actions > .shea-nav-menu-button { display: inline-flex !important; }
+  .shea-nav-shell .shea-nav-menu-button { display: grid !important; }
+  .shea-nav-shell .shea-nav-cart,
+  .shea-nav-shell .shea-nav-menu-button {
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+  }
+  .shea-nav-shell .shea-nav-cart > span { display: none !important; }
+  .shea-nav-shell .shea-nav-brand {
+    width: 52px !important;
+    height: 52px !important;
+    overflow: hidden !important;
+  }
+  .shea-nav-shell .shea-nav-brand img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    border-radius: 50% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    transform: none !important;
+  }
+  .commerce-hero-card { min-height: 400px !important; }
+  .commerce-hero .commerce-hero-copy { padding: 56px 20px 74px !important; }
+  .commerce-hero .commerce-hero-copy h1 { max-width: 330px !important; font-size: clamp(30px, 8.8vw, 35px) !important; }
+  .commerce-hero .commerce-hero-copy p { font-size: 13px !important; }
+  .commerce-hero .commerce-hero-actions a { min-height: 44px !important; }
+  .commerce-brand-intro h2 {
+    max-width: 100% !important;
+    font-size: clamp(32px, 9vw, 36px) !important;
+    line-height: 1.04 !important;
+    overflow-wrap: anywhere;
+  }
+}
