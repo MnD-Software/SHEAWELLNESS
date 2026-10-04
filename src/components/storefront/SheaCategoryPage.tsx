@@ -6,6 +6,7 @@ import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { platformSnapshot } from "@/lib/platform-data";
+import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import type { Product } from "@/lib/types";
 
 export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySlug: string; initialCategory?: string | null }) {
@@ -40,8 +41,8 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
           <p>Shop Shea Wellness products by category with clear product cards, real product pages, reviews, and cart actions.</p>
           <a href="/shop">All products <ArrowRight size={18} /></a>
         </div>
-        <figure>
-          <img src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
+        <figure className={isSidewaysSheaProductAsset(heroProduct.imageUrl) ? "is-rotated" : undefined}>
+          <img className={isSidewaysSheaProductAsset(heroProduct.imageUrl) ? "shea-rotated-product-image" : undefined} src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
         </figure>
       </section>
 
@@ -62,8 +63,8 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
         <div className="shea-category-product-grid">
           {categoryProducts.map((product) => (
             <article key={product.id}>
-              <a href={`/products/${encodeURIComponent(product.id)}`}>
-                <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
+              <a className={isSidewaysSheaProductAsset(product.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(product.id)}`}>
+                <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
               </a>
               <div>
                 <span>{product.category}</span>

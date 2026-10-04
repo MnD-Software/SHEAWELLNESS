@@ -24,6 +24,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
 import { formatMoney, productPriceForSize } from "@/lib/format";
+import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { categoryToSlug } from "@/lib/product-routing";
 import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
@@ -175,6 +176,9 @@ export function CommerceStorefront({
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("information");
   const [checkoutForm, setCheckoutForm] = useState<CheckoutForm>(defaultForm);
   const [orderNumber, setOrderNumber] = useState("");
+  const [checkoutError, setCheckoutError] = useState("");
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const checkoutRequestId = useRef<string | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
@@ -184,6 +188,7 @@ export function CommerceStorefront({
 
   const heroSlides = mediaConfig.heroSlides;
   const heroSlide = heroSlides[heroIndex] ?? heroSlides[0];
+  const heroMediaIsSideways = isSidewaysSheaProductAsset(heroSlide?.src);
   const mediaVideos = mediaConfig.videos;
 
   function moveHero(direction: 1 | -1) {
@@ -329,50 +334,82 @@ export function CommerceStorefront({
   }
 
   async function placeOrder() {
-    const response = await fetch("/api/storefront/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        customer: checkoutForm,
-        items: cart.map((line) => ({
-          productId: line.product.id,
-          title: line.product.title,
-          quantity: line.quantity,
-          size: line.size,
-          unitPrice: productPriceForSize(line.product, line.size)
-        })),
-        totals: { subtotal, shipping, tax, total }
-      })
-    });
+    if (!cart.length || placingOrder) return;
 
-    const payload = (await response.json()) as { data?: { orderNumber: string } };
-    const nextOrderNumber = payload.data?.orderNumber ?? `SHEA-${Date.now().toString().slice(-6)}`;
-    const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as unknown[];
-    window.localStorage.setItem("sheaWellnessOrders", JSON.stringify([
-      {
-        source: "shea_storefront_checkout",
-        orderNumber: nextOrderNumber,
-        customerName: checkoutForm.fullName,
-        customerEmail: checkoutForm.email,
-        itemCount: cart.reduce((count, line) => count + line.quantity, 0),
-        totalPrice: total,
-        items: cart.map((line) => ({
-          productId: line.product.id,
-          title: line.product.title,
-          imageUrl: line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl,
-          price: productPriceForSize(line.product, line.size),
-          size: line.size,
-          quantity: line.quantity
-        })),
-        createdAt: new Date().toISOString(),
-        paymentStatus: "pending",
-        fulfillmentStatus: "unfulfilled"
-      },
-      ...savedOrders
-    ]));
-    setOrderNumber(nextOrderNumber);
-    setCheckoutStep("success");
-    setCart([]);
+    setPlacingOrder(true);
+    setCheckoutError("");
+    const requestId = checkoutRequestId.current ?? (globalThis.crypto?.randomUUID?.() ?? `checkout-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    checkoutRequestId.current = requestId;
+
+    try {
+      const response = await fetch("/api/storefront/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId,
+          customer: checkoutForm,
+          // Product titles, prices, delivery, tax, and totals are calculated again
+          // by the server. These client values are only a request for product IDs,
+          // selected options, and quantities.
+          items: cart.map((line) => ({
+            productId: line.product.id,
+            title: line.product.title,
+            quantity: line.quantity,
+            size: line.size,
+            unitPrice: productPriceForSize(line.product, line.size)
+          })),
+          totals: { subtotal, shipping, tax, total }
+        })
+      });
+      const payload = await response.json().catch(() => null) as {
+        data?: {
+          orderNumber: string;
+          itemCount: number;
+          items: Array<{ productId: string; title: string; size: string; quantity: number; unitPrice: number }>;
+          total: number;
+          paymentStatus: string;
+          fulfillmentStatus: string;
+          placedAt: string;
+        };
+        error?: string;
+      } | null;
+      if (!response.ok || !payload?.data?.orderNumber) {
+        throw new Error(payload?.error ?? "We could not save your order. Please try again.");
+      }
+
+      const savedOrder = payload.data;
+      const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as unknown[];
+      window.localStorage.setItem("sheaWellnessOrders", JSON.stringify([
+        {
+          source: "shea_storefront_checkout",
+          orderNumber: savedOrder.orderNumber,
+          customerName: checkoutForm.fullName,
+          customerEmail: checkoutForm.email,
+          itemCount: savedOrder.itemCount,
+          totalPrice: savedOrder.total,
+          items: savedOrder.items.map((item) => {
+            const product = cart.find((line) => line.product.id === item.productId)?.product;
+            return {
+              ...item,
+              imageUrl: product?.sizeMedia?.[item.size]?.imageUrl ?? product?.imageUrl ?? "",
+              price: item.unitPrice
+            };
+          }),
+          createdAt: savedOrder.placedAt,
+          paymentStatus: savedOrder.paymentStatus,
+          fulfillmentStatus: savedOrder.fulfillmentStatus
+        },
+        ...savedOrders
+      ]));
+      setOrderNumber(savedOrder.orderNumber);
+      setCheckoutStep("success");
+      setCart([]);
+      checkoutRequestId.current = null;
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : "We could not save your order. Please try again.");
+    } finally {
+      setPlacingOrder(false);
+    }
   }
 
   function getProductReviews(productId: string) {
@@ -404,9 +441,9 @@ export function CommerceStorefront({
               </div>
 
               <div className="commerce-hero-media">
-                <div className="commerce-hero-image-frame">
+                <div className={clsx("commerce-hero-image-frame", heroMediaIsSideways && "is-rotated")}>
                   {heroSlide ? (
-                    <Image src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" unoptimized style={{ objectFit: "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
+                    <Image className={heroMediaIsSideways ? "shea-rotated-product-image" : undefined} src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" unoptimized style={{ objectFit: heroMediaIsSideways ? "contain" : "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
                   ) : null}
                 </div>
                 {heroSlide ? (
@@ -571,8 +608,8 @@ export function CommerceStorefront({
             const wished = wishlist.includes(product.id);
             return (
             <article className="commerce-product-card" key={product.id}>
-              <a className="commerce-product-image" href={`/products/${encodeURIComponent(product.id)}`}>
-                <img src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
+              <a className={clsx("commerce-product-image", isSidewaysSheaProductAsset(product.imageUrl) && "is-rotated")} href={`/products/${encodeURIComponent(product.id)}`}>
+                <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
                 <span className="commerce-card-badges"><em>{product.category}</em>{lowStock ? <em className="stock">Low stock</em> : null}</span>
                 <b>View product</b>
               </a>
@@ -776,7 +813,12 @@ export function CommerceStorefront({
           <span>Cart</span>
           <b>{cartCount}</b>
         </button>
-        <button type="button" onClick={() => setCheckoutOpen(true)} disabled={cart.length === 0}>
+        <button type="button" onClick={() => {
+          setCheckoutOpen(true);
+          setCheckoutStep("information");
+          setCheckoutError("");
+          checkoutRequestId.current = null;
+        }} disabled={cart.length === 0}>
           <CreditCard size={20} />
           <span>Checkout</span>
         </button>
@@ -793,6 +835,8 @@ export function CommerceStorefront({
           setCartOpen(false);
           setCheckoutOpen(true);
           setCheckoutStep("information");
+          setCheckoutError("");
+          checkoutRequestId.current = null;
         }}
       />
 
@@ -809,6 +853,8 @@ export function CommerceStorefront({
           total={total}
           currency={store.currency}
           orderNumber={orderNumber}
+          error={checkoutError}
+          placingOrder={placingOrder}
           onClose={() => setCheckoutOpen(false)}
           onPlaceOrder={placeOrder}
         />
@@ -848,8 +894,8 @@ function CartDrawer({
       <div className="commerce-cart-lines">
         {cart.length === 0 ? <p>Your cart is ready for Shea Wellness products.</p> : null}
         {cart.map((line, index) => (
-          <article key={`${line.product.id}-${line.size}`}>
-            <img src={line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
+          <article className={isSidewaysSheaProductAsset(line.product.imageUrl) ? "is-rotated" : undefined} key={`${line.product.id}-${line.size}`}>
+            <img className={isSidewaysSheaProductAsset(line.product.imageUrl) ? "shea-rotated-product-image" : undefined} src={line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
             <div>
               <strong>{line.product.title}</strong>
               <span>{line.size}</span>
@@ -928,8 +974,8 @@ function ProductModal({
         <button type="button" className="commerce-close" onClick={onClose} aria-label="Close product">
           <X size={20} />
         </button>
-        <div className="commerce-modal-media">
-          <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
+        <div className={clsx("commerce-modal-media", isSidewaysSheaProductAsset(product.imageUrl) && "is-rotated")}>
+          <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
         </div>
         <div className="commerce-modal-copy">
           <h2>{product.title}</h2>
@@ -998,6 +1044,8 @@ function CheckoutFlow({
   total,
   currency,
   orderNumber,
+  error,
+  placingOrder,
   onClose,
   onPlaceOrder
 }: {
@@ -1012,6 +1060,8 @@ function CheckoutFlow({
   total: number;
   currency: string;
   orderNumber: string;
+  error: string;
+  placingOrder: boolean;
   onClose: () => void;
   onPlaceOrder: () => Promise<void>;
 }) {
@@ -1054,13 +1104,14 @@ function CheckoutFlow({
               {step === "review" ? (
                 <CheckoutReview form={form} cart={cart} currency={currency} total={total} />
               ) : null}
+              {error ? <p className="commerce-checkout-error" role="alert">{error}</p> : null}
               <div className="commerce-checkout-actions">
-                <button type="button" className="secondary" onClick={() => {
+                <button type="button" className="secondary" disabled={placingOrder} onClick={() => {
                   const index = steps.indexOf(step);
                   setStep(index <= 0 ? "information" : steps[index - 1]);
                 }}>Back</button>
                 {step === "review" ? (
-                  <button type="button" onClick={onPlaceOrder}>Place order</button>
+                  <button type="button" disabled={placingOrder} onClick={onPlaceOrder}>{placingOrder ? "Saving order…" : "Place order request"}</button>
                 ) : (
                   <button type="button" disabled={!canProceed} onClick={() => setStep(steps[steps.indexOf(step) + 1])}>Continue</button>
                 )}
@@ -1129,11 +1180,11 @@ function CheckoutDelivery({ form, setForm }: { form: CheckoutForm; setForm: (for
 function CheckoutPayment({ form, setForm }: { form: CheckoutForm; setForm: (form: CheckoutForm) => void }) {
   return (
     <div className="commerce-checkout-panel">
-      <span>Payment</span>
-      <h2>Payment method</h2>
+      <span>Payment preference</span>
+      <h2>How should Shea Wellness contact you to arrange payment?</h2>
       {[
-        { id: "card", title: "Credit or debit card", detail: "Secure retail checkout", icon: CreditCard },
-        { id: "paypal", title: "PayPal", detail: "External wallet checkout", icon: ShieldCheck },
+        { id: "card", title: "Credit or debit card", detail: "A secure payment link is sent after stock and delivery are confirmed.", icon: CreditCard },
+        { id: "paypal", title: "PayPal", detail: "PayPal instructions are sent after the order is reviewed.", icon: ShieldCheck },
         { id: "mpesa", title: "M-Pesa", detail: "A payment prompt or verified PayBill instructions are provided after order review.", icon: ShoppingCart }
       ].map((method) => {
         const Icon = method.icon;
@@ -1166,7 +1217,7 @@ function CheckoutReview({
   return (
     <div className="commerce-checkout-panel">
       <span>Review</span>
-      <h2>Confirm before payment</h2>
+      <h2>Confirm your order request</h2>
       <div className="commerce-review-box">
         <strong>{form.fullName}</strong>
         <p>{form.email}</p>
@@ -1176,7 +1227,7 @@ function CheckoutReview({
       </div>
       <div className="commerce-review-box">
         <strong>{cart.length} line items</strong>
-        <p>Products subtotal: {formatMoney(total, currency)}. Delivery, tax, and payment confirmation follow address review.</p>
+        <p>Products subtotal: {formatMoney(total, currency)}. Delivery, tax, and payment confirmation follow address review. No payment is collected in this step.</p>
       </div>
     </div>
   );

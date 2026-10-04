@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { getStoreContent, saveMedia, savePageOverrides, saveProducts } from "@/server/repositories/storeContentRepository";
+import { requireAdminAccess } from "@/server/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,10 @@ const updateSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("pageOverrides"), pageOverrides: z.record(z.unknown()) })
 ]);
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const denied = requireAdminAccess(request);
+  if (denied) return denied;
+
   try {
     return NextResponse.json({ data: await getStoreContent() });
   } catch (error) {
@@ -19,6 +23,9 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
+  const denied = requireAdminAccess(request);
+  if (denied) return denied;
+
   try {
     const payload = updateSchema.parse(await request.json());
     const content = payload.type === "products"

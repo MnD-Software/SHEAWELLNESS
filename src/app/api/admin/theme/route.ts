@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import { platformSnapshot } from "@/lib/platform-data";
 import { themeLayoutSchema } from "@/lib/validation";
+import { requireAdminAccess } from "@/server/adminAuth";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = requireAdminAccess(request);
+  if (denied) return denied;
+
   return NextResponse.json({ data: platformSnapshot.theme });
 }
 
 export async function PUT(request: Request) {
+  const denied = requireAdminAccess(request);
+  if (denied) return denied;
+
   const layout = themeLayoutSchema.parse(await request.json());
 
   return NextResponse.json({

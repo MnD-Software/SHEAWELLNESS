@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
+import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
@@ -83,6 +84,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const selectedImage = selectedMedia?.imageUrl ?? product?.imageUrl ?? "";
   const selectedImagePosition = selectedMedia?.imagePosition ?? product?.imagePosition;
   const selectedVideo = selectedMedia?.videoUrl;
+  const selectedImageIsSideways = isSidewaysSheaProductAsset(selectedImage);
 
   function toggleWishlist() {
     if (!product) return;
@@ -131,7 +133,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
         <section className="shea-product-not-found">
           <span>Product unavailable</span>
           <h1>This Shea Wellness product is not available in this browser.</h1>
-          <p>If it was created in admin, open the shop in the same browser session or recreate the product from the dashboard.</p>
+          <p>It may be unavailable, retired, or still in draft. Return to the shop to browse the current live catalogue.</p>
           <a href="/shop">Return to shop <ArrowRight size={18} /></a>
         </section>
       </main>
@@ -145,11 +147,11 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
       <section className="shea-product-detail-hero">
         <div className="shea-product-gallery">
-          <div className="shea-product-main-image">
-            <img src={selectedImage} alt={`${product.title}${size ? ` — ${size}` : ""}`} style={{ objectPosition: selectedImagePosition }} />
+          <div className={`shea-product-main-image${selectedImageIsSideways ? " is-rotated" : ""}`}>
+            <img className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt={`${product.title}${size ? ` — ${size}` : ""}`} style={{ objectPosition: selectedImagePosition }} />
           </div>
           <div className="shea-product-thumbs">
-            <img src={selectedImage} alt="" style={{ objectPosition: selectedImagePosition }} />
+            <img className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt="" style={{ objectPosition: selectedImagePosition }} />
             {selectedVideo ? <video src={selectedVideo} autoPlay muted loop playsInline preload="metadata" poster={selectedImage} /> : null}
           </div>
         </div>
@@ -258,8 +260,8 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
           <div>
             {relatedProducts.map((item) => (
-              <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}>
-                <img src={item.imageUrl} alt={item.title} style={{ objectPosition: item.imagePosition }} />
+              <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}>
+                <img className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} style={{ objectPosition: item.imagePosition }} />
                 <strong>{item.title}</strong>
                 <span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span>
               </a>
@@ -268,9 +270,9 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
         </section>
       ) : null}
 
-      {relatedProducts.length >= 2 ? <section className="shea-frequently-bought"><div><span>Frequently bought together</span><h2>Build a complete routine.</h2><p>Pair {product.title} with complementary care from the same collection.</p></div><div>{[product, ...relatedProducts.slice(0, 2)].map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
+      {relatedProducts.length >= 2 ? <section className="shea-frequently-bought"><div><span>Frequently bought together</span><h2>Build a complete routine.</h2><p>Pair {product.title} with complementary care from the same collection.</p></div><div>{[product, ...relatedProducts.slice(0, 2)].map((item) => <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
 
-      {recentlyViewed.length ? <section className="shea-product-related recently-viewed"><div className="shea-section-title"><span>Recently viewed</span><h2>Continue where you left off.</h2></div><div>{recentlyViewed.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
+      {recentlyViewed.length ? <section className="shea-product-related recently-viewed"><div className="shea-section-title"><span>Recently viewed</span><h2>Continue where you left off.</h2></div><div>{recentlyViewed.map((item) => <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
 
       <SheaTrustGrid />
       <SheaCommerceFooter />

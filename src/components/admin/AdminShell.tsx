@@ -60,7 +60,7 @@ const productFilters: Array<"all" | ProductStatus> = ["all", "active", "low_stoc
 type View = (typeof adminNav)[number]["id"];
 
 type RuntimeOrder = {
-  source?: string;
+  id: string;
   orderNumber: string;
   customerName: string;
   customerEmail: string;
@@ -70,6 +70,31 @@ type RuntimeOrder = {
   paymentStatus: string;
   fulfillmentStatus: string;
 };
+
+type ServerOrder = {
+  id: string;
+  orderNumber: string;
+  customer: { fullName: string; email: string };
+  items: Array<{ quantity: number }>;
+  total: number;
+  paymentStatus: string;
+  fulfillmentStatus: string;
+  placedAt: string;
+};
+
+function toRuntimeOrder(order: ServerOrder): RuntimeOrder {
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    customerName: order.customer.fullName,
+    customerEmail: order.customer.email,
+    itemCount: order.items.reduce((total, item) => total + item.quantity, 0),
+    totalPrice: Number(order.total),
+    createdAt: order.placedAt,
+    paymentStatus: order.paymentStatus,
+    fulfillmentStatus: order.fulfillmentStatus
+  };
+}
 
 type RuntimeReview = {
   source?: string;
@@ -95,6 +120,16 @@ type ProductFormState = {
   status: ProductStatus;
   variations: ProductVariationDraft[];
 };
+
+const ADMIN_KEY_STORAGE = "sheaWellnessAdminAccessKey";
+
+function adminRequestHeaders(headers: Record<string, string> = {}) {
+  const accessKey = typeof window === "undefined" ? "" : window.sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
+  return {
+    ...headers,
+    ...(accessKey ? { "x-shea-admin-key": accessKey } : {})
+  };
+}
 
 type MediaSection = "hero" | "images" | "videos";
 
@@ -226,7 +261,7 @@ function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
   return {
     id: asset?.id ?? "",
     title: asset?.title ?? "",
-    src: asset?.src ?? "/assets/WhatsApp Image 2026-07-08 at 11.48.35.jpeg",
+    src: asset?.src ?? "/assets/website-edits/facial-oils.jpg",
     tag: asset?.tag ?? "Skin routine",
     kicker: heroAsset.kicker ?? "Before and after",
     body: heroAsset.body ?? "Show the customer care journey with real Shea Wellness media.",
@@ -248,7 +283,7 @@ function mediaFilename(src: string) {
 async function uploadAdminMedia(file: File) {
   const form = new FormData();
   form.set("file", file);
-  const response = await fetch("/api/admin/upload", { method: "POST", body: form });
+  const response = await fetch("/api/admin/upload", { method: "POST", headers: adminRequestHeaders(), body: form });
   const responseText = await response.text();
   let payload: { data?: { url?: unknown }; error?: unknown } = {};
 
@@ -272,6 +307,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [filter, setFilter] = useState<(typeof productFilters)[number]>("all");
   const [managedProducts, setManagedProducts] = useState<Product[]>(snapshot.products);
   const [runtimeOrders, setRuntimeOrders] = useState<RuntimeOrder[]>([]);
+  const [ordersState, setOrdersState] = useState<"loading" | "ready" | "error">("loading");
+  const [ordersMessage, setOrdersMessage] = useState("");
+  const [adminKey, setAdminKey] = useState("");
+  const [accessState, setAccessState] = useState<"checking" | "required" | "ready">("checking");
+  const [accessMessage, setAccessMessage] = useState("");
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(emptyMediaConfig);
   const [pageOverrides, setPageOverrides] = useState<PageOverrides>({});
@@ -290,15 +330,61 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   }, [activeStore.id, filter, managedProducts, query]);
 
   useEffect(() => {
-    const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as RuntimeOrder[];
     const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as RuntimeReview[];
-    setRuntimeOrders(savedOrders.filter((order) => order.source === "shea_storefront_checkout"));
     setRuntimeReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
 
-    void fetch("/api/admin/content", { cache: "no-store" })
+    const storedKey = window.sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
+    if (storedKey) {
+      setAdminKey(storedKey);
+      setAccessState("ready");
+      return;
+    }
+    setAccessState("required");
+  }, []);
+
+  function suspendAdminAccess(message: string) {
+    window.sessionStorage.removeItem(ADMIN_KEY_STORAGE);
+    setAdminKey("");
+    setAccessMessage(message);
+    setAccessState("required");
+  }
+
+  useEffect(() => {
+    if (!adminKey) return;
+    let cancelled = false;
+    const headers = adminRequestHeaders();
+
+    setAccessState("ready");
+    setOrdersState("loading");
+    setContentLoaded(false);
+
+    void fetch("/api/admin/orders?limit=100", { cache: "no-store", headers })
+      .then(async (response) => {
+        const payload = await response.json() as { data?: ServerOrder[]; error?: string };
+        if (response.status === 401 || response.status === 503) {
+          if (!cancelled) suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
+          return;
+        }
+        if (!response.ok || !Array.isArray(payload.data)) throw new Error(payload.error ?? "Unable to load orders.");
+        if (cancelled) return;
+        setRuntimeOrders(payload.data.map(toRuntimeOrder));
+        setOrdersState("ready");
+      })
+      .catch((error: Error) => {
+        if (cancelled) return;
+        setOrdersState("error");
+        setOrdersMessage(error.message);
+      });
+
+    void fetch("/api/admin/content", { cache: "no-store", headers })
       .then(async (response) => {
         const payload = await response.json();
+        if (response.status === 401 || response.status === 503) {
+          if (!cancelled) suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
+          return;
+        }
         if (!response.ok) throw new Error(payload.error ?? "Unable to load content.");
+        if (cancelled) return;
         setManagedProducts((payload.data.products as Product[]).map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
         setMediaConfig(sanitizeSheaMediaConfig(payload.data.media as SheaMediaConfig));
         setPageOverrides((payload.data.pageOverrides as PageOverrides | undefined) ?? {});
@@ -307,11 +393,16 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         setContentLoaded(true);
       })
       .catch((error: Error) => {
+        if (cancelled) return;
         setSaveState("error");
         setSaveMessage(error.message);
         setContentLoaded(true);
       });
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [adminKey]);
 
   async function persistContent(body: object): Promise<ContentSaveResult> {
     setSaveState("saving");
@@ -319,10 +410,13 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     try {
       const response = await fetch("/api/admin/content", {
         method: "PUT",
-        headers: { "content-type": "application/json" },
+        headers: adminRequestHeaders({ "content-type": "application/json" }),
         body: JSON.stringify(body)
       });
       const payload = await response.json();
+      if (response.status === 401 || response.status === 503) {
+        suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
+      }
       if (!response.ok) throw new Error(payload.error ?? "Unable to save changes.");
       setSaveState("saved");
       setSaveMessage("Saved to Neon");
@@ -355,12 +449,50 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     void persistContent({ type: "pageOverrides", pageOverrides: nextPageOverrides });
   }
 
+  async function updateOrderStatus(orderId: string, update: Pick<RuntimeOrder, "paymentStatus" | "fulfillmentStatus">) {
+    setOrdersMessage("");
+    try {
+      const response = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: adminRequestHeaders({ "content-type": "application/json" }),
+        body: JSON.stringify({ id: orderId, ...update })
+      });
+      const payload = await response.json() as { data?: ServerOrder; error?: string };
+      if (response.status === 401 || response.status === 503) {
+        suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
+      }
+      if (!response.ok || !payload.data) throw new Error(payload.error ?? "Unable to update order.");
+      const saved = toRuntimeOrder(payload.data);
+      setRuntimeOrders((orders) => orders.map((order) => order.id === saved.id ? saved : order));
+    } catch (error) {
+      setOrdersMessage(error instanceof Error ? error.message : "Unable to update order.");
+    }
+  }
+
   function openNewProduct() {
     setView("products");
     setCreateProductRequest((request) => request + 1);
   }
 
+  function unlockAdmin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const accessCode = String(new FormData(event.currentTarget).get("accessCode") ?? "").trim();
+    if (!accessCode) {
+      setAccessMessage("Enter the admin access code to continue.");
+      return;
+    }
+
+    window.sessionStorage.setItem(ADMIN_KEY_STORAGE, accessCode);
+    setAccessMessage("");
+    setAdminKey(accessCode);
+    setAccessState("ready");
+  }
+
   const adminOrders = runtimeOrders;
+
+  if (accessState !== "ready") {
+    return <AdminAccessGate state={accessState} message={accessMessage} onUnlock={unlockAdmin} />;
+  }
 
   return (
     <div className={clsx("shea-admin", sidebarCollapsed && "sidebar-collapsed")}>
@@ -401,17 +533,47 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
             <i aria-hidden="true" />
             {saveMessage}
           </span>
+          <button type="button" className="shea-admin-lock" onClick={() => suspendAdminAccess("Dashboard locked. Enter the access code to continue.")}>Lock</button>
           <button type="button" onClick={openNewProduct}><PackagePlus size={17} /> Add product</button>
         </header>
 
         {view === "overview" ? <OverviewView snapshot={snapshot} products={filteredProducts} orders={adminOrders} reviews={runtimeReviews} mediaConfig={mediaConfig} setView={setView} /> : null}
-        {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} /> : null}
+        {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} state={ordersState} message={ordersMessage} onStatusUpdate={updateOrderStatus} /> : null}
         {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
       </main>
     </div>
+  );
+}
+
+function AdminAccessGate({
+  state,
+  message,
+  onUnlock
+}: {
+  state: "checking" | "required";
+  message: string;
+  onUnlock: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <main className="shea-admin-access">
+      <section>
+        <span>Shea Wellness LTD</span>
+        <ShieldCheck size={30} />
+        <h1>{state === "checking" ? "Restoring secure dashboard access" : "Admin access required"}</h1>
+        <p>{state === "checking" ? "Checking this browser session…" : "Enter the deployment access code. It is kept only for this browser session and is never stored in the website source."}</p>
+        {state === "required" ? <form onSubmit={onUnlock}>
+          <label>
+            Access code
+            <input name="accessCode" type="password" autoComplete="current-password" autoFocus required />
+          </label>
+          {message ? <p role="alert">{message}</p> : null}
+          <button type="submit">Unlock dashboard</button>
+        </form> : null}
+      </section>
+    </main>
   );
 }
 
@@ -1107,12 +1269,31 @@ function ReviewsView({ products, reviews }: { products: PlatformSnapshot["produc
   );
 }
 
-function OrdersView({ snapshot, orders }: { snapshot: PlatformSnapshot; orders: RuntimeOrder[] }) {
+function OrdersView({
+  snapshot,
+  orders,
+  state,
+  message,
+  onStatusUpdate
+}: {
+  snapshot: PlatformSnapshot;
+  orders: RuntimeOrder[];
+  state: "loading" | "ready" | "error";
+  message: string;
+  onStatusUpdate: (orderId: string, update: Pick<RuntimeOrder, "paymentStatus" | "fulfillmentStatus">) => Promise<void>;
+}) {
+  const fulfillmentStatuses = ["unfulfilled", "partial", "on_hold", "fulfilled"];
+  const paymentStatuses = ["pending", "authorized", "paid", "failed", "refunded"];
+
   return (
     <section className="shea-admin-stack">
       <AdminHeading eyebrow="Operations" title="Orders and fulfillment" />
+      {message ? <p className="shea-admin-order-message" role="alert">{message}</p> : null}
+      {state === "loading" ? <div className="shea-admin-empty"><ShoppingCart size={28} /><strong>Loading orders</strong><p>Checking the secure order queue…</p></div> : null}
+      {state === "error" ? <div className="shea-admin-empty"><ShoppingCart size={28} /><strong>Orders are unavailable</strong><p>{message || "Connect DATABASE_URL to load the order queue."}</p></div> : null}
+      {state === "ready" && !orders.length ? <div className="shea-admin-empty"><ShoppingCart size={28} /><strong>No orders yet</strong><p>Submitted storefront orders will appear here for fulfillment.</p></div> : null}
       <section className="shea-admin-grid three">
-        {["unfulfilled", "partial", "on_hold"].map((status) => (
+        {["unfulfilled", "partial", "on_hold", "fulfilled"].map((status) => (
           <Panel key={status} title={titleCase(status)} description="Operational work queue.">
             <div className="shea-admin-list">
               {orders
@@ -1123,7 +1304,21 @@ function OrdersView({ snapshot, orders }: { snapshot: PlatformSnapshot; orders: 
                       <strong>{order.orderNumber}</strong>
                       <span>{order.customerName}</span>
                     </div>
-                    <strong>{formatMoney(order.totalPrice, snapshot.activeStore.currency)}</strong>
+                    <div className="shea-admin-order-controls">
+                      <strong>{formatMoney(order.totalPrice, snapshot.activeStore.currency)}</strong>
+                      <label>
+                        Fulfillment
+                        <select value={order.fulfillmentStatus} onChange={(event) => void onStatusUpdate(order.id, { paymentStatus: order.paymentStatus, fulfillmentStatus: event.target.value })}>
+                          {fulfillmentStatuses.map((item) => <option key={item} value={item}>{titleCase(item)}</option>)}
+                        </select>
+                      </label>
+                      <label>
+                        Payment
+                        <select value={order.paymentStatus} onChange={(event) => void onStatusUpdate(order.id, { paymentStatus: event.target.value, fulfillmentStatus: order.fulfillmentStatus })}>
+                          {paymentStatuses.map((item) => <option key={item} value={item}>{titleCase(item)}</option>)}
+                        </select>
+                      </label>
+                    </div>
                   </article>
                 ))}
             </div>

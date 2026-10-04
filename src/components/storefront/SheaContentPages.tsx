@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRight,
   Award,
@@ -18,7 +20,6 @@ import {
   sheaBlogTopics,
   sheaBrand,
   sheaCatalogueDownload,
-  sheaProductCategories,
   sheaQuality,
   sheaSocialProof,
   sheaSustainability,
@@ -26,9 +27,14 @@ import {
   sheaWholesale,
   sheaWhyChoose
 } from "@/lib/shea-content";
+import { formatMoney } from "@/lib/format";
+import { platformSnapshot } from "@/lib/platform-data";
+import type { Product } from "@/lib/types";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import { partnerLogos } from "@/lib/shea-website-content";
+import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
+import { useEffect, useMemo, useState } from "react";
 
 type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blog" | "quality" | "contact" | "catalogue";
 
@@ -43,7 +49,7 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
     eyebrow: "Product catalogue",
     title: "Skin care, hair care, face care, and spa essentials.",
     body: "Browse Shea Wellness routines for dry skin, sensitive skin, body glow, natural face care, hair and scalp moisture, and spa environments.",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg"
+    image: "/assets/website-edits/facial-oils.jpg"
   },
   wholesale: {
     eyebrow: "Retail partners",
@@ -85,6 +91,29 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
 
 export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
+  const [catalogueProducts, setCatalogueProducts] = useState<Product[]>(() => (
+    platformSnapshot.products.filter((product) => product.status === "active" || product.status === "low_stock")
+  ));
+
+  useEffect(() => {
+    if (kind !== "products") return;
+    let cancelled = false;
+
+    void fetch("/api/storefront/content", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) return;
+        const payload = await response.json() as { data?: { products?: Product[] } };
+        const products = payload.data?.products;
+        if (!cancelled && Array.isArray(products)) {
+          setCatalogueProducts(products.filter((product) => product.status === "active" || product.status === "low_stock"));
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [kind]);
 
   return (
     <main className={`shea-page shea-page-${kind}`}>
@@ -101,16 +130,12 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
         </div>
         <figure>
           <img src={meta.image} alt={kind === "about" ? "Shea Wellness founder seated in front of a fireplace" : `${meta.title} by Shea Wellness`} />
-          {kind === "about" ? <figcaption className="shea-founder-caption"><span>Shea Wellness Ltd</span><strong>Care Inspired by Nature</strong></figcaption> : <figcaption>
-            <video src={sheaVideos[0].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
-            <span>{sheaVideos[0].tag}</span>
-            <strong>Real product motion</strong>
-          </figcaption>}
+          {kind === "about" ? <figcaption className="shea-founder-caption"><span>Shea Wellness Ltd</span><strong>Care Inspired by Nature</strong></figcaption> : <figcaption className="shea-page-hero-caption"><span>Shea Wellness</span><strong>Natural care, clearly guided</strong></figcaption>}
         </figure>
       </section>
 
       {kind === "about" ? <AboutSections /> : null}
-      {kind === "products" ? <ProductsSections /> : null}
+      {kind === "products" ? <ProductsSections products={catalogueProducts} currency={platformSnapshot.activeStore.currency} /> : null}
       {kind === "wholesale" ? <WholesaleSections /> : null}
       {kind === "sustainability" ? <SustainabilitySections /> : null}
       {kind === "blog" ? <BlogSections /> : null}
@@ -144,7 +169,7 @@ const sheaEditorialStories = [
   {
     title: "Black soap without the harsh feeling: how to cleanse with balance",
     category: "Face guide",
-    image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+    image: "/assets/website-edits/black-soap-routine.jpg",
     readTime: "5 min read",
     body: "A cleanser guide explaining how African black soap can fit into a routine when used gently, rinsed thoroughly, and followed with moisture.",
     lesson: "Start a few times weekly, avoid the eye area, and always moisturize after cleansing."
@@ -287,7 +312,17 @@ function AboutSections() {
   );
 }
 
-function ProductsSections() {
+function ProductsSections({ products, currency }: { products: Product[]; currency: string }) {
+  const productsByCategory = useMemo(() => {
+    const grouped = new Map<string, Product[]>();
+    products.forEach((product) => {
+      const existing = grouped.get(product.category) ?? [];
+      existing.push(product);
+      grouped.set(product.category, existing);
+    });
+    return Array.from(grouped.entries());
+  }, [products]);
+
   return (
     <>
       <VideoShowcase title="Product videos shoppers can actually see" body="Use these films for product inspection, social proof, and retail buyer confidence." />
@@ -307,31 +342,32 @@ function ProductsSections() {
         </div>
       </section>
       <section className="shea-section">
-        <SectionTitle label="Our products" title="Every category from the content structure is represented." />
+        <SectionTitle label="Our products" title="Verified products, current prices, and the live catalogue." />
         <div className="shea-product-category-stack">
-          {sheaProductCategories.map((category) => (
-            <section className="shea-product-category" key={category.name}>
+          {productsByCategory.map(([category, categoryProducts]) => (
+            <section className="shea-product-category" key={category}>
               <div className="shea-product-category-head">
-                <span>{category.name}</span>
-                <p>{category.summary}</p>
+                <span>{category}</span>
+                <p>Current Shea Wellness products available to order.</p>
               </div>
               <div className="shea-product-list">
-                {category.products.map((product) => (
-                  <article className="shea-product-detail-card" key={product.name}>
-                    <img src={product.image} alt={product.name} />
+                {categoryProducts.map((product) => (
+                  <article className={`shea-product-detail-card${isSidewaysSheaProductAsset(product.imageUrl) ? " is-rotated" : ""}`} key={product.id}>
+                    <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
                     <div>
-                      <strong>{product.name}</strong>
+                      <strong>{product.title}</strong>
                       <p>{product.description}</p>
-                      <ProductFact label="Key ingredients" items={product.ingredients} />
-                      <ProductFact label="Benefits" items={product.benefits} />
+                      <ProductFact label="Collection" items={[product.category, product.badge]} />
                       <ProductFact label="Size options" items={product.sizes} />
-                      <small>{product.usage}</small>
+                      <small>{product.deliveryBadge} · {formatMoney(product.price, currency)}</small>
+                      <a href={`/products/${encodeURIComponent(product.id)}`}>View product <ArrowRight size={15} /></a>
                     </div>
                   </article>
                 ))}
               </div>
             </section>
           ))}
+          {!productsByCategory.length ? <p className="shea-empty-catalogue">The current catalogue is being prepared. Please check back shortly.</p> : null}
         </div>
       </section>
     </>
@@ -434,7 +470,7 @@ function BlogSections() {
         <div className="shea-story-grid">
           {sheaEditorialStories.map((story) => (
             <article key={story.title}>
-              <img src={story.image} alt="" />
+              <img className={isSidewaysSheaProductAsset(story.image) ? "shea-rotated-product-image" : undefined} src={story.image} alt="" />
               <div>
                 <span>{story.category} - {story.readTime}</span>
                 <strong>{story.title}</strong>
@@ -509,9 +545,7 @@ function LivingPageSection({ kind }: { kind: SheaPageKind }) {
     <section className="shea-living-section">
       <figure>
         <img src={copy.image} alt="" loading="lazy" />
-        <figcaption>
-          <video src={sheaVideos[1].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
-        </figcaption>
+        <figcaption><span>Shea Wellness</span><strong>Care inspired by nature</strong></figcaption>
       </figure>
       <div>
         <span>Shea Wellness experience</span>

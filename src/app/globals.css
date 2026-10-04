@@ -12977,3 +12977,342 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
     overflow-wrap: anywhere;
   }
 }
+
+/* Route-stability pass: department pages use their own compact, product-led hero.
+   The selectors stay scoped so the approved home layout is not affected. */
+:where(.shea-page, .shea-department-page, .shea-category-page, .shea-product-page, .shea-policy-page, .shea-account-page, .guide-page) {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+:where(.shea-page, .shea-department-page, .shea-category-page, .shea-product-page, .shea-policy-page, .shea-account-page, .guide-page) :where(h1, h2, h3, h4, p, li) {
+  overflow-wrap: anywhere;
+}
+
+:where(.shea-page, .shea-department-page, .shea-category-page, .shea-product-page, .shea-policy-page, .shea-account-page, .guide-page) :where(img, video, svg) {
+  max-width: 100%;
+}
+
+:where(.shea-page, .shea-department-page, .shea-category-page, .shea-product-page, .shea-policy-page, .shea-account-page, .guide-page) :where(section, article, figure, form, header, footer, nav, div) {
+  min-width: 0;
+}
+
+.shea-department-page .department-hero {
+  width: min(1440px, calc(100% - 32px));
+  min-height: clamp(420px, 34vw, 540px);
+  margin-top: 16px;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  border-radius: 24px;
+}
+
+.shea-department-page .department-hero > div:first-child {
+  min-width: 0;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(32px, 4.6vw, 64px);
+}
+
+.shea-department-page .department-hero h1 {
+  max-width: 10.5ch;
+  margin: 12px 0 16px;
+  font-size: clamp(40px, 4.1vw, 62px);
+  line-height: 1.02;
+  letter-spacing: -.035em;
+  text-wrap: balance;
+}
+
+.shea-department-page .department-hero p {
+  max-width: 48ch;
+  margin: 0;
+  font-size: clamp(14px, 1.08vw, 16px);
+  line-height: 1.58;
+}
+
+.shea-department-page .department-hero > div:first-child > div {
+  margin-top: 20px;
+}
+
+.shea-department-page .department-product-carousel {
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  align-items: stretch;
+  padding: clamp(20px, 2.6vw, 36px) !important;
+}
+
+.shea-department-page .department-carousel-stage {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, .62fr);
+  gap: clamp(16px, 2vw, 26px);
+}
+
+.shea-department-page .department-carousel-stage > a {
+  width: 100%;
+  min-width: 0;
+  height: clamp(260px, 27vw, 410px);
+  max-height: none;
+  border-radius: 20px !important;
+}
+
+.shea-department-page .department-carousel-product-copy {
+  min-width: 0;
+}
+
+.shea-department-page .department-carousel-product-copy h2 {
+  font-size: clamp(27px, 2.5vw, 38px);
+  overflow-wrap: anywhere;
+}
+
+.shea-department-page .department-carousel-dots {
+  position: static;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.shea-department-page .department-carousel-image.is-rotated,
+.shea-department-page .department-products article > a.is-rotated {
+  display: grid !important;
+  place-items: center;
+}
+
+.shea-department-page img.shea-rotated-product-image {
+  object-fit: contain !important;
+  transform: rotate(90deg) scale(.78) !important;
+  transform-origin: center;
+}
+
+.shea-department-page .department-product-card:hover img.shea-rotated-product-image {
+  transform: rotate(90deg) scale(.82) !important;
+}
+
+@media (max-width: 900px) {
+  .shea-department-page .department-hero {
+    min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .shea-department-page .department-hero > div:first-child {
+    padding: clamp(32px, 7vw, 56px);
+  }
+
+  .shea-department-page .department-product-carousel {
+    padding: clamp(20px, 5vw, 34px) !important;
+  }
+
+  .shea-department-page .department-carousel-stage > a {
+    height: clamp(260px, 48vw, 390px);
+  }
+}
+
+@media (max-width: 640px) {
+  .shea-department-page .department-hero {
+    width: calc(100% - 24px);
+    margin-top: 12px;
+    border-radius: 20px;
+  }
+
+  .shea-department-page .department-hero > div:first-child {
+    padding: 30px 20px;
+  }
+
+  .shea-department-page .department-hero h1 {
+    max-width: 13ch;
+    font-size: clamp(34px, 9vw, 44px);
+  }
+
+  .shea-department-page .department-hero p {
+    font-size: 14px;
+  }
+
+  .shea-department-page .department-hero > div:first-child > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 18px;
+  }
+
+  .shea-department-page .department-hero > div:first-child > div > a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .shea-department-page .department-product-carousel {
+    padding: 16px 16px 20px !important;
+  }
+
+  .shea-department-page .department-carousel-stage {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: 18px;
+  }
+
+  .shea-department-page .department-carousel-stage > a {
+    height: auto;
+    min-height: 220px;
+    aspect-ratio: 4 / 3;
+  }
+
+  .shea-department-page .department-carousel-product-copy {
+    padding: 0 4px;
+  }
+
+  .shea-department-page .department-carousel-product-copy h2 {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+
+  .shea-department-page .department-carousel-arrow {
+    display: none;
+  }
+
+  .shea-department-page .department-products footer {
+    flex-wrap: wrap;
+  }
+
+  .shea-department-page .department-products footer > strong {
+    flex: 1 0 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  .shea-department-page .department-hero h1 {
+    font-size: clamp(32px, 9vw, 38px);
+  }
+
+  .shea-department-page .department-carousel-stage > a {
+    min-height: 200px;
+  }
+}
+
+/* Admin access and order controls remain usable on narrow screens. */
+.shea-admin-access {
+  box-sizing: border-box;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top, #eff5ee 0, #f6f7f3 46%, #e8eee8 100%);
+  color: #173d2b;
+}
+
+.shea-admin-access > section {
+  box-sizing: border-box;
+  width: min(100%, 480px);
+  max-width: 100%;
+  display: grid;
+  gap: 16px;
+  padding: clamp(26px, 5vw, 42px);
+  border: 1px solid #d7e1d9;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(23, 61, 43, .12);
+}
+
+.shea-admin-access > section > span {
+  color: #59705f;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.shea-admin-access svg { color: #1f6043; }
+.shea-admin-access h1 { margin: 0; font: 700 clamp(28px, 5vw, 40px)/1.04 Georgia, serif; }
+.shea-admin-access h1,
+.shea-admin-access p { overflow-wrap: anywhere; }
+.shea-admin-access p { margin: 0; color: #5e6c62; line-height: 1.6; }
+.shea-admin-access form { display: grid; gap: 14px; margin-top: 4px; }
+.shea-admin-access label { display: grid; gap: 7px; color: #354b3c; font-size: 12px; font-weight: 800; }
+.shea-admin-access input { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid #cbd8ce; border-radius: 10px; color: #173d2b; font: inherit; }
+.shea-admin-access form > p { padding: 10px 12px; border: 1px solid #efc6bf; border-radius: 9px; background: #fff7f5; color: #9a3f31; font-size: 12px; }
+.shea-admin-access button,
+.shea-admin-lock { min-height: 42px; border: 0; border-radius: 9px; background: #173d2b; color: #fff; font: 800 12px/1 Arial, sans-serif; cursor: pointer; }
+.shea-admin-lock { padding: 0 13px; background: #f0f4f0; color: #173d2b; }
+
+.shea-admin-order-message { margin: 0; padding: 11px 13px; border: 1px solid #efc6bf; border-radius: 9px; background: #fff7f5; color: #9a3f31; font-size: 12px; font-weight: 750; }
+.shea-admin-order-controls { min-width: 148px; display: grid; gap: 7px; justify-items: end; }
+.shea-admin-order-controls > strong { color: #173d2b; }
+.shea-admin-order-controls label { width: 100%; display: grid; gap: 3px; color: #67766d; font-size: 9px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+.shea-admin-order-controls select { width: 100%; min-height: 31px; padding: 0 7px; border: 1px solid #d5dfd7; border-radius: 6px; background: #fff; color: #173d2b; font-size: 11px; font-weight: 750; }
+
+.shea-sticky-cart {
+  box-sizing: border-box;
+  max-width: calc(100vw - 16px);
+}
+
+.shea-sticky-cart > div {
+  flex: 1 1 auto;
+  max-width: calc(100% - 118px);
+}
+
+.shea-sticky-cart button {
+  max-width: 48%;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .shea-admin-topbar { gap: 8px; }
+  .shea-admin-lock { min-width: 48px; }
+  .shea-admin-order-controls { width: 100%; justify-items: stretch; }
+  .shea-admin-list > article { align-items: stretch; flex-direction: column; }
+  .shea-admin-access { padding: 16px; }
+  .shea-admin-access > section { padding: 24px 20px; }
+  .shea-sticky-cart { gap: 8px; padding: 10px; }
+  .shea-sticky-cart > div { max-width: calc(100% - 104px); }
+  .shea-sticky-cart button { min-height: 40px; padding-inline: 12px; font-size: 11px !important; }
+}
+
+/* Correct the few supplied black-soap photos whose stored pixels are sideways.
+   This is deliberately opt-in: newly uploaded media retains its own orientation. */
+:where(
+  .commerce-hero-image-frame.is-rotated,
+  .commerce-product-image.is-rotated,
+  .commerce-cart-lines > article.is-rotated,
+  .commerce-modal-media.is-rotated,
+  .shea-category-hero figure.is-rotated,
+  .shea-category-product-grid > article > a.is-rotated,
+  .shea-product-main-image.is-rotated,
+  .shea-product-related a.is-rotated,
+  .shea-frequently-bought a.is-rotated,
+  .shea-product-detail-card.is-rotated
+) {
+  display: grid !important;
+  place-items: center;
+  overflow: hidden;
+  background: #f3f5f0 !important;
+}
+
+:where(
+  .commerce-hero-image-frame,
+  .commerce-product-image,
+  .commerce-cart-lines > article,
+  .commerce-modal-media,
+  .shea-category-hero figure,
+  .shea-category-product-grid > article > a,
+  .shea-product-main-image,
+  .shea-product-related a,
+  .shea-frequently-bought a,
+  .shea-product-detail-card,
+  .shea-story-grid article
+) > img.shea-rotated-product-image,
+.shea-product-thumbs > img.shea-rotated-product-image {
+  object-fit: contain !important;
+  object-position: center !important;
+  transform: rotate(90deg) scale(.78) !important;
+  transform-origin: center;
+}
+
+.commerce-hero-image-frame.is-rotated > img.shea-rotated-product-image {
+  padding: clamp(14px, 2vw, 28px);
+}
+
+@media (hover: hover) {
+  .commerce-product-image.is-rotated:hover > img.shea-rotated-product-image,
+  .shea-category-product-grid > article > a.is-rotated:hover > img.shea-rotated-product-image {
+    transform: rotate(90deg) scale(.82) !important;
+  }
+}

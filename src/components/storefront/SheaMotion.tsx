@@ -31,7 +31,6 @@ export function SheaMotion() {
     if (reduceMotion) return;
 
     const targets = Array.from(document.querySelectorAll<HTMLElement>(revealSelectors.join(",")));
-    targets.forEach((target) => target.classList.add("shea-motion-ready"));
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -44,7 +43,20 @@ export function SheaMotion() {
       { rootMargin: "0px 0px -12% 0px", threshold: 0.14 }
     );
 
-    targets.forEach((target) => observer.observe(target));
+    targets.forEach((target) => {
+      const bounds = target.getBoundingClientRect();
+      target.classList.add("shea-motion-ready");
+
+      // Critical content already in the first viewport must never wait for an
+      // asynchronous observer callback. This keeps the hero crisp during
+      // hydration, screenshots, slow devices, and browser back/forward restores.
+      if (bounds.top < window.innerHeight && bounds.bottom > 0) {
+        target.classList.add("shea-motion-in");
+        return;
+      }
+
+      observer.observe(target);
+    });
 
     const heroImages = Array.from(document.querySelectorAll<HTMLElement>(".commerce-hero-card img, .shea-category-hero img, .shea-product-main-image img"));
     function moveImages() {

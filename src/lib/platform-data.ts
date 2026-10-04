@@ -179,7 +179,9 @@ export const platformSnapshot: PlatformSnapshot = {
       deliveryBadge: "2-4 drops daily",
       price: 2100,
       inventoryQty: 82,
-      status: "active",
+      // This placeholder image is not a verified Rosehip pack shot. Keep the
+      // record in the catalogue for the admin to finish, but do not publish it.
+      status: "draft",
       channel: "both",
       sales: 129
     },
@@ -200,7 +202,8 @@ export const platformSnapshot: PlatformSnapshot = {
       deliveryBadge: "Morning protection",
       price: 1900,
       inventoryQty: 58,
-      status: "active",
+      // Awaiting a verified Cucumber Mint Sunscreen product image.
+      status: "draft",
       channel: "both",
       sales: 94
     },
@@ -221,7 +224,8 @@ export const platformSnapshot: PlatformSnapshot = {
       deliveryBadge: "Skin and hair nourishment",
       price: 1500,
       inventoryQty: 72,
-      status: "active",
+      // Awaiting a verified Baobab Oil product image.
+      status: "draft",
       channel: "both",
       sales: 112
     },
@@ -390,7 +394,8 @@ export const platformSnapshot: PlatformSnapshot = {
       deliveryBadge: "Catalogue request",
       price: 12000,
       inventoryQty: 25,
-      status: "active",
+      // A single butter jar does not verify this multi-product offer.
+      status: "draft",
       channel: "both",
       sales: 86
     }

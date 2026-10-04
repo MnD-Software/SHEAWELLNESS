@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { saveUploadedImage } from "@/server/repositories/mediaUploadRepository";
+import { requireAdminAccess } from "@/server/adminAuth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -35,6 +36,9 @@ async function uploadToCloudinary(file: File, cloudName: string, apiKey: string,
 }
 
 export async function POST(request: NextRequest) {
+  const denied = requireAdminAccess(request);
+  if (denied) return denied;
+
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;

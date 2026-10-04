@@ -36,13 +36,48 @@ const retiredSyntheticImages: Record<string, string> = {
   "/assets/shea-essential-oils.png": "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
   "/assets/shea-chebe-haircare.png": "/assets/sheawellness/pure-raw-shea-butter.jpeg",
   "/assets/shea-body-butter.png": "/assets/sheawellness/lavender-shea-butter-front.jpeg",
-  "/assets/shea-black-soap.png": "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
-  "/assets/sheawellness/face-care-routine.png": "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
-  "/assets/sheawellness/face-care-routine-hero.png": "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg"
+  "/assets/shea-black-soap.png": "/assets/website-edits/black-soap-collection.jpg",
+  "/assets/sheawellness/face-care-routine.png": "/assets/website-edits/facial-oils.jpg",
+  "/assets/sheawellness/face-care-routine-hero.png": "/assets/website-edits/facial-oils.jpg"
 };
+
+const legacyMediaPathPrefixes = ["/assets/WhatsApp Image ", "/assets/WhatsApp Video "];
+
+// Older deployments imported every received WhatsApp and August media file
+// into the editable library. Those generated identifiers are not an editorial
+// choice and caused retired imagery to return whenever the persisted content
+// record was read again.
+const legacyBulkMediaId = /^(?:product_image_\d+|august_2026_(?:image|video)_\d+|images_\d+|page_image_\d+)$/;
+
+export function isLegacySheaMediaPath(src: string) {
+  return legacyMediaPathPrefixes.some((prefix) => src.startsWith(prefix));
+}
 
 export function replaceRetiredSyntheticImage(src: string) {
   return retiredSyntheticImages[src] ?? src;
+}
+
+function sanitizeMediaAssets<T extends SheaMediaAsset>(assets: T[]) {
+  return assets.flatMap((asset) => {
+    const src = typeof asset?.src === "string" ? replaceRetiredSyntheticImage(asset.src) : "";
+    return src && !isLegacySheaMediaPath(src) ? [{ ...asset, src }] : [];
+  });
+}
+
+function isLegacyBulkMediaAsset(asset: SheaMediaAsset) {
+  return legacyBulkMediaId.test(asset.id);
+}
+
+function mergeCuratedMedia<T extends SheaMediaAsset>(defaults: T[], saved: T[]) {
+  const defaultIds = new Set(defaults.map((asset) => asset.id));
+  const defaultSources = new Set(defaults.map((asset) => asset.src));
+  const retainedSaved = saved.filter((asset) => (
+    !isLegacyBulkMediaAsset(asset)
+    && !defaultIds.has(asset.id)
+    && !defaultSources.has(asset.src)
+  ));
+
+  return [...defaults, ...retainedSaved];
 }
 
 export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfig {
@@ -50,139 +85,30 @@ export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfi
   const images = Array.isArray(config?.images) ? config.images : [];
   const videos = Array.isArray(config?.videos) ? config.videos : [];
 
+  const safeHeroSlides = sanitizeMediaAssets(heroSlides);
+  const safeImages = sanitizeMediaAssets(images);
+  const safeVideos = sanitizeMediaAssets(videos);
+  const includesLegacyBulkImport = [...safeHeroSlides, ...safeImages, ...safeVideos].some(isLegacyBulkMediaAsset);
+
+  if (includesLegacyBulkImport) {
+    return {
+      // Restore the concise, approved storefront media instead of exposing the
+      // historic bulk library. Explicitly added media is retained when it does
+      // not collide with an approved source or a retired generated identifier.
+      heroSlides: mergeCuratedMedia(sheaHeroSlides, safeHeroSlides),
+      images: mergeCuratedMedia(sheaImageMedia, safeImages),
+      videos: mergeCuratedMedia(sheaVideos, safeVideos)
+    };
+  }
+
   return {
-    heroSlides: heroSlides.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
+    heroSlides: sanitizeMediaAssets(heroSlides),
     // An empty collection is a valid editorial decision. Do not merge defaults
     // back into saved content, otherwise deleted media returns on the next load.
-    images: images.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) })),
-    videos: videos.map((item) => ({ ...item, src: replaceRetiredSyntheticImage(item.src) }))
+    images: sanitizeMediaAssets(images),
+    videos: sanitizeMediaAssets(videos)
   };
 }
-
-const whatsappImageFiles = [
-  "WhatsApp Image 2026-07-07 at 11.44.10.jpeg",
-  "WhatsApp Image 2026-07-07 at 11.48.21 (1).jpeg",
-  "WhatsApp Image 2026-07-07 at 11.48.21 (2).jpeg",
-  "WhatsApp Image 2026-07-07 at 11.48.21.jpeg",
-  "WhatsApp Image 2026-07-08 at 11.46.26 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 11.46.26 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 11.46.26.jpeg",
-  "WhatsApp Image 2026-07-08 at 11.48.35.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.03.57.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.03.58.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.04.41.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.04.42 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.04.42.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.20 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.20.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.21 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.21 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.21.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.22 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.22 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.22.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.23 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.23 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.23.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.24 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.24.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.25 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.25 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.25.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.26 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.26 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.26.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.27 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.27 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.27.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.28 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.28 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.28 (3).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.28 (4).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.28.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.29 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.29 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.29 (3).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.29.jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.30 (1).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.30 (2).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.30 (3).jpeg",
-  "WhatsApp Image 2026-07-08 at 12.44.30.jpeg"
-];
-
-const whatsappVideoFiles = [
-  "WhatsApp Video 2026-07-07 at 11.44.58.mp4",
-  "WhatsApp Video 2026-07-07 at 11.44.59.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.00.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.01.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.02.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.04.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.05.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.06.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.07.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.08.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.09.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.16.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.31.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.32.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.34.mp4",
-  "WhatsApp Video 2026-07-07 at 11.45.36.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.07.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.09.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.10.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.20.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.22.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.24.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.25.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.26.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.42.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.45.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.47.mp4",
-  "WhatsApp Video 2026-07-07 at 11.46.49.mp4",
-  "WhatsApp Video 2026-07-07 at 11.47.52.mp4",
-  "WhatsApp Video 2026-07-07 at 11.47.53.mp4",
-  "WhatsApp Video 2026-07-07 at 11.47.55.mp4",
-  "WhatsApp Video 2026-07-07 at 11.48.22.mp4",
-  "WhatsApp Video 2026-07-07 at 11.48.24.mp4",
-  "WhatsApp Video 2026-07-07 at 11.48.43.mp4",
-  "WhatsApp Video 2026-07-07 at 11.48.44.mp4",
-  "WhatsApp Video 2026-07-07 at 11.48.45.mp4",
-  "WhatsApp Video 2026-07-07 at 11.48.46.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.02.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.03.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.05.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.06.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.07.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.08.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.47.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.49.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.50.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.51.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.52.mp4",
-  "WhatsApp Video 2026-07-07 at 11.49.53.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.04.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.05.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.06.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.07.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.08.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.09.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.10.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.11.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.12.mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.14 (1).mp4",
-  "WhatsApp Video 2026-07-07 at 11.50.14.mp4"
-];
-
-const august2026ImageFiles = [
-  ...Array.from({ length: 62 }, (_, index) => `aug-2026-${String(index + 1).padStart(3, "0")}.jpeg`),
-  "shea-wellness-face-care-routine.png"
-];
-
-const august2026VideoFiles = Array.from(
-  { length: 8 },
-  (_, index) => `aug-2026-video-${String(index + 1).padStart(2, "0")}.mp4`
-);
 
 export const sheaHeroSlides: SheaHeroSlide[] = [
   {
@@ -235,57 +161,30 @@ export const sheaHeroSlides: SheaHeroSlide[] = [
   }
 ];
 
-export const sheaImageMedia: SheaMediaAsset[] = [
-  "/assets/website-edits/community-impact.png",
-  "/assets/website-edits/spa-facial.jpg",
-  "/assets/website-edits/massage-oils.jpg",
-  "/assets/website-edits/pure-raw-shea-butter.jpg",
-  "/assets/website-edits/aroma-diffuser-purple.jpg",
-  "/assets/website-edits/essential-oils-collection.jpg",
-  "/assets/website-edits/aroma-diffuser-wood.jpg",
-  "/assets/website-edits/facial-oils.jpg",
-  "/assets/website-edits/body-oils-collection.jpg",
-  "/assets/website-edits/botanical-oils.jpg",
-  "/assets/website-edits/rosehip-facial-oil.jpg",
-  "/assets/website-edits/shea-butter-single.jpg",
-  "/assets/website-edits/black-soap-routine.jpg",
-  "/assets/website-edits/shea-butter-pair.jpg",
-  "/assets/website-edits/black-soap-body-wash.jpg",
-  "/assets/website-edits/black-soap-face-wash.jpg",
-  "/assets/website-edits/black-soap-body-wash-pair.jpg",
-  "/assets/website-edits/black-soap-face-wash-pair.jpg",
-  "/assets/website-edits/black-soap-collection.jpg",
-  "/assets/website-edits/vanilla-mint-shea-butter.jpg",
-  "/assets/website-edits/essential-oils.jpg",
-  "/assets/website-edits/grapefruit-shea-butter.jpg",
-  "/assets/website-edits/lavender-shea-butter.jpg",
-  "/assets/website-edits/shea-wellness-logo.jpg",
-  "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
-  "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-  "/assets/sheawellness/lavender-shea-butter-front.jpeg",
-  "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
-  "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
-  "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
-  "/assets/sheawellness/lavender-shea-butter-back.jpeg"
-].map((src, index) => ({
-  id: `product_image_${index + 1}`,
-  title: `Product image ${index + 1}`,
-  src,
-  type: "image" as const,
-  tag: "Product"
-})).concat(whatsappImageFiles.map((file, index) => ({
-  id: `campaign_image_${index + 1}`,
-  title: `Campaign image ${index + 1}`,
-  src: `/assets/${file}`,
-  type: "image" as const,
-  tag: index < 7 ? "Brand asset" : "Skin routine"
-}))).concat(august2026ImageFiles.map((file, index) => ({
-  id: `august_2026_image_${index + 1}`,
-  title: file === "shea-wellness-face-care-routine.png" ? "Shea Wellness Face Care Routine" : `August 2026 media ${index + 1}`,
-  src: `/assets/media-library/aug-2026/${file}`,
-  type: "image" as const,
-  tag: file === "shea-wellness-face-care-routine.png" ? "Face care routine" : "Product media"
-})));
+const curatedImageMedia: Array<Omit<SheaMediaAsset, "id">> = [
+  { title: "Community impact", src: "/assets/website-edits/community-impact.png", type: "image", tag: "Brand story" },
+  { title: "Spa facial", src: "/assets/website-edits/spa-facial.jpg", type: "image", tag: "Spa care" },
+  { title: "Massage oils", src: "/assets/website-edits/massage-oils.jpg", type: "image", tag: "Spa essentials" },
+  { title: "Facial oils", src: "/assets/website-edits/facial-oils.jpg", type: "image", tag: "Face care" },
+  { title: "Body oils", src: "/assets/website-edits/body-oils-collection.jpg", type: "image", tag: "Skin care" },
+  { title: "Botanical oils", src: "/assets/website-edits/botanical-oils.jpg", type: "image", tag: "Wellness routine" },
+  { title: "Pure raw shea butter", src: "/assets/sheawellness/pure-raw-shea-butter.jpeg", type: "image", tag: "Verified product" },
+  { title: "Lavender shea butter", src: "/assets/sheawellness/lavender-shea-butter-front.jpeg", type: "image", tag: "Verified product" },
+  { title: "Lemongrass shea butter", src: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg", type: "image", tag: "Verified product" },
+  { title: "Grapefruit shea butter", src: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg", type: "image", tag: "Verified product" },
+  { title: "Vanilla mint shea butter", src: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg", type: "image", tag: "Verified product" },
+  { title: "Chebe hair serum", src: "/assets/media-library/aug-2026/aug-2026-026.jpeg", type: "image", tag: "Verified product" },
+  { title: "Chebe hair butter", src: "/assets/media-library/aug-2026/aug-2026-043.jpeg", type: "image", tag: "Verified product" },
+  { title: "Yellow castor oil", src: "/assets/media-library/aug-2026/aug-2026-028.jpeg", type: "image", tag: "Verified product" },
+  { title: "Essential oils", src: "/assets/media-library/aug-2026/aug-2026-025.jpeg", type: "image", tag: "Verified product" },
+  { title: "Aromatherapy bundle", src: "/assets/media-library/aug-2026/aug-2026-030.jpeg", type: "image", tag: "Verified product" },
+  { title: "Professional spa essentials", src: "/assets/media-library/aug-2026/aug-2026-057.jpeg", type: "image", tag: "Verified product" }
+];
+
+export const sheaImageMedia: SheaMediaAsset[] = curatedImageMedia.map((asset, index) => ({
+  id: `curated_image_${index + 1}`,
+  ...asset
+}));
 
 export const sheaNav = [
   { label: "Home", href: "/" },
@@ -367,7 +266,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Rosehip Facial Oil",
-        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+        image: "/assets/website-edits/facial-oils.jpg",
         description: "Lightweight botanical facial oil for daily moisture and a healthy-looking glow.",
         ingredients: ["Rosehip Oil", "Botanical Oil Blend"],
         benefits: ["Deep hydration", "Softens and smooths", "Supports the moisture barrier"],
@@ -385,7 +284,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Cucumber Mint Sunscreen SPF Gel",
-        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+        image: "/assets/website-edits/facial-oils.jpg",
         description: "Daily SPF step for the morning routine to help protect skin from UV exposure.",
         ingredients: ["Cucumber", "Mint", "Broad-spectrum SPF"],
         benefits: ["Daily protection", "Light gel finish", "Supports a healthy barrier"],
@@ -400,7 +299,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Chebe Hair Growth Serum with Karkar Oil",
-        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+        image: "/assets/media-library/aug-2026/aug-2026-026.jpeg",
         description: "A nourishing serum for protective styles, length retention, and scalp care.",
         ingredients: ["Chebe Powder", "Karkar Oil", "Natural Oils"],
         benefits: ["Length retention", "Strengthens hair strands", "Adds shine"],
@@ -409,7 +308,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Chebe Hair Butter",
-        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+        image: "/assets/media-library/aug-2026/aug-2026-043.jpeg",
         description: "Rich hair butter for nourishment, shine, and breakage prevention.",
         ingredients: ["Shea Butter", "Chebe", "Natural Oils"],
         benefits: ["Rich nourishment", "Prevents breakage", "Improves manageability"],
@@ -418,7 +317,7 @@ export const sheaProductCategories = [
       },
       {
         name: "African Liquid Black Soap Shampoo",
-        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.25.jpeg",
+        image: "/assets/website-edits/black-soap-collection.jpg",
         description: "A natural shampoo option for clean scalp and hair care routines.",
         ingredients: ["African Black Soap", "Shea Butter", "Botanical Extracts"],
         benefits: ["Cleanses scalp", "Removes buildup", "Supports natural hair care"],
@@ -427,7 +326,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Cold Pressed Yellow Castor Oil",
-        image: "/assets/WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+        image: "/assets/media-library/aug-2026/aug-2026-028.jpeg",
         description: "A rich oil for dry scalp, brittle hair, protective styles, and body moisture sealing.",
         ingredients: ["Cold Pressed Yellow Castor Oil"],
         benefits: ["Moisturizes dry scalp", "Softens brittle hair", "Seals in moisture"],
@@ -620,20 +519,6 @@ export const sheaVideos: SheaMediaAsset[] = [
   ...baseSheaVideos.map((video, index) => ({
     id: `product_video_${index + 1}`,
     ...video
-  })),
-  ...whatsappVideoFiles.map((file, index) => ({
-    id: `campaign_video_${index + 1}`,
-    title: `Campaign video ${index + 1}`,
-    src: `/assets/${file}`,
-    type: "video" as const,
-    tag: "New media"
-  })),
-  ...august2026VideoFiles.map((file, index) => ({
-    id: `august_2026_video_${index + 1}`,
-    title: `August 2026 video ${index + 1}`,
-    src: `/assets/media-library/aug-2026/${file}`,
-    type: "video" as const,
-    tag: "Product media"
   }))
 ];
 
