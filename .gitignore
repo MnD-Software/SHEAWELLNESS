@@ -1,5 +1,9 @@
 node_modules
 .next
+.next-smoke/
+.next-verify/
+playwright-report/
+test-results/
 .codex/
 artifacts/
 .env

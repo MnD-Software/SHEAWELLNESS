@@ -98,7 +98,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       <b>{cartCount ?? 0}</b>
     </button>
   ) : (
-    <a className="shea-nav-cart" href="/shop">
+    <a className="shea-nav-cart" href="/shop?cart=open">
       <ShoppingCart size={18} />
       <span>Cart</span>
       <b>{cartCount ?? 0}</b>

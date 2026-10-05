@@ -29,6 +29,7 @@ import {
 } from "@/lib/shea-content";
 import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
+import { ContactForm } from "./ContactForm";
 import type { Product } from "@/lib/types";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
@@ -604,15 +605,7 @@ function ContactSections() {
         <span>Business address</span>
         <strong>{sheaBrand.address}</strong>
       </div>
-      <form className="shea-contact-form">
-        <span>Contact form</span>
-        <h2>Business enquiries welcome</h2>
-        <label>Name<input placeholder="Your name" /></label>
-        <label>Email<input placeholder="you@example.com" type="email" /></label>
-        <label>Enquiry type<select defaultValue="Wholesale"><option>Wholesale</option><option>Retail order</option><option>Spa essentials</option><option>Media</option></select></label>
-        <label>Message<textarea placeholder="Tell Shea Wellness what you need" /></label>
-        <button type="button">Send enquiry</button>
-      </form>
+      <ContactForm />
     </section>
   );
 }

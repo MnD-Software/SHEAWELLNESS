@@ -6,6 +6,7 @@ import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { platformSnapshot } from "@/lib/platform-data";
+import { readStoredArray } from "@/lib/browser-storage";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import type { Product } from "@/lib/types";
 
@@ -14,7 +15,7 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
-    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity: number }>;
+    const savedCart = readStoredArray("sheaWellnessCart") as Array<{ quantity: number }>;
     setCartCount(savedCart.reduce((total, line) => total + line.quantity, 0));
     void fetch("/api/storefront/content", { cache: "no-store" })
       .then(async (response) => {

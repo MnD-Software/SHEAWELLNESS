@@ -118,7 +118,9 @@ function normalizeStoredProducts(products: Product[]): Product[] {
     return {
       ...product,
       category: product.category === "Body Care" ? "Skin Care" : product.category,
-      imageUrl: VERIFIED_PRODUCT_IMAGES[product.id] ?? replaceRetiredSyntheticImage(product.imageUrl),
+      imageUrl: isLegacySheaMediaPath(product.imageUrl)
+        ? VERIFIED_PRODUCT_IMAGES[product.id] ?? replaceRetiredSyntheticImage(product.imageUrl)
+        : replaceRetiredSyntheticImage(product.imageUrl),
       status: productNeedsVerifiedMedia(product) ? "draft" : product.status,
       sizes: safeSizes,
       price: Number.isFinite(price) && price >= 0 ? price : fallbackPrice,
@@ -135,7 +137,7 @@ function defaultProducts() {
 function productsOrDefaults(products: unknown): Product[] {
   if (!Array.isArray(products)) return defaultProducts();
   const normalizedProducts = normalizeStoredProducts(products as Product[]);
-  return normalizedProducts.length ? normalizedProducts : defaultProducts();
+  return normalizedProducts;
 }
 
 function defaults(): StoreContent {
@@ -167,6 +169,20 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
         )
       `;
       await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS page_overrides JSONB NOT NULL DEFAULT '{}'::jsonb`;
+      await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS catalogue_initialized BOOLEAN NOT NULL DEFAULT FALSE`;
+      // Migrate the old media-only record once. Subsequent intentional empty
+      // catalogues stay empty; there is no repeating read-time seed fallback.
+      await sql`
+        UPDATE storefront_content
+        SET products = CASE WHEN products = '[]'::jsonb THEN ${JSON.stringify(defaultProducts())}::jsonb ELSE products END,
+          catalogue_initialized = TRUE
+        WHERE store_key = ${STORE_KEY} AND catalogue_initialized = FALSE
+      `;
+      await sql`
+        INSERT INTO storefront_content (store_key, products, media, catalogue_initialized)
+        VALUES (${STORE_KEY}, ${JSON.stringify(defaultProducts())}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb, TRUE)
+        ON CONFLICT (store_key) DO NOTHING
+      `;
     })().catch((error) => {
       tableReady = null;
       throw error;
@@ -175,9 +191,12 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
   await tableReady;
 }
 
-export async function getStoreContent(): Promise<StoreContent> {
+export async function getStoreContent({ strict = false }: { strict?: boolean } = {}): Promise<StoreContent> {
   const sql = database();
-  if (!sql) return defaults();
+  if (!sql) {
+    if (strict) throw new Error("DATABASE_URL is not configured.");
+    return defaults();
+  }
 
   try {
     await ensureTable(sql);
@@ -196,7 +215,8 @@ export async function getStoreContent(): Promise<StoreContent> {
       persisted: true,
       updatedAt: new Date(rows[0].updated_at as string).toISOString()
     };
-  } catch {
+  } catch (error) {
+    if (strict) throw error;
     // Public browsing should remain available with the verified in-repo
     // catalogue when the optional content database is temporarily offline.
     // Admin writes and checkout persistence remain strict and still fail.
@@ -219,6 +239,19 @@ export async function saveProducts(products: Product[]) {
     RETURNING updated_at
   `;
   return { persisted: true, updatedAt: new Date(rows[0].updated_at as string).toISOString() };
+}
+
+export async function appendProduct(product: Product) {
+  const sql = database();
+  if (!sql) throw new Error("DATABASE_URL is not configured.");
+  await ensureTable(sql);
+  const safeProduct = normalizeStoredProducts([product])[0];
+  await sql`
+    INSERT INTO storefront_content (store_key, products, media)
+    VALUES (${STORE_KEY}, ${JSON.stringify([...defaultProducts(), safeProduct])}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb)
+    ON CONFLICT (store_key) DO UPDATE
+    SET products = storefront_content.products || ${JSON.stringify([safeProduct])}::jsonb, updated_at = NOW()
+  `;
 }
 
 export async function saveMedia(media: SheaMediaConfig) {

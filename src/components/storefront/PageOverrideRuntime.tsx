@@ -13,11 +13,14 @@ export function applyPageOverrides(pageOverrides: PageOverrides, path = window.l
   const imageNodes = Array.from(root.querySelectorAll<HTMLImageElement>(editableImageSelector));
   Object.entries(page.texts ?? {}).forEach(([key, value]) => {
     const node = textNodes[Number(key)];
-    if (node && node.textContent !== value) node.textContent = value;
+    if (node && !node.closest("[data-live-content], .department-product-carousel") && node.textContent !== value) node.textContent = value;
   });
   Object.entries(page.images ?? {}).forEach(([key, value]) => {
     const node = imageNodes[Number(key)];
-    if (node && node.getAttribute("src") !== value) node.src = value;
+    if (node && !node.closest("[data-live-content], .department-product-carousel") && node.getAttribute("src") !== value) {
+      node.removeAttribute("srcset");
+      node.src = value;
+    }
   });
 }
 

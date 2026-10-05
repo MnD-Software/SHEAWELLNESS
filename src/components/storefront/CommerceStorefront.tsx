@@ -23,6 +23,8 @@ import {
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import Image from "next/image";
+import { CampaignCarousel } from "./CampaignCarousel";
+import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { categoryToSlug } from "@/lib/product-routing";
@@ -156,12 +158,16 @@ export function CommerceStorefront({
   store,
   products,
   initialSearch = "",
-  featuredProductLimit
+  featuredProductLimit,
+  initialMedia,
+  initialWellnessGuidesEnabled = false
 }: {
   store: Store;
   products: Product[];
   initialSearch?: string;
   featuredProductLimit?: number;
+  initialMedia?: SheaMediaConfig;
+  initialWellnessGuidesEnabled?: boolean;
 }) {
   const [catalogProducts, setCatalogProducts] = useState(products);
   const liveProducts = catalogProducts.filter((product) => product.status === "active" || product.status === "low_stock");
@@ -179,22 +185,15 @@ export function CommerceStorefront({
   const [checkoutError, setCheckoutError] = useState("");
   const [placingOrder, setPlacingOrder] = useState(false);
   const checkoutRequestId = useRef<string | null>(null);
-  const [heroIndex, setHeroIndex] = useState(0);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
   const [saleSeconds, setSaleSeconds] = useState(47 * 60 * 60 + 36 * 60);
-  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(defaultStorefrontMedia);
-  const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
+  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(initialMedia ?? defaultStorefrontMedia);
+  const wellnessGuidesEnabled = initialWellnessGuidesEnabled;
 
   const heroSlides = mediaConfig.heroSlides;
-  const heroSlide = heroSlides[heroIndex] ?? heroSlides[0];
-  const heroMediaIsSideways = isSidewaysSheaProductAsset(heroSlide?.src);
   const mediaVideos = mediaConfig.videos;
 
-  function moveHero(direction: 1 | -1) {
-    if (heroSlides.length < 2) return;
-    setHeroIndex((index) => (index + direction + heroSlides.length) % heroSlides.length);
-  }
 
   useEffect(() => {
     void fetch("/api/storefront/content", { cache: "no-store" })
@@ -208,20 +207,8 @@ export function CommerceStorefront({
   }, []);
 
   useEffect(() => {
-    const syncWellnessVisibility = () => {
-      setWellnessGuidesEnabled(window.localStorage.getItem("sheaWellnessHomepageGuidesEnabled") === "true");
-    };
-    syncWellnessVisibility();
-    window.addEventListener("storage", syncWellnessVisibility);
-    window.addEventListener("sheaWellnessSettingsChanged", syncWellnessVisibility);
-    return () => {
-      window.removeEventListener("storage", syncWellnessVisibility);
-      window.removeEventListener("sheaWellnessSettingsChanged", syncWellnessVisibility);
-    };
-  }, []);
-
-  useEffect(() => {
-    setWishlist(JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[]);
+    setWishlist(readStoredArray("sheaWellnessWishlist") as string[]);
+    if (new URLSearchParams(window.location.search).get("cart") === "open") setCartOpen(true);
   }, []);
 
   useEffect(() => {
@@ -258,24 +245,16 @@ export function CommerceStorefront({
       productId: line.product.id,
       title: line.product.title,
       imageUrl: line.product.imageUrl,
-      price: line.product.price,
+      price: productPriceForSize(line.product, line.size),
       size: line.size,
       quantity: line.quantity
     } satisfies StoredCartLine))));
   }, [cart, cartHydrated]);
 
   useEffect(() => {
-    if (heroSlides.length < 2) return;
-    const timer = window.setInterval(() => {
-      setHeroIndex((index) => (index + 1) % heroSlides.length);
-    }, 5500);
-    return () => window.clearInterval(timer);
-  }, [heroSlides.length]);
-
-  useEffect(() => {
     const savedReviews = window.localStorage.getItem("sheaWellnessReviews");
     if (savedReviews) {
-      setReviews(JSON.parse(savedReviews) as ProductReview[]);
+      setReviews(readStoredArray("sheaWellnessReviews") as ProductReview[]);
     }
   }, []);
 
@@ -378,7 +357,7 @@ export function CommerceStorefront({
       }
 
       const savedOrder = payload.data;
-      const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as unknown[];
+      const savedOrders = readStoredArray("sheaWellnessOrders");
       window.localStorage.setItem("sheaWellnessOrders", JSON.stringify([
         {
           source: "shea_storefront_checkout",
@@ -426,55 +405,7 @@ export function CommerceStorefront({
 
       {isHomePage ? (
         <>
-          <section className="commerce-hero" id="top">
-            <div className="commerce-hero-card shea-carousel-shell" aria-label="Shea Wellness campaign carousel">
-              <div className="commerce-hero-copy">
-                <div>
-                  <span>{heroSlide?.kicker ?? "Pure Nilotica Shea"}</span>
-                  <h1>{heroSlide?.title ?? "Modern wellness essentials"}</h1>
-                  {heroSlide?.body ? <p>{heroSlide.body}</p> : null}
-                  <div className="commerce-hero-actions">
-                    {heroSlide ? <a href={heroSlide.ctaHref}>{heroSlide.ctaLabel}</a> : null}
-                    <a className="ghost" href="/wellness-guides">Explore wellness guides</a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="commerce-hero-media">
-                <div className={clsx("commerce-hero-image-frame", heroMediaIsSideways && "is-rotated")}>
-                  {heroSlide ? (
-                    <Image className={heroMediaIsSideways ? "shea-rotated-product-image" : undefined} src={heroSlide.src} alt={heroSlide.title} fill priority sizes="100vw" unoptimized style={{ objectFit: heroMediaIsSideways ? "contain" : "cover", objectPosition: heroSlide.objectPosition ?? "50% 50%" }} />
-                  ) : null}
-                </div>
-                {heroSlide ? (
-                  <div className="commerce-hero-meta">
-                    <span>{heroSlide.tag}</span>
-                    <strong>Before / After</strong>
-                  </div>
-                ) : null}
-              </div>
-
-              <button type="button" className="commerce-carousel-arrow shea-carousel-control previous" onClick={() => moveHero(-1)} aria-label="Previous campaign slide">
-                <ArrowLeft size={20} />
-              </button>
-              <button type="button" className="commerce-carousel-arrow shea-carousel-control next" onClick={() => moveHero(1)} aria-label="Next campaign slide">
-                <ArrowRight size={20} />
-              </button>
-
-              <div className="commerce-carousel-dots shea-carousel-pagination" aria-label="Choose campaign slide">
-                {heroSlides.map((slide, index) => (
-                  <button
-                    type="button"
-                    key={slide.id}
-                    className={clsx(heroIndex === index && "active")}
-                    onClick={() => setHeroIndex(index)}
-                    aria-label={`Show ${slide.title}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
-
+          <CampaignCarousel slides={heroSlides} />
           <section className="commerce-brand-intro" aria-labelledby="shea-intro-heading">
             <span>Welcome to Shea Wellness</span>
             <h2 id="shea-intro-heading">Healthy skin begins with nature.</h2>
@@ -899,7 +830,7 @@ function CartDrawer({
             <div>
               <strong>{line.product.title}</strong>
               <span>{line.size}</span>
-              <b>{formatMoney(line.product.price, currency)}</b>
+              <b>{formatMoney(productPriceForSize(line.product, line.size), currency)}</b>
               <div className="commerce-qty">
                 <button type="button" onClick={() => onUpdate(index, line.quantity - 1)}><Minus size={14} /></button>
                 <span>{line.quantity}</span>
@@ -1066,7 +997,7 @@ function CheckoutFlow({
   onPlaceOrder: () => Promise<void>;
 }) {
   const steps: CheckoutStep[] = ["information", "delivery", "payment", "review"];
-  const canProceed = step !== "information" || Boolean(form.email && form.fullName && form.phone && form.address && form.country && form.city);
+  const canProceed = step !== "information" || Boolean(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) && form.fullName.trim().length >= 2 && form.phone.trim().length >= 6 && form.address.trim().length >= 4 && form.country.trim().length >= 2 && form.city.trim().length >= 2);
 
   return (
     <div className="commerce-checkout-backdrop">

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
+import { readStoredArray } from "@/lib/browser-storage";
 import { sheaBrand } from "@/lib/shea-content";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
@@ -44,9 +45,9 @@ export function SheaAccountDashboard() {
   const [reorderMessage, setReorderMessage] = useState("");
 
   useEffect(() => {
-    const savedOrders = JSON.parse(window.localStorage.getItem("sheaWellnessOrders") ?? "[]") as AccountOrder[];
-    const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as AccountReview[];
-    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity: number }>;
+    const savedOrders = readStoredArray("sheaWellnessOrders") as AccountOrder[];
+    const savedReviews = readStoredArray("sheaWellnessReviews") as AccountReview[];
+    const savedCart = readStoredArray("sheaWellnessCart") as Array<{ quantity: number }>;
     setOrders(savedOrders.filter((order) => order.source === "shea_storefront_checkout"));
     setReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
     setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
@@ -60,7 +61,7 @@ export function SheaAccountDashboard() {
 
   function reorder(order: AccountOrder) {
     if (!order.items?.length) return;
-    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
+    const savedCart = readStoredArray("sheaWellnessCart") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
     const nextCart = [...savedCart];
     for (const item of order.items) {
       const existingIndex = nextCart.findIndex((line) => line.productId === item.productId && line.size === item.size);

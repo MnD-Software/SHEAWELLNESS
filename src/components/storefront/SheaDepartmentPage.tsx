@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, ShoppingBag
 import { useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { platformSnapshot } from "@/lib/platform-data";
+import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import type { Product } from "@/lib/types";
@@ -57,17 +58,17 @@ const departmentContent: Record<DepartmentKind, {
   }
 };
 
-export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
+export function SheaDepartmentPage({ kind, initialProducts }: { kind: DepartmentKind; initialProducts: Product[] }) {
   const content = departmentContent[kind];
-  const [products, setProducts] = useState<Product[]>(platformSnapshot.products);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [cartCount, setCartCount] = useState(0);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [wishlist, setWishlist] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ quantity: number }>;
+    const savedCart = readStoredArray("sheaWellnessCart") as Array<{ quantity: number }>;
     setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
-    setWishlist(JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[]);
+    setWishlist(readStoredArray("sheaWellnessWishlist") as string[]);
     void fetch("/api/storefront/content", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) return;
@@ -84,25 +85,19 @@ export function SheaDepartmentPage({ kind }: { kind: DepartmentKind }) {
     setCarouselIndex(0);
   }, [kind]);
 
-  useEffect(() => {
-    if (featuredProducts.length < 2) return;
-    const timer = window.setInterval(() => setCarouselIndex((current) => (current + 1) % featuredProducts.length), 5500);
-    return () => window.clearInterval(timer);
-  }, [featuredProducts.length]);
-
   const moveCarousel = (direction: number) => {
     if (!featuredProducts.length) return;
     setCarouselIndex((current) => (current + direction + featuredProducts.length) % featuredProducts.length);
   };
 
-  const featuredProduct = featuredProducts[carouselIndex];
+  const featuredProduct = featuredProducts[carouselIndex % Math.max(featuredProducts.length, 1)];
 
   function toggleWishlist(productId: string) {
     setWishlist((current) => { const next = current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId]; window.localStorage.setItem("sheaWellnessWishlist", JSON.stringify(next)); return next; });
   }
 
   function quickAdd(product: Product) {
-    const saved = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
+    const saved = readStoredArray("sheaWellnessCart") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
     const size = product.sizes[0] ?? "One size";
     const index = saved.findIndex((line) => line.productId === product.id && line.size === size);
     const next = index >= 0 ? saved.map((line, itemIndex) => itemIndex === index ? { ...line, quantity: line.quantity + 1 } : line) : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: productPriceForSize(product, size), size, quantity: 1 }, ...saved];

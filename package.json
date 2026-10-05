@@ -9,9 +9,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "test:smoke": "node scripts/smoke.mjs",
+    "test:sanity": "node scripts/sanity.mjs",
+    "test:database": "node scripts/db-sanity.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
@@ -23,6 +23,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "playwright": "1.53.0",
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",

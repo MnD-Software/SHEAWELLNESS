@@ -28,6 +28,8 @@ import {
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
+import { EnquiriesView } from "./EnquiriesView";
+import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize, titleCase } from "@/lib/format";
 import {
   sheaBlogTopics,
@@ -52,6 +54,7 @@ const adminNav = [
   { id: "media", label: "Media library", icon: Image },
   { id: "pages", label: "Site pages", icon: FileText },
   { id: "orders", label: "Orders", icon: ShoppingCart },
+  { id: "enquiries", label: "Enquiries", icon: Mail },
   { id: "settings", label: "Settings", icon: Settings }
 ] as const;
 
@@ -256,7 +259,7 @@ function productToDraft(product?: Product): ProductFormState {
 }
 
 function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
-  const heroAsset = asset as Partial<SheaHeroSlide>;
+  const heroAsset = (asset ?? {}) as Partial<SheaHeroSlide>;
 
   return {
     id: asset?.id ?? "",
@@ -330,7 +333,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   }, [activeStore.id, filter, managedProducts, query]);
 
   useEffect(() => {
-    const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as RuntimeReview[];
+    const savedReviews = readStoredArray("sheaWellnessReviews") as RuntimeReview[];
     setRuntimeReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
 
     const storedKey = window.sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
@@ -444,9 +447,9 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     return result;
   }
 
-  function savePageOverridesConfig(nextPageOverrides: PageOverrides) {
-    setPageOverrides(nextPageOverrides);
-    void persistContent({ type: "pageOverrides", pageOverrides: nextPageOverrides });
+  async function savePageOverridesConfig(nextPageOverrides: PageOverrides) {
+    const result = await persistContent({ type: "pageOverrides", pageOverrides: nextPageOverrides });
+    if (result.success) setPageOverrides(nextPageOverrides);
   }
 
   async function updateOrderStatus(orderId: string, update: Pick<RuntimeOrder, "paymentStatus" | "fulfillmentStatus">) {
@@ -512,7 +515,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
           {adminNav.map((item) => {
             const Icon = item.icon;
             return (
-              <button type="button" key={item.id} className={clsx(view === item.id && "active")} onClick={() => setView(item.id)}>
+              <button type="button" key={item.id} aria-label={item.label} className={clsx(view === item.id && "active")} onClick={() => setView(item.id)}>
                 <Icon size={18} />
                 <span>{item.label}</span>
               </button>
@@ -543,6 +546,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
+        {view === "enquiries" ? <EnquiriesView /> : null}
       </main>
     </div>
   );
@@ -1691,15 +1695,26 @@ function MediaView({
 
 function SettingsView({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
+  const [settingsBusy, setSettingsBusy] = useState(true);
+  const [settingsMessage, setSettingsMessage] = useState("");
 
   useEffect(() => {
-    setWellnessGuidesEnabled(window.localStorage.getItem("sheaWellnessHomepageGuidesEnabled") === "true");
+    void fetch("/api/admin/settings", { headers: adminRequestHeaders(), cache: "no-store" })
+      .then(async response => { const payload = await response.json(); if (!response.ok) throw new Error(payload.error); setWellnessGuidesEnabled(payload.data.wellnessGuidesEnabled); })
+      .catch(error => setSettingsMessage(error.message))
+      .finally(() => setSettingsBusy(false));
   }, []);
 
-  function updateWellnessGuidesVisibility(enabled: boolean) {
-    setWellnessGuidesEnabled(enabled);
-    window.localStorage.setItem("sheaWellnessHomepageGuidesEnabled", String(enabled));
-    window.dispatchEvent(new Event("sheaWellnessSettingsChanged"));
+  async function updateWellnessGuidesVisibility(enabled: boolean) {
+    setSettingsBusy(true); setSettingsMessage("");
+    try {
+      const response = await fetch("/api/admin/settings", { method: "PUT", headers: { ...adminRequestHeaders(), "content-type": "application/json" }, body: JSON.stringify({ wellnessGuidesEnabled: enabled }) });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error);
+      setWellnessGuidesEnabled(payload.data.wellnessGuidesEnabled);
+      setSettingsMessage("Saved to Neon. This setting applies to all visitors.");
+    } catch (error) { setSettingsMessage(error instanceof Error ? error.message : "Unable to save settings."); }
+    finally { setSettingsBusy(false); }
   }
 
   return (
@@ -1727,11 +1742,13 @@ function SettingsView({ snapshot }: { snapshot: PlatformSnapshot }) {
             <input
               type="checkbox"
               checked={wellnessGuidesEnabled}
+              disabled={settingsBusy}
               onChange={(event) => updateWellnessGuidesVisibility(event.target.checked)}
               aria-label="Show wellness guides feature on homepage"
             />
             <i aria-hidden="true" />
           </label>
+          {settingsMessage && <p role="status">{settingsMessage}</p>}
         </Panel>
       </section>
     </section>

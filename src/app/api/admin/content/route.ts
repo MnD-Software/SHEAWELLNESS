@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
   if (denied) return denied;
 
   try {
-    return NextResponse.json({ data: await getStoreContent() });
+    return NextResponse.json({ data: await getStoreContent({ strict: true }) });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load content." }, { status: 500 });
   }

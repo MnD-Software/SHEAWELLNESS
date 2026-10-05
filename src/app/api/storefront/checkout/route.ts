@@ -121,7 +121,7 @@ function checkoutResponse(order: StorefrontOrder) {
 export async function POST(request: Request) {
   try {
     const checkout = checkoutSchema.parse(await request.json());
-    const content = await getStoreContent();
+    const content = await getStoreContent({ strict: true });
     const items = canonicalLines(checkout.items, content.products);
     const subtotal = toMoney(items.reduce((total, item) => total + item.lineTotal, 0));
 
@@ -152,7 +152,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ data: checkoutResponse(result.order) }, { status: result.created ? 201 : 200 });
   } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (error instanceof z.ZodError || error instanceof SyntaxError) {
       return NextResponse.json({ error: "Please check the checkout information and try again." }, { status: 400 });
     }
     if (error instanceof CheckoutValidationError) {

@@ -40,7 +40,7 @@ export function SheaMotion() {
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.14 }
+      { rootMargin: "100px 0px", threshold: 0 }
     );
 
     targets.forEach((target) => {

@@ -1,12 +1,15 @@
 import { SheaProductDetail } from "@/components/storefront/SheaProductDetail";
-import { platformSnapshot } from "@/lib/platform-data";
+import { getStoreContent } from "@/server/repositories/storeContentRepository";
+import { notFound } from "next/navigation";
+export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 
 type ProductParams = Promise<{ productId: string }>;
 
 export async function generateMetadata({ params }: { params: ProductParams }): Promise<Metadata> {
   const { productId } = await params;
-  const product = platformSnapshot.products.find((item) => item.id === decodeURIComponent(productId));
+  const content = await getStoreContent();
+  const product = content.products.find((item) => item.id === decodeURIComponent(productId) && (item.status === "active" || item.status === "low_stock"));
   if (!product) return { title: "Product not found | Shea Wellness" };
   const path = `/products/${encodeURIComponent(product.id)}`;
   return {
@@ -21,7 +24,9 @@ export async function generateMetadata({ params }: { params: ProductParams }): P
 export default async function ProductDetailRoute({ params }: { params: ProductParams }) {
   const { productId } = await params;
   const decodedProductId = decodeURIComponent(productId);
-  const initialProduct = platformSnapshot.products.find((product) => product.id === decodedProductId) ?? null;
+  const content = await getStoreContent();
+  const initialProduct = content.products.find((product) => product.id === decodedProductId && (product.status === "active" || product.status === "low_stock"));
+  if (!initialProduct) notFound();
 
   return <SheaProductDetail productId={decodedProductId} initialProduct={initialProduct} />;
 }

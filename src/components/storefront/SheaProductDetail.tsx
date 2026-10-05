@@ -5,6 +5,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
+import { readStoredArray } from "@/lib/browser-storage";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
 import type { Product } from "@/lib/types";
@@ -42,14 +43,14 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const [recentProductIds, setRecentProductIds] = useState<string[]>([]);
 
   useEffect(() => {
-    const savedReviews = JSON.parse(window.localStorage.getItem("sheaWellnessReviews") ?? "[]") as ProductReview[];
-    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as StoredCartLine[];
+    const savedReviews = readStoredArray("sheaWellnessReviews") as ProductReview[];
+    const savedCart = readStoredArray("sheaWellnessCart") as StoredCartLine[];
 
     setReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
     setCartCount(savedCart.reduce((total, line) => total + line.quantity, 0));
-    const savedWishlist = JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[];
+    const savedWishlist = readStoredArray("sheaWellnessWishlist") as string[];
     setWished(savedWishlist.includes(productId));
-    const savedRecent = JSON.parse(window.localStorage.getItem("sheaWellnessRecentlyViewed") ?? "[]") as string[];
+    const savedRecent = readStoredArray("sheaWellnessRecentlyViewed") as string[];
     const nextRecent = [productId, ...savedRecent.filter((id) => id !== productId)].slice(0, 8);
     window.localStorage.setItem("sheaWellnessRecentlyViewed", JSON.stringify(nextRecent));
     setRecentProductIds(nextRecent.filter((id) => id !== productId));
@@ -58,8 +59,8 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
         if (!response.ok) return;
         const payload = await response.json();
         const nextProducts = Array.isArray(payload.data?.products) ? payload.data.products as Product[] : [];
-        const nextProduct = nextProducts.find((item) => item.id === productId) ?? null;
-        setProducts(nextProducts);
+        const nextProduct = nextProducts.find((item) => item.id === productId && (item.status === "active" || item.status === "low_stock")) ?? null;
+        setProducts(nextProducts.filter((item) => item.status === "active" || item.status === "low_stock"));
         setProduct(nextProduct);
         setSize(nextProduct?.sizes[0] ?? "100g");
       })
@@ -88,7 +89,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
   function toggleWishlist() {
     if (!product) return;
-    const saved = JSON.parse(window.localStorage.getItem("sheaWellnessWishlist") ?? "[]") as string[];
+    const saved = readStoredArray("sheaWellnessWishlist") as string[];
     const next = saved.includes(product.id) ? saved.filter((id) => id !== product.id) : [...saved, product.id];
     window.localStorage.setItem("sheaWellnessWishlist", JSON.stringify(next));
     setWished(next.includes(product.id));
@@ -96,7 +97,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
   function addToCart() {
     if (!product) return;
-    const savedCart = JSON.parse(window.localStorage.getItem("sheaWellnessCart") ?? "[]") as StoredCartLine[];
+    const savedCart = readStoredArray("sheaWellnessCart") as StoredCartLine[];
     const existingIndex = savedCart.findIndex((line) => line.productId === product.id && line.size === size);
     const nextCart = existingIndex >= 0
       ? savedCart.map((line, index) => index === existingIndex ? { ...line, quantity: line.quantity + 1 } : line)

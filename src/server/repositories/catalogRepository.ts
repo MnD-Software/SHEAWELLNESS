@@ -1,4 +1,4 @@
-import { platformSnapshot } from "@/lib/platform-data";
+import { getStoreContent, appendProduct } from "./storeContentRepository";
 import type { Product } from "@/lib/types";
 
 type ProductCreateInput = Omit<
@@ -30,9 +30,10 @@ export interface CatalogRepository {
   createProduct(storeId: string, product: ProductCreateInput): Promise<Product>;
 }
 
-export class SeedCatalogRepository implements CatalogRepository {
+export class NeonCatalogRepository implements CatalogRepository {
   async listProducts(storeId: string) {
-    return platformSnapshot.products.filter((product) => product.storeId === storeId);
+    const content = await getStoreContent({ strict: true });
+    return content.products.filter((product) => product.storeId === storeId);
   }
 
   async createProduct(storeId: string, product: ProductCreateInput) {
@@ -54,8 +55,9 @@ export class SeedCatalogRepository implements CatalogRepository {
       deliveryBadge: product.deliveryBadge ?? "Ready to ship"
     };
 
+    await appendProduct(created);
     return created;
   }
 }
 
-export const catalogRepository = new SeedCatalogRepository();
+export const catalogRepository = new NeonCatalogRepository();

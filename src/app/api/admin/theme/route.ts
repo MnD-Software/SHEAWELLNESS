@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { platformSnapshot } from "@/lib/platform-data";
+import { readTheme, saveTheme } from "@/server/repositories/settingsRepository";
 import { themeLayoutSchema } from "@/lib/validation";
 import { requireAdminAccess } from "@/server/adminAuth";
 
@@ -7,18 +7,16 @@ export async function GET(request: Request) {
   const denied = requireAdminAccess(request);
   if (denied) return denied;
 
-  return NextResponse.json({ data: platformSnapshot.theme });
+  try { return NextResponse.json({ data: await readTheme() }); }
+  catch { return NextResponse.json({ error: "Unable to load saved theme." }, { status: 503 }); }
 }
 
 export async function PUT(request: Request) {
   const denied = requireAdminAccess(request);
   if (denied) return denied;
 
-  const layout = themeLayoutSchema.parse(await request.json());
-
-  return NextResponse.json({
-    data: layout,
-    status: "validated",
-    message: "Theme payload is valid and ready for draft persistence."
-  });
+  try {
+    const layout = themeLayoutSchema.parse(await request.json());
+    return NextResponse.json({ data: await saveTheme(layout), status: "saved" });
+  } catch { return NextResponse.json({ error: "Unable to save theme. Check the payload and database connection." }, { status: 400 }); }
 }
