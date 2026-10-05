@@ -13317,6 +13317,14 @@ body::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .commerce-modal-backdrop, .commerce-checkout-backdrop { z-index: 10003; }
 body:has(.commerce-drawer.open) .commerce-mobile-tabs,
 body:has(.commerce-checkout-backdrop) .commerce-mobile-tabs { visibility: hidden; }
+/* Header is in the root layout now; pages must not reserve space for a second fixed header. */
+body main:is(.commerce-site, .shea-page, .shea-department-page, .shea-category-page, .shea-product-page, .shea-policy-page, .shea-account-page, .shea-faq-page, .guide-page) { padding-top: 0 !important; margin-top: 0 !important; }
+.shea-cart-scrim { position: fixed; inset: 0; z-index: 10001; border: 0; background: #0d231980; backdrop-filter: blur(3px); }
+@media (max-width: 700px) {
+  body:has([data-testid="global-header"]) { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .commerce-mobile-tabs { bottom: max(8px, env(safe-area-inset-bottom)); }
+  .shea-sticky-cart { position: static !important; width: 100% !important; margin: 20px 0; }
+}
 .shea-admin-enquiries { min-width: 0; padding: clamp(16px, 3vw, 32px); }
 .shea-admin-enquiries article { margin-top: 16px; padding: 20px; border: 1px solid #dce5dd; border-radius: 16px; background: #fff; overflow-wrap: anywhere; }
 .shea-admin-enquiries article span { font-size: 12px; color: #607366; }

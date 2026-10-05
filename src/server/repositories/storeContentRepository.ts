@@ -21,7 +21,7 @@ export type PageOverrides = Record<string, { texts?: Record<string, string>; ima
 
 const STORE_KEY = "shea-wellness";
 const PAGE_OVERRIDE_SCHEMA_KEY = "__shea_page_overrides_schema";
-const PAGE_OVERRIDE_SCHEMA_VERSION = "2";
+const PAGE_OVERRIDE_SCHEMA_VERSION = "3";
 const PAGE_OVERRIDE_SCHEMA = { texts: { version: PAGE_OVERRIDE_SCHEMA_VERSION } };
 const VERIFIED_PRODUCT_IMAGES: Record<string, string> = {
   prod_chebe_serum: "/assets/media-library/aug-2026/aug-2026-026.jpeg",
@@ -57,7 +57,8 @@ function sanitizePageOverrides(
     return { [PAGE_OVERRIDE_SCHEMA_KEY]: PAGE_OVERRIDE_SCHEMA };
   }
 
-  // Old page-image overrides are index based and can silently put a historic
+  // Version 3 excludes the shared header from page image indexes. Old
+  // page-image overrides are index based and can silently put a historic
   // upload back into a completely different layout after a design update. Keep
   // legacy text so editors do not lose copy, but require the current schema
   // marker before an image override is allowed to affect the public site.

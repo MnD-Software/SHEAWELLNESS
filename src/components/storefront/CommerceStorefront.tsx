@@ -29,7 +29,7 @@ import { formatMoney, productPriceForSize } from "@/lib/format";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { categoryToSlug } from "@/lib/product-routing";
 import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
+import { useStorefrontCart } from "./StorefrontCart";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import type { Product, Store } from "@/lib/types";
 import { partnerLogos, quickFaqs } from "@/lib/shea-website-content";
@@ -160,7 +160,8 @@ export function CommerceStorefront({
   initialSearch = "",
   featuredProductLimit,
   initialMedia,
-  initialWellnessGuidesEnabled = false
+  initialWellnessGuidesEnabled = false,
+  cartOnly = false
 }: {
   store: Store;
   products: Product[];
@@ -168,6 +169,7 @@ export function CommerceStorefront({
   featuredProductLimit?: number;
   initialMedia?: SheaMediaConfig;
   initialWellnessGuidesEnabled?: boolean;
+  cartOnly?: boolean;
 }) {
   const [catalogProducts, setCatalogProducts] = useState(products);
   const liveProducts = catalogProducts.filter((product) => product.status === "active" || product.status === "low_stock");
@@ -175,8 +177,7 @@ export function CommerceStorefront({
   const [activeCategory, setActiveCategory] = useState("All");
   const [query, setQuery] = useState(initialSearch);
   const [sort, setSort] = useState("featured");
-  const [cart, setCart] = useState<CartLine[]>([]);
-  const [cartHydrated, setCartHydrated] = useState(false);
+  const { cart, setCart, add: addSharedCart, open: openSharedCart } = useStorefrontCart();
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("information");
@@ -196,6 +197,7 @@ export function CommerceStorefront({
 
 
   useEffect(() => {
+    if (cartOnly) return;
     void fetch("/api/storefront/content", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) return;
@@ -208,48 +210,14 @@ export function CommerceStorefront({
 
   useEffect(() => {
     setWishlist(readStoredArray("sheaWellnessWishlist") as string[]);
-    if (new URLSearchParams(window.location.search).get("cart") === "open") setCartOpen(true);
+    if (cartOnly && new URLSearchParams(window.location.search).get("cart") === "open") setCartOpen(true);
   }, []);
 
   useEffect(() => {
+    if (cartOnly) return;
     const timer = window.setInterval(() => setSaleSeconds((value) => Math.max(0, value - 1)), 1000);
     return () => window.clearInterval(timer);
   }, []);
-
-  useEffect(() => {
-    const savedCart = window.localStorage.getItem("sheaWellnessCart");
-    if (!savedCart) {
-      setCartHydrated(true);
-      return;
-    }
-
-    try {
-      const parsedCart = JSON.parse(savedCart) as StoredCartLine[];
-      const nextCart = parsedCart
-        .map((line) => {
-          const product = catalogProducts.find((item) => item.id === line.productId);
-          return product ? { product, size: line.size, quantity: line.quantity } : null;
-        })
-        .filter((line): line is CartLine => Boolean(line));
-      setCart(nextCart);
-    } catch {
-      setCart([]);
-    } finally {
-      setCartHydrated(true);
-    }
-  }, [catalogProducts]);
-
-  useEffect(() => {
-    if (!cartHydrated) return;
-    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(cart.map((line) => ({
-      productId: line.product.id,
-      title: line.product.title,
-      imageUrl: line.product.imageUrl,
-      price: productPriceForSize(line.product, line.size),
-      size: line.size,
-      quantity: line.quantity
-    } satisfies StoredCartLine))));
-  }, [cart, cartHydrated]);
 
   useEffect(() => {
     const savedReviews = window.localStorage.getItem("sheaWellnessReviews");
@@ -257,6 +225,21 @@ export function CommerceStorefront({
       setReviews(readStoredArray("sheaWellnessReviews") as ProductReview[]);
     }
   }, []);
+
+  useEffect(() => {
+    if (!cartOnly) return;
+    const open = () => setCartOpen(true);
+    window.addEventListener("shea-cart-open", open);
+    return () => window.removeEventListener("shea-cart-open", open);
+  }, [cartOnly]);
+  useEffect(() => {
+    if (!cartOnly || (!cartOpen && !checkoutOpen)) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const dismiss = (event: KeyboardEvent) => { if (event.key === "Escape") { setCartOpen(false); setCheckoutOpen(false); } };
+    window.addEventListener("keydown", dismiss);
+    return () => { document.body.style.overflow = previous; window.removeEventListener("keydown", dismiss); };
+  }, [cartOnly, cartOpen, checkoutOpen]);
 
   const filteredProducts = useMemo(() => {
     const nextProducts = liveProducts.filter((product) => {
@@ -286,15 +269,8 @@ export function CommerceStorefront({
   const displayedProducts = featuredProductLimit ? filteredProducts.slice(0, featuredProductLimit) : filteredProducts;
 
   function addToCart(product: Product, quantity = 1, size = product.sizes[0]) {
-    const selectedProduct = { ...product, price: productPriceForSize(product, size) };
-    setCart((lines) => {
-      const existingIndex = lines.findIndex((line) => line.product.id === product.id && line.size === size);
-      if (existingIndex === -1) {
-        return [...lines, { product: selectedProduct, quantity, size }];
-      }
-      return lines.map((line, index) => (index === existingIndex ? { ...line, quantity: line.quantity + quantity } : line));
-    });
-    setCartOpen(true);
+    addSharedCart(product, size, quantity);
+    openSharedCart();
   }
 
   function toggleWishlist(productId: string) {
@@ -308,7 +284,7 @@ export function CommerceStorefront({
   function updateLine(index: number, quantity: number) {
     setCart((lines) => {
       if (quantity <= 0) return lines.filter((_, lineIndex) => lineIndex !== index);
-      return lines.map((line, lineIndex) => (lineIndex === index ? { ...line, quantity } : line));
+      return lines.map((line, lineIndex) => (lineIndex === index ? { ...line, quantity: Math.min(quantity, Math.max(1, line.product.inventoryQty)) } : line));
     });
   }
 
@@ -399,9 +375,66 @@ export function CommerceStorefront({
     window.location.assign(`/products/${encodeURIComponent(productId)}`);
   }
 
+  if (cartOnly) return (<>
+      <nav className="commerce-mobile-tabs" aria-label="Mobile storefront navigation">
+        <a href="/"><Home size={20} /><span>Home</span></a>
+        <a href="/shop"><Grid2X2 size={20} /><span>Shop</span></a>
+        <button type="button" onClick={() => setCartOpen(true)}>
+          <ShoppingCart size={20} />
+          <span>Cart</span>
+          <b>{cartCount}</b>
+        </button>
+        <button type="button" onClick={() => {
+          setCheckoutOpen(true);
+          setCheckoutStep("information");
+          setCheckoutError("");
+          checkoutRequestId.current = null;
+        }} disabled={cart.length === 0}>
+          <CreditCard size={20} />
+          <span>Checkout</span>
+        </button>
+      </nav>
+
+      {cartOpen && <button type="button" className="shea-cart-scrim" onClick={() => setCartOpen(false)} aria-label="Close shopping cart" />}
+      <CartDrawer
+        cart={cart}
+        open={cartOpen}
+        currency={store.currency}
+        subtotal={subtotal}
+        onClose={() => setCartOpen(false)}
+        onUpdate={updateLine}
+        onCheckout={() => {
+          setCartOpen(false);
+          setCheckoutOpen(true);
+          setCheckoutStep("information");
+          setCheckoutError("");
+          checkoutRequestId.current = null;
+        }}
+      />
+
+      {checkoutOpen ? (
+        <CheckoutFlow
+          step={checkoutStep}
+          setStep={setCheckoutStep}
+          form={checkoutForm}
+          setForm={setCheckoutForm}
+          cart={cart}
+          subtotal={subtotal}
+          shipping={shipping}
+          tax={tax}
+          total={total}
+          currency={store.currency}
+          orderNumber={orderNumber}
+          error={checkoutError}
+          placingOrder={placingOrder}
+          onClose={() => setCheckoutOpen(false)}
+          onPlaceOrder={placeOrder}
+        />
+      ) : null}
+    </>);
+
   return (
     <main className="commerce-site">
-      <SheaGlobalHeader cartCount={cartCount} onCartOpen={() => setCartOpen(true)} searchValue={query} onSearchChange={setQuery} />
 
       {isHomePage ? (
         <>
@@ -480,7 +513,7 @@ export function CommerceStorefront({
             <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
               {mediaVideos.slice(0, 4).map((video) => (
                 <article key={video.src}>
-                  <video src={video.src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
+                  <video src={video.src} controls playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
                   <strong>{video.title}</strong>
                 </article>
               ))}
@@ -736,60 +769,6 @@ export function CommerceStorefront({
       <SheaCommerceFooter />
       <SheaWhatsApp />
 
-      <nav className="commerce-mobile-tabs" aria-label="Mobile storefront navigation">
-        <a href="#top"><Home size={20} /><span>Home</span></a>
-        <a href="/shop"><Grid2X2 size={20} /><span>Shop</span></a>
-        <button type="button" onClick={() => setCartOpen(true)}>
-          <ShoppingCart size={20} />
-          <span>Cart</span>
-          <b>{cartCount}</b>
-        </button>
-        <button type="button" onClick={() => {
-          setCheckoutOpen(true);
-          setCheckoutStep("information");
-          setCheckoutError("");
-          checkoutRequestId.current = null;
-        }} disabled={cart.length === 0}>
-          <CreditCard size={20} />
-          <span>Checkout</span>
-        </button>
-      </nav>
-
-      <CartDrawer
-        cart={cart}
-        open={cartOpen}
-        currency={store.currency}
-        subtotal={subtotal}
-        onClose={() => setCartOpen(false)}
-        onUpdate={updateLine}
-        onCheckout={() => {
-          setCartOpen(false);
-          setCheckoutOpen(true);
-          setCheckoutStep("information");
-          setCheckoutError("");
-          checkoutRequestId.current = null;
-        }}
-      />
-
-      {checkoutOpen ? (
-        <CheckoutFlow
-          step={checkoutStep}
-          setStep={setCheckoutStep}
-          form={checkoutForm}
-          setForm={setCheckoutForm}
-          cart={cart}
-          subtotal={subtotal}
-          shipping={shipping}
-          tax={tax}
-          total={total}
-          currency={store.currency}
-          orderNumber={orderNumber}
-          error={checkoutError}
-          placingOrder={placingOrder}
-          onClose={() => setCheckoutOpen(false)}
-          onPlaceOrder={placeOrder}
-        />
-      ) : null}
     </main>
   );
 }
@@ -812,7 +791,7 @@ function CartDrawer({
   onCheckout: () => void;
 }) {
   return (
-    <aside className={clsx("commerce-drawer", open && "open")} aria-hidden={!open}>
+    <aside className={clsx("commerce-drawer", open && "open")} role="dialog" aria-label="Shopping cart" aria-modal={open ? true : undefined} aria-hidden={!open} inert={!open}>
       <div className="commerce-drawer-head">
         <div>
           <span>Shopping cart</span>
@@ -826,7 +805,7 @@ function CartDrawer({
         {cart.length === 0 ? <p>Your cart is ready for Shea Wellness products.</p> : null}
         {cart.map((line, index) => (
           <article className={isSidewaysSheaProductAsset(line.product.imageUrl) ? "is-rotated" : undefined} key={`${line.product.id}-${line.size}`}>
-            <img className={isSidewaysSheaProductAsset(line.product.imageUrl) ? "shea-rotated-product-image" : undefined} src={line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
+            <img className={isSidewaysSheaProductAsset(line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl) ? "shea-rotated-product-image" : undefined} src={line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
             <div>
               <strong>{line.product.title}</strong>
               <span>{line.size}</span>

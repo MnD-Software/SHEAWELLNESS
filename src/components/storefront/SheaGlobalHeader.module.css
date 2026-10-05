@@ -1,0 +1,28 @@
+.shell { position: sticky; top: 0; z-index: 900; width: 100%; color: #173d2b; background: #f4f6f0; border-bottom: 1px solid #dfe5db; }
+.promo { padding: 8px 16px; background: #10231a; color: #fff; text-align: center; font: 750 10px/1.4 Arial, sans-serif; letter-spacing: .05em; text-transform: uppercase; }
+.bar { display: flex; align-items: center; gap: 24px; max-width: 1440px; min-height: 88px; margin: auto; padding: 14px 28px; }
+.brand { display: flex; align-items: center; flex-shrink: 0; gap: 10px; text-decoration: none; color: inherit; }
+.brand img { width: 54px; height: 54px; object-fit: contain; border-radius: 50%; }
+.brand span { display: grid; gap: 3px; }
+.brand strong { font: 700 26px/1.05 Georgia, serif; }
+.brand small { font: 750 9px/1.3 Arial, sans-serif; letter-spacing: .07em; text-transform: uppercase; color: #6b7b6c; }
+.desktop { display: flex; justify-content: center; gap: 22px; flex: 1; min-width: 0; }
+.desktop a { padding: 12px 0; text-decoration: none; white-space: nowrap; color: inherit; font: 800 11px/1.4 Arial, sans-serif; text-transform: uppercase; border-bottom: 2px solid transparent; }
+.desktop a[aria-current=page] { border-color: #173d2b; }
+.actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.icon, .cart { display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0; width: 42px; height: 42px; padding: 0; border: 1px solid #dce3d9; border-radius: 50%; background: white; color: #173d2b; cursor: pointer; text-decoration: none; }
+.cart { width: auto; min-width: 82px; padding: 0 10px; border-radius: 24px; }
+.cart b { position: static; display: grid; place-items: center; flex-shrink: 0; min-width: 22px; height: 22px; padding: 0 4px; border-radius: 50%; color: white; background: #173d2b; font: 800 11px Arial, sans-serif; }
+.categories { display: none; }
+.search { position: absolute; top: 100%; right: max(12px, calc((100vw - 1384px) / 2)); width: min(480px, calc(100% - 24px)); padding: 16px; border: 1px solid #dce3d9; border-radius: 0 0 20px 20px; background: white; box-shadow: 0 14px 30px #173d2b1a; }
+.search form { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid #dce3d9; border-radius: 12px; }
+.search input { flex: 1; width: 0; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 14px; }
+.search form button { display: grid; place-items: center; width: 36px; height: 36px; border: 0; background: transparent; color: #173d2b; }
+.search > div { display: grid; max-height: 50dvh; overflow-y: auto; }
+.search > div a { display: flex; align-items: center; gap: 12px; padding: 12px 0; color: inherit; text-decoration: none; border-bottom: 1px solid #edf0e9; }
+.search > div span { flex: 1; min-width: 0; display: grid; gap: 5px; }
+.search small { font-size: 12px; line-height: 1.4; color: #6b7b6c; }
+.shell button:focus-visible, .shell a:focus-visible { outline: 3px solid #b4934a; outline-offset: 3px; }
+@media (max-width: 1200px) { .desktop { display: none; } .categories { display: flex; gap: 8px; padding: 8px 20px; overflow-x: auto; scrollbar-width: none; border-top: 1px solid #e5e9e0; } .categories a { flex: 0 0 auto; padding: 8px 14px; border: 1px solid #dce3d9; border-radius: 24px; background: white; color: #173d2b; font: 750 11px/1.3 Arial, sans-serif; text-decoration: none; } .categories a[aria-current=page] { background: #173d2b; color: white; } }
+@media (max-width: 700px) { .bar { min-height: 68px; padding: 10px 12px; gap: 10px; } .brand { gap: 7px; } .brand img { width: 38px; height: 38px; } .brand strong { font-size: 19px; } .brand small { font-size: 7px; letter-spacing: .03em; } .actions { gap: 5px; } .desktopAction { display: none; } .icon { width: 38px; height: 38px; } .cart { min-width: 55px; height: 38px; padding: 0 6px; gap: 3px; } .cart svg { width: 17px; } .cart b { min-width: 18px; height: 18px; font-size: 10px; } .categories { padding: 7px 12px; gap: 6px; } .categories a { padding: 7px 12px; font-size: 10px; } .promo { font-size: 8px; padding: 6px 12px; } }
+@media (max-width: 380px) { .brand strong { font-size: 16px; } .brand small { display: none; } .brand img { width: 32px; height: 32px; } .bar { gap: 6px; padding-inline: 10px; } .actions { gap: 4px; } .icon { width: 36px; height: 36px; } }

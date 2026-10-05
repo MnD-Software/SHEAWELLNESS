@@ -2,10 +2,10 @@
 
 import { Heart, PackageCheck, ReceiptText, ShoppingCart, Star, UserRound } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { readStoredArray } from "@/lib/browser-storage";
+import { useStorefrontCart } from "./StorefrontCart";
 import { sheaBrand } from "@/lib/shea-content";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 
@@ -43,6 +43,7 @@ export function SheaAccountDashboard() {
   const [reviews, setReviews] = useState<AccountReview[]>([]);
   const [cartCount, setCartCount] = useState(0);
   const [reorderMessage, setReorderMessage] = useState("");
+  const sharedCart = useStorefrontCart();
 
   useEffect(() => {
     const savedOrders = readStoredArray("sheaWellnessOrders") as AccountOrder[];
@@ -61,24 +62,16 @@ export function SheaAccountDashboard() {
 
   function reorder(order: AccountOrder) {
     if (!order.items?.length) return;
-    const savedCart = readStoredArray("sheaWellnessCart") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
-    const nextCart = [...savedCart];
     for (const item of order.items) {
-      const existingIndex = nextCart.findIndex((line) => line.productId === item.productId && line.size === item.size);
-      if (existingIndex >= 0) {
-        nextCart[existingIndex] = { ...nextCart[existingIndex], quantity: nextCart[existingIndex].quantity + item.quantity };
-      } else {
-        nextCart.push({ ...item });
-      }
+      const product = sharedCart.products.find(product => product.id === item.productId);
+      if (product) sharedCart.add(product, product.sizes.includes(item.size) ? item.size : product.sizes[0], item.quantity);
     }
-    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(nextCart));
-    setCartCount(nextCart.reduce((total, item) => total + item.quantity, 0));
+    sharedCart.open();
     setReorderMessage(`${order.orderNumber} was added to your cart.`);
   }
 
   return (
     <main className="shea-account-page">
-      <SheaGlobalHeader cartCount={cartCount} />
       <section className="shea-account-hero">
         <div>
           <span>Customer dashboard</span>

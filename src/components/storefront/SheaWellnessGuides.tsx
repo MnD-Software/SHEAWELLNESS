@@ -1,5 +1,4 @@
 import { CheckCircle2, Droplets, Leaf, ShieldCheck, Sparkles } from "lucide-react";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import { productPairings } from "@/lib/shea-website-content";
 
@@ -175,7 +174,6 @@ const guides: Guide[] = [
 export function SheaWellnessGuides() {
   return (
     <main className="shea-page guide-page">
-      <SheaGlobalHeader />
       <section className="guide-hero">
         <span>Care inspired by nature</span>
         <h1>Find the Shea Wellness routine for you.</h1>

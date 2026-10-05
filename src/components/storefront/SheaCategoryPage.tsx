@@ -2,7 +2,6 @@
 
 import { ArrowRight, Grid2X2, ShoppingCart, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { platformSnapshot } from "@/lib/platform-data";
@@ -33,7 +32,6 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
 
   return (
     <main className="shea-category-page">
-      <SheaGlobalHeader cartCount={cartCount} />
 
       <section className="shea-category-hero">
         <div>

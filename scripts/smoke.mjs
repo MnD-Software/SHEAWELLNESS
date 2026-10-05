@@ -26,14 +26,23 @@ if (process.env.SMOKE_ADMIN_KEY) {
   assert.equal((await api.request.post('/api/admin/products', { headers, data: {} })).status(), 400);
 }
 assert.equal((await api.request.post('/api/storefront/enquiries', { data: {} })).status(), 400);
-await Promise.all([320, 390, 768, 1440].map(async width => {
+// Bound memory use on Windows QA machines while retaining the full viewport matrix.
+for (const width of [320, 390, 768, 1440]) {
   const context = await browser.newContext({ viewport: { width, height: 900 }, isMobile: width < 768, hasTouch: width < 768 });
   const page = await context.newPage();
   let errors = [];
   page.on('pageerror', error => errors.push(error.message));
   for (const route of routes) {
     errors = [];
-    const response = await page.goto(base + route, { waitUntil: 'networkidle', timeout: 90000 });
+    const response = await page.goto(base + route, { waitUntil: 'domcontentloaded', timeout: 90000 });
+    if (route !== '/admin') await page.locator('[data-cart-ready="true"]').waitFor();
+    // Streaming media is not a page-readiness signal. Verify the actual visible images.
+    await page.locator('img').evaluateAll(async images => {
+      await Promise.all(images.filter(img => {
+        const box = img.getBoundingClientRect();
+        return box.width > 0 && box.bottom > 0 && box.top < innerHeight;
+      }).map(img => img.decode().catch(() => {})));
+    });
     const overflow = await page.evaluate(() => ({ viewport: innerWidth, body: document.documentElement.scrollWidth }));
     const broken = await page.locator('img').evaluateAll(images => images.filter(img => img.complete && img.naturalWidth === 0 && img.getBoundingClientRect().width > 0).map(img => img.getAttribute('src')));
     const result = { route, width, status: response.status(), overflow, errors: [...errors], broken };
@@ -60,7 +69,7 @@ await Promise.all([320, 390, 768, 1440].map(async width => {
     }
   }
   await context.close();
-}));
+}
 await writeFile('artifacts/smoke/results.json', JSON.stringify(results, null, 2));
 await api.close();
 await browser.close();

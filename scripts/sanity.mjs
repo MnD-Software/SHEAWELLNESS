@@ -7,7 +7,11 @@ page.setDefaultNavigationTimeout(90000);
 const base = process.env.SMOKE_URL || 'http://localhost:3140';
 const errors = [];
 page.on('pageerror', error => errors.push(error.message));
-await page.goto(base, { waitUntil: 'networkidle' });
+async function visit(route = '') {
+  await page.goto(base + route, { waitUntil: 'domcontentloaded' });
+  if (route !== '/admin') await page.locator('[data-cart-ready="true"]').waitFor();
+}
+await visit();
 const carousel = page.locator('[data-live-content]');
 const firstTitle = await carousel.locator('h1').innerText();
 const cdp = await context.newCDPSession(page);
@@ -20,19 +24,19 @@ assert.equal(await carousel.locator('h1').innerText(), firstTitle);
 await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
 await page.locator('.shea-desktop-sidebar.open').waitFor({ state: 'visible' });
 await page.locator('.shea-sidebar-topline').getByRole('button', { name: 'Close site navigation', exact: true }).click();
-await page.goto(base + '/skin', { waitUntil: 'networkidle' });
+await visit('/skin');
 const collection = page.locator('.department-product-carousel');
 const productTitle = await collection.locator('h2').innerText();
 await collection.getByRole('button', { name: 'Next product', exact: true }).click();
 assert.notEqual(await collection.locator('h2').innerText(), productTitle);
 await collection.getByRole('button', { name: 'Previous product', exact: true }).click();
 assert.equal(await collection.locator('h2').innerText(), productTitle);
-await page.goto(base + '/shop', { waitUntil: 'networkidle' });
+await visit('/shop');
 await page.locator('.commerce-product-image').first().click();
-await page.waitForLoadState('networkidle');
+await page.getByRole('button', { name: /Add to cart/i }).first().waitFor();
 await page.getByRole('button', { name: /Add to cart/i }).first().click();
 await page.getByText(/added to cart\./).waitFor();
-await page.goto(base + '/shop?cart=open', { waitUntil: 'networkidle' });
+await visit('/shop?cart=open');
 await page.locator('.commerce-drawer.open').waitFor({ state: 'visible' });
 const checkoutButton = page.locator('.commerce-drawer.open').getByRole('button', { name: 'Checkout', exact: true });
 console.log('Mobile cart opened with the selected product.');
@@ -47,7 +51,7 @@ await page.getByRole('button', { name: 'Place order request', exact: true }).wai
 assert.ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 390);
 await page.screenshot({ path: 'artifacts/smoke/checkout-mobile.png' });
 // Exercise review UI without submitting an extra order; persistence is covered by db-sanity.
-await page.goto(base + '/admin', { waitUntil: 'networkidle' });
+await visit('/admin');
 await page.locator('input[name=accessCode]').fill(process.env.SMOKE_ADMIN_KEY || '');
 await page.getByRole('button', { name: 'Unlock dashboard', exact: true }).click();
 await page.locator('.shea-admin').waitFor({ state: 'visible' });
@@ -59,9 +63,9 @@ for (const label of ['Orders', 'Products', 'Media library', 'Site pages', 'Enqui
   assert.ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 390, 'Admin panel ' + label);
 }
 await page.screenshot({ path: 'artifacts/smoke/admin-mobile.png' });
-await page.goto(base + '/account', { waitUntil: 'networkidle' });
+await visit('/account');
 await page.evaluate(() => ['sheaWellnessCart', 'sheaWellnessWishlist', 'sheaWellnessOrders', 'sheaWellnessReviews', 'sheaWellnessRecentlyViewed'].forEach(key => localStorage.setItem(key, 'bad-json')));
-for (const route of ['/account', '/face', '/shop']) await page.goto(base + route, { waitUntil: 'networkidle' });
+for (const route of ['/account', '/face', '/shop']) await visit(route);
 assert.deepEqual(errors, []);
 await browser.close();
 console.log('PASS: real touch swipe, campaign and collection controls, mobile menu, add-to-cart, checkout through review, all admin panels, and corrupted browser-storage recovery.');

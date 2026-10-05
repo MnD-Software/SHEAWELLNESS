@@ -2,10 +2,10 @@
 
 import { ArrowRight, CheckCircle2, Heart, Leaf, PackageCheck, RotateCcw, ShieldCheck, ShoppingCart, Sparkles, Star, Truck } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { readStoredArray } from "@/lib/browser-storage";
+import { useStorefrontCart } from "./StorefrontCart";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
 import type { Product } from "@/lib/types";
@@ -38,6 +38,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewBody, setReviewBody] = useState("");
   const [cartCount, setCartCount] = useState(0);
+  const sharedCart = useStorefrontCart();
   const [notice, setNotice] = useState("");
   const [wished, setWished] = useState(false);
   const [recentProductIds, setRecentProductIds] = useState<string[]>([]);
@@ -97,14 +98,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
   function addToCart() {
     if (!product) return;
-    const savedCart = readStoredArray("sheaWellnessCart") as StoredCartLine[];
-    const existingIndex = savedCart.findIndex((line) => line.productId === product.id && line.size === size);
-    const nextCart = existingIndex >= 0
-      ? savedCart.map((line, index) => index === existingIndex ? { ...line, quantity: line.quantity + 1 } : line)
-      : [{ productId: product.id, title: product.title, imageUrl: selectedImage, price: productPriceForSize(product, size), size, quantity: 1 }, ...savedCart];
-
-    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(nextCart));
-    setCartCount(nextCart.reduce((total, line) => total + line.quantity, 0));
+    sharedCart.add(product, size);
     setNotice(`${product.title} added to cart.`);
   }
 
@@ -130,7 +124,6 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   if (!product) {
     return (
       <main className="shea-product-page">
-        <SheaGlobalHeader cartCount={cartCount} />
         <section className="shea-product-not-found">
           <span>Product unavailable</span>
           <h1>This Shea Wellness product is not available in this browser.</h1>
@@ -144,7 +137,6 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   return (
     <main className="shea-product-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, image: product.imageUrl, description: product.description, brand: { "@type": "Brand", name: "Shea Wellness" }, aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount }, offers: { "@type": "Offer", priceCurrency: platformSnapshot.activeStore.currency, price: product.price, availability: product.inventoryQty > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } }) }} />
-      <SheaGlobalHeader cartCount={cartCount} />
 
       <section className="shea-product-detail-hero">
         <div className="shea-product-gallery">
@@ -153,7 +145,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
           <div className="shea-product-thumbs">
             <img className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt="" style={{ objectPosition: selectedImagePosition }} />
-            {selectedVideo ? <video src={selectedVideo} autoPlay muted loop playsInline preload="metadata" poster={selectedImage} /> : null}
+            {selectedVideo ? <video src={selectedVideo} controls playsInline preload="none" poster={selectedImage} /> : null}
           </div>
         </div>
 

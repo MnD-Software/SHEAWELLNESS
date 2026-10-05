@@ -31,7 +31,6 @@ import { formatMoney } from "@/lib/format";
 import { platformSnapshot } from "@/lib/platform-data";
 import { ContactForm } from "./ContactForm";
 import type { Product } from "@/lib/types";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import { partnerLogos } from "@/lib/shea-website-content";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
@@ -118,7 +117,6 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
 
   return (
     <main className={`shea-page shea-page-${kind}`}>
-      <SheaGlobalHeader />
       <section className="shea-page-hero">
         <div>
           <span>{meta.eyebrow}</span>

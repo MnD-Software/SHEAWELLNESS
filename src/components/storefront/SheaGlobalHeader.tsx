@@ -4,9 +4,12 @@ import { ArrowRight, Gift, Heart, Home, Menu, Search, ShoppingBag, ShoppingCart,
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { sheaBrand } from "@/lib/shea-content";
-import { platformSnapshot } from "@/lib/platform-data";
+import type { Product } from "@/lib/types";
+import { useStorefrontCart } from "./StorefrontCart";
+import styles from "./SheaGlobalHeader.module.css";
 
 type SheaGlobalHeaderProps = {
+  products?: Product[];
   cartCount?: number;
   onCartOpen?: () => void;
   searchValue?: string;
@@ -50,7 +53,8 @@ const sidebarLinks = [
   { label: "Contact", href: "/contact", icon: UserRound }
 ];
 
-export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchChange }: SheaGlobalHeaderProps) {
+export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }: SheaGlobalHeaderProps) {
+  const { count, open, ready } = useStorefrontCart();
   const pathname = usePathname();
   const [localSearch, setLocalSearch] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -59,7 +63,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
   const value = searchValue ?? localSearch;
   const searchTerm = value.trim().toLowerCase();
   const searchResults = [
-    ...platformSnapshot.products.map((product) => ({
+    ...products.filter(product => ["active", "low_stock"].includes(product.status)).map((product) => ({
       label: product.title,
       href: `/shop?search=${encodeURIComponent(product.title)}`,
       body: `${product.category} - ${product.description}`
@@ -91,19 +95,7 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
     window.location.href = term ? `/shop?search=${encodeURIComponent(term)}` : "/shop";
   }
 
-  const cartAction = onCartOpen ? (
-    <button type="button" className="shea-nav-cart" onClick={onCartOpen}>
-      <ShoppingCart size={18} />
-      <span>Cart</span>
-      <b>{cartCount ?? 0}</b>
-    </button>
-  ) : (
-    <a className="shea-nav-cart" href="/shop?cart=open">
-      <ShoppingCart size={18} />
-      <span>Cart</span>
-      <b>{cartCount ?? 0}</b>
-    </a>
-  );
+
 
   return (
     <>
@@ -152,79 +144,31 @@ export function SheaGlobalHeader({ cartCount, onCartOpen, searchValue, onSearchC
       </div>
     </aside>
 
-    <header className="shea-nav-shell">
-      <div className="shea-nav-promo">
-        <span className="promo-full">100% natural ingredients. Ethically sourced Nilotica shea. Export-ready quality.</span>
-        <span className="promo-short">100% natural. Nilotica shea. Export-ready.</span>
-      </div>
-      <div className="shea-nav-bar">
-        <div className="shea-nav-left">
-          <a className="shea-nav-brand" href="/" aria-label={`${sheaBrand.name} home`}>
-            <img src="/assets/website-edits/shea-wellness-logo.jpg" alt={sheaBrand.name} />
-            <span className="shea-nav-brand-wordmark"><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
-          </a>
-        </div>
-
-        <nav className="shea-nav-desktop" aria-label="Primary navigation">
-          {primaryLinks.map((item) => (
-            <a href={item.href} className={pathname.startsWith(item.href.split("?")[0].split("#")[0]) ? "active" : undefined} key={item.label}>{item.label}</a>
-          ))}
+    <header className={styles.shell} data-testid="global-header" data-cart-ready={ready}>
+      <div className={styles.promo}>100% natural. Ethically sourced Nilotica shea.</div>
+      <div className={styles.bar}>
+        <a className={styles.brand} href="/" aria-label={sheaBrand.name + " home"}>
+          <img src="/assets/website-edits/shea-wellness-logo.jpg" alt={sheaBrand.name} width={54} height={54} />
+          <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
+        </a>
+        <nav className={styles.desktop} aria-label="Primary navigation">
+          {primaryLinks.map(item => <a href={item.href} key={item.label} aria-current={pathname.startsWith(item.href) ? "page" : undefined}>{item.label}</a>)}
         </nav>
-
-        <div className="shea-nav-actions">
-          <button type="button" className="shea-nav-search-button" onClick={() => setSearchOpen((open) => !open)} aria-label="Search Shea Wellness">
-            <Search size={18} />
-          </button>
-          <a href="/account" aria-label="Open customer account"><UserRound size={18} /></a>
-          <a href="/shop" aria-label="Wishlist"><Heart size={18} /></a>
-          {cartAction}
-          <button
-            type="button"
-            className="shea-nav-menu-button"
-            onClick={() => setMobileOpen((open) => !open)}
-            aria-expanded={mobileOpen}
-            aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
-          >
-            {mobileOpen ? <X size={19} /> : <Menu size={21} />}
-          </button>
+        <div className={styles.actions}>
+          <button type="button" className={styles.icon} onClick={() => setSearchOpen(value => !value)} aria-label="Search Shea Wellness" aria-expanded={searchOpen}><Search size={19} /></button>
+          <a className={styles.icon + " " + styles.desktopAction} href="/account" aria-label="Open customer account"><UserRound size={19} /></a>
+          <a className={styles.icon + " " + styles.desktopAction} href="/shop" aria-label="Wishlist"><Heart size={19} /></a>
+          <button type="button" className={styles.cart} onClick={open} aria-label={"Open cart, " + count + " items"} data-testid="header-cart"><ShoppingCart size={19} /><b>{count}</b></button>
+          <button type="button" className={styles.icon} onClick={() => setMobileOpen(value => !value)} aria-expanded={mobileOpen} aria-label={mobileOpen ? "Close navigation" : "Open navigation"}>{mobileOpen ? <X size={19} /> : <Menu size={21} />}</button>
         </div>
-
-        <button type="button" className="shea-nav-search-button mobile-action" onClick={() => setSearchOpen((open) => !open)} aria-label="Search Shea Wellness">
-          <Search size={19} />
-        </button>
       </div>
-
-      <nav className="shea-mobile-category-nav" aria-label="Product categories">
-        {primaryLinks.map((item) => <a href={item.href} key={item.label}>{item.label}</a>)}
+      <nav className={styles.categories} aria-label="Product categories">
+        {primaryLinks.map(item => <a href={item.href} key={item.label} aria-current={pathname.startsWith(item.href) ? "page" : undefined}>{item.label}</a>)}
       </nav>
-
-      {searchOpen ? (
-        <section className="shea-nav-search-panel" aria-label="Search Shea Wellness">
-          <form className="shea-nav-search expanded" onSubmit={submitSearch}>
-            <Search size={18} />
-            <input
-              autoFocus
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-              placeholder="Search products, pages, wholesale, quality..."
-              aria-label="Search products, pages, wholesale, quality"
-            />
-            <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18} /></button>
-          </form>
-          <div className="shea-nav-search-results">
-            {searchResults.map((item) => (
-              <a href={item.href} key={`${item.href}-${item.label}`}>
-                <span>
-                  <strong>{item.label}</strong>
-                  <small>{item.body}</small>
-                </span>
-                <ArrowRight size={16} />
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
+      {searchOpen && <section className={styles.search} aria-label="Search Shea Wellness">
+        <form onSubmit={submitSearch}><Search size={18} /><input autoFocus value={value} onChange={event => setValue(event.target.value)} placeholder="Search products and pages" aria-label="Search products, pages, wholesale, quality" /><button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search"><X size={18} /></button></form>
+        <div>{searchResults.map(item => <a href={item.href} key={item.href + item.label}><span><strong>{item.label}</strong><small>{item.body}</small></span><ArrowRight size={16} /></a>)}</div>
+      </section>}
     </header>
     </>
   );

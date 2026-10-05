@@ -58,7 +58,8 @@ export function SheaMotion() {
       observer.observe(target);
     });
 
-    const heroImages = Array.from(document.querySelectorAll<HTMLElement>(".commerce-hero-card img, .shea-category-hero img, .shea-product-main-image img"));
+    // Never replace orientation transforms or animate product photography on phones.
+    const heroImages = window.matchMedia("(max-width: 900px)").matches ? [] : Array.from(document.querySelectorAll<HTMLElement>(".commerce-hero-card img:not(.shea-rotated-product-image), .shea-category-hero img:not(.shea-rotated-product-image), .shea-product-main-image img:not(.shea-rotated-product-image)"));
     function moveImages() {
       const scroll = window.scrollY;
       heroImages.forEach((image) => {

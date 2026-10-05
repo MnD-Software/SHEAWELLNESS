@@ -1,12 +1,10 @@
 import { ArrowRight, MessageCircle, Search } from "lucide-react";
 import { faqGroups } from "@/lib/shea-website-content";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 
 export function SheaFaqPage() {
   return (
     <main className="shea-faq-page">
-      <SheaGlobalHeader />
       <section className="shea-faq-hero">
         <span>Frequently asked questions</span>
         <h1>Answers for your routine, order and delivery.</h1>

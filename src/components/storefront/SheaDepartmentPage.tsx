@@ -2,9 +2,9 @@
 
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, ShoppingBag, ShoppingCart, Sparkles, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 import { platformSnapshot } from "@/lib/platform-data";
 import { readStoredArray } from "@/lib/browser-storage";
+import { useStorefrontCart } from "./StorefrontCart";
 import { formatMoney, productPriceForSize } from "@/lib/format";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import type { Product } from "@/lib/types";
@@ -62,6 +62,7 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
   const content = departmentContent[kind];
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [cartCount, setCartCount] = useState(0);
+  const sharedCart = useStorefrontCart();
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [wishlist, setWishlist] = useState<string[]>([]);
 
@@ -97,17 +98,12 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
   }
 
   function quickAdd(product: Product) {
-    const saved = readStoredArray("sheaWellnessCart") as Array<{ productId: string; title: string; imageUrl: string; price: number; size: string; quantity: number }>;
-    const size = product.sizes[0] ?? "One size";
-    const index = saved.findIndex((line) => line.productId === product.id && line.size === size);
-    const next = index >= 0 ? saved.map((line, itemIndex) => itemIndex === index ? { ...line, quantity: line.quantity + 1 } : line) : [{ productId: product.id, title: product.title, imageUrl: product.imageUrl, price: productPriceForSize(product, size), size, quantity: 1 }, ...saved];
-    window.localStorage.setItem("sheaWellnessCart", JSON.stringify(next));
-    setCartCount(next.reduce((total, line) => total + line.quantity, 0));
+    sharedCart.add(product, product.sizes[0] ?? "One size");
+    sharedCart.open();
   }
 
   return (
     <main className={`shea-department-page department-${kind}`}>
-      <SheaGlobalHeader cartCount={cartCount} />
       <section className="department-hero">
         <div><span>{content.eyebrow}</span><h1>{content.title}</h1><p>{content.intro}</p><div><a href="#department-products">Shop this collection <ArrowRight size={17} /></a><a className="secondary" href="/wellness-guides">Read care guides</a></div></div>
         <div className="department-product-carousel shea-carousel-shell" aria-label={`${content.eyebrow} product carousel`}>

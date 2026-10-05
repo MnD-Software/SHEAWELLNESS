@@ -1,6 +1,5 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
-import { SheaGlobalHeader } from "@/components/storefront/SheaGlobalHeader";
 
 const content = {
   policies: { eyebrow: "Customer care", title: "Clear, fair shopping policies.", intro: "We want every Shea Wellness order to feel simple and transparent.", sections: [["Purchases", "Product availability and pricing are shown before you place an order. Delivery details are confirmed after the destination is reviewed."], ["Product care", "Store natural products in a cool, dry place and follow the directions supplied with each item."], ["Support", "Contact us promptly if an order arrives damaged, incomplete, or different from what you ordered."]] },
@@ -11,5 +10,5 @@ const content = {
 
 export function SheaPolicyPage({ kind }: { kind: keyof typeof content }) {
   const page = content[kind];
-  return <main className="shea-policy-page"><SheaGlobalHeader /><section className="shea-policy-hero"><span>{page.eyebrow}</span><h1>{page.title}</h1><p>{page.intro}</p><a href="/contact">Contact our team <ArrowRight size={17} /></a></section><section className="shea-policy-cards">{page.sections.map(([title, body]) => <article key={title}><CheckCircle2 size={20} /><h2>{title}</h2><p>{body}</p></article>)}</section><SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp /></main>;
+  return <main className="shea-policy-page"><section className="shea-policy-hero"><span>{page.eyebrow}</span><h1>{page.title}</h1><p>{page.intro}</p><a href="/contact">Contact our team <ArrowRight size={17} /></a></section><section className="shea-policy-cards">{page.sections.map(([title, body]) => <article key={title}><CheckCircle2 size={20} /><h2>{title}</h2><p>{body}</p></article>)}</section><SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp /></main>;
 }
