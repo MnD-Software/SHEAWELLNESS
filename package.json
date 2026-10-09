@@ -17,7 +17,8 @@
     "test:chrome": "node scripts/chrome-sanity.mjs",
     "test:database": "node scripts/db-sanity.mjs",
     "test:refinements": "node scripts/refinement-sanity.mjs",
-    "test:chunks": "node scripts/chunk-media-sanity.mjs"
+    "test:chunks": "node scripts/chunk-media-sanity.mjs",
+    "test:media-picker": "node scripts/media-picker-sanity.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

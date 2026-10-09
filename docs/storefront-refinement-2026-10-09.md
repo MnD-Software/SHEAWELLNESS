@@ -12,6 +12,8 @@ Select library items to add them to a homepage carousel, before-and-after rail, 
 
 In **Products**, use **Choose from media library**, **Choose variation image**, and **Add image to gallery**. Remove gallery images with their thumbnail buttons. Select the correct size photo rather than assigning an unverified jar size.
 
+The image chooser scrolls through thumbnails at their full card height. Every image fits inside its thumbnail without cropping; captions remain visible. **Preview full image** opens a large, fitted view with **Use this image** and **Open original** actions. Escape closes the preview before closing the chooser.
+
 If a file upload fails, use **Retry / resume uploads**. If uploads succeed but saving fails, use **Save uploaded files**; this preserves the already-uploaded URLs and retries only the library save.
 
 Limits: 100 files / 200 MB extracted per batch; ZIP 100 MB; images 10 MB; videos 25 MB; PDFs 20 MB. JPG, PNG, WebP, GIF, AVIF, MP4, WebM, MOV and PDF are supported. Exports and originals remain available through Preview.
@@ -29,3 +31,5 @@ Stock and publication states are preserved. Supplied size prices remain authorit
 Use `npm run build`, `npm run typecheck`, and the `test:smoke`, `test:sanity`, `test:chrome`, `test:layout`, `test:media`, `test:owner-media`, `test:refinements`, `test:database`, and `test:chunks` scripts. Set `SMOKE_URL` to the running production build. `QA_BROWSER_PATH` chooses an installed H.264-capable Chrome/Edge browser; `QA_BROWSER_ENGINE=webkit` selects Safari layout coverage. QA browser screenshots and results are written under ignored `artifacts/`.
 
 The refinement test isolates bulk library writes with browser fixtures, tests ZIP duplicate filtering, upload/save recovery, reload, placements/removal, carousel controls, responsive cards and variation/cart prices. Database tests create temporary records and remove them in finally blocks. Chunk tests upload a real 7.8 MB PDF and 4.2 MB MP4, retrieve the exact PDF, validate video metadata, ranges, missing-part rejection and retry behavior, then remove only their own records.
+
+`test:media-picker` checks every image across every chooser page at 320, 390, 768 and 1832 pixels, verifies complete thumbnails and captions, exercises portrait, landscape and logo previews, and selects an image without saving a product change. Run it with Chromium/Edge and WebKit. Uploaded video/PDF responses bypass CDN caching so byte-range requests reach the media endpoint; static storefront assets retain their normal CDN behavior.

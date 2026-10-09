@@ -20,7 +20,8 @@ export async function GET(request: NextRequest) {
     const headers = {
         "content-type": image.contentType,
         "content-disposition": `inline; filename="${image.filename}"`,
-        "cache-control": "public, max-age=31536000, immutable",
+        "cache-control": image.contentType.startsWith("image/") ? "public, max-age=31536000, immutable" : "private, no-store",
+        "vercel-cdn-cache-control": "no-store",
         "accept-ranges": "bytes"
     };
     const range = request.headers.get('range');

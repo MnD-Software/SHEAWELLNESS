@@ -1123,7 +1123,8 @@ function MediaLibraryPicker({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [page, setPage] = useState(0);
-  const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image").map((asset) => [asset.src, asset])).values());
+  const [preview, setPreview] = useState<SheaMediaAsset | SheaHeroSlide | null>(null);
+  const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image" && asset.src).map((asset) => [asset.src, asset])).values());
   const visibleAssets = uniqueAssets.filter((asset) => `${asset.title} ${asset.tag}`.toLowerCase().includes(search.trim().toLowerCase()));
   const pageSize = 24;
   const pageCount = Math.max(1, Math.ceil(visibleAssets.length / pageSize));
@@ -1134,11 +1135,11 @@ function MediaLibraryPicker({
 
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") { if (preview) setPreview(null); else onClose(); }
     }
     window.addEventListener("keydown", closeOnEscape);
     return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [onClose]);
+  }, [onClose, preview]);
 
   return (
     <div className="shea-media-picker-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
@@ -1155,11 +1156,14 @@ function MediaLibraryPicker({
         {uploadError ? <p className="shea-media-picker-error" role="alert">{uploadError}</p> : null}
         <div className="shea-media-picker-grid">
           {isLoading ? <p className="shea-media-picker-loading">Loading your saved media library…</p> : pageAssets.map((asset) => (
-            <button type="button" key={asset.src} className={clsx(asset.src === selectedSrc && "selected")} onClick={() => onSelect(asset.src)} title={asset.title}>
-              <StorefrontImage src={asset.src} alt={asset.title} loading="lazy" decoding="async" />
+            <article key={asset.src} className={clsx("media-picker-card", asset.src === selectedSrc && "selected")}>
+              <button className="media-picker-image" type="button" onClick={() => onSelect(asset.src)} aria-label={`Choose ${asset.title}`} title={asset.title}>
+                <StorefrontImage src={asset.src} alt={asset.alt || asset.title} loading="lazy" decoding="async" />
+              </button>
               <span>{asset.title}</span>
               <small>{mediaFilename(asset.src)}</small>
-            </button>
+              <button className="media-picker-preview-button" type="button" onClick={() => setPreview(asset)} aria-label={`Preview ${asset.title}`}>Preview full image</button>
+            </article>
           ))}
         </div>
         {!isLoading && visibleAssets.length > pageSize ? <footer className="shea-media-picker-pagination">
@@ -1168,6 +1172,11 @@ function MediaLibraryPicker({
           <button type="button" onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))} disabled={currentPage >= pageCount - 1}>Next</button>
         </footer> : null}
         {!isLoading && !visibleAssets.length ? <div className="shea-admin-empty"><Image size={28} /><strong>No images found</strong><p>Upload an image or try a different search.</p></div> : null}
+        {preview && <div className="media-picker-full-preview" role="region" aria-label="Full image preview">
+          <header><h3>{preview.title}</h3><button type="button" onClick={() => setPreview(null)} aria-label="Close full image preview" autoFocus>×</button></header>
+          <div><StorefrontImage src={preview.src} alt={preview.alt || preview.title} /></div>
+          <footer><button type="button" onClick={() => onSelect(preview.src)}>Use this image</button><a href={preview.src} target="_blank" rel="noreferrer">Open original</a></footer>
+        </div>}
       </section>
     </div>
   );
