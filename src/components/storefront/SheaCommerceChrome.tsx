@@ -27,7 +27,7 @@ export function SheaCommerceFooter() {
       </div>
       <div className="shea-commerce-footer-grid">
         <div className="shea-commerce-footer-brand">
-          <a className="shea-footer-logo" href="/" aria-label="Shea Wellness home"><img src="/assets/shea-wellness-tree-logo.jpeg" alt="Shea Wellness" /></a>
+          <a className="shea-footer-logo" href="/" aria-label="Shea Wellness home"><b className="shea-wordmark" aria-hidden="true">S</b></a>
           <div><strong>Shea Wellness Ltd</strong><small>Care inspired by nature</small></div>
           <p>Natural skin, face, hair, and spa care rooted in African botanical heritage.</p>
           <span><PackageCheck size={16} /> Made in Kenya</span>

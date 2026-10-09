@@ -28,7 +28,8 @@ const revealSelectors = [
 export function SheaMotion() {
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) return;
+    // Phone and tablet content should be visible immediately during scrolling.
+    if (reduceMotion || window.matchMedia("(max-width: 900px)").matches) return;
 
     const targets = Array.from(document.querySelectorAll<HTMLElement>(revealSelectors.join(",")));
 

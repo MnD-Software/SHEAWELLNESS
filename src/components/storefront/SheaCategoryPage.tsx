@@ -1,5 +1,6 @@
 "use client";
 
+import { StorefrontImage } from "./StorefrontImage";
 import { ArrowRight, Grid2X2, ShoppingCart, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { formatMoney } from "@/lib/format";
@@ -41,7 +42,7 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
           <a href="/shop">All products <ArrowRight size={18} /></a>
         </div>
         <figure className={isSidewaysSheaProductAsset(heroProduct.imageUrl) ? "is-rotated" : undefined}>
-          <img className={isSidewaysSheaProductAsset(heroProduct.imageUrl) ? "shea-rotated-product-image" : undefined} src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
+          <StorefrontImage className={isSidewaysSheaProductAsset(heroProduct.imageUrl) ? "shea-rotated-product-image" : undefined} src={heroProduct.imageUrl} alt={heroProduct.title} style={{ objectPosition: heroProduct.imagePosition }} />
         </figure>
       </section>
 
@@ -63,7 +64,7 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
           {categoryProducts.map((product) => (
             <article key={product.id}>
               <a className={isSidewaysSheaProductAsset(product.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(product.id)}`}>
-                <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
+                <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
               </a>
               <div>
                 <span>{product.category}</span>

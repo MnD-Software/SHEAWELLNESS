@@ -1,5 +1,6 @@
 "use client";
 
+import { StorefrontImage } from "./StorefrontImage";
 import {
   ArrowRight,
   Award,
@@ -128,7 +129,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
           </div>
         </div>
         <figure>
-          <img src={meta.image} alt={kind === "about" ? "Shea Wellness founder seated in front of a fireplace" : `${meta.title} by Shea Wellness`} />
+          <StorefrontImage src={meta.image} alt={kind === "about" ? "Shea Wellness founder seated in front of a fireplace" : `${meta.title} by Shea Wellness`} />
           {kind === "about" ? <figcaption className="shea-founder-caption"><span>Shea Wellness Ltd</span><strong>Care Inspired by Nature</strong></figcaption> : <figcaption className="shea-page-hero-caption"><span>Shea Wellness</span><strong>Natural care, clearly guided</strong></figcaption>}
         </figure>
       </section>
@@ -292,7 +293,7 @@ function AboutSections() {
     <section className="shea-complete-story">
       <header><span>Our story</span><h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2></header>
       <div className="shea-story-opening">
-        <img src="/assets/website-edits/community-impact.png" alt="Women celebrating Shea Wellness community impact" />
+        <StorefrontImage src="/assets/website-edits/community-impact.png" alt="Women celebrating Shea Wellness community impact" />
         <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
       </div>
 
@@ -352,7 +353,7 @@ function ProductsSections({ products, currency }: { products: Product[]; currenc
               <div className="shea-product-list">
                 {categoryProducts.map((product) => (
                   <article className={`shea-product-detail-card${isSidewaysSheaProductAsset(product.imageUrl) ? " is-rotated" : ""}`} key={product.id}>
-                    <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
+                    <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
                     <div>
                       <strong>{product.title}</strong>
                       <p>{product.description}</p>
@@ -378,7 +379,7 @@ function WholesaleSections() {
     <>
       <section className="shea-partners-section">
         <header><span>Our partners</span><h2>Trusted across hospitality, retail, trade and wellness.</h2><p>Shea Wellness has built relationships with organisations and destinations in Kenya, Africa and beyond.</p></header>
-        <div>{partnerLogos.map(([name, file]) => <figure key={name}><img src={`/assets/partners/${file}`} alt={`${name} logo`} loading="lazy" /><figcaption>{name}</figcaption></figure>)}</div>
+        <div>{partnerLogos.map(([name]) => <figure key={name}><strong>{name}</strong><figcaption>{name}</figcaption></figure>)}</div>
       </section>
       <section className="shea-split-section">
         <div>
@@ -437,7 +438,7 @@ function BlogSections() {
     <>
       <section className="shea-blog-editorial">
         <article className="shea-blog-feature">
-          <video src={sheaVideos[2].src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
+          <video src={sheaVideos[2].src} autoPlay muted loop playsInline preload="metadata" />
           <div>
             <span>Cinematic feature</span>
             <h2>The Shea Wellness routine: cleanse, nourish, seal, and glow.</h2>
@@ -469,7 +470,7 @@ function BlogSections() {
         <div className="shea-story-grid">
           {sheaEditorialStories.map((story) => (
             <article key={story.title}>
-              <img className={isSidewaysSheaProductAsset(story.image) ? "shea-rotated-product-image" : undefined} src={story.image} alt="" />
+              <StorefrontImage className={isSidewaysSheaProductAsset(story.image) ? "shea-rotated-product-image" : undefined} src={story.image} alt="" />
               <div>
                 <span>{story.category} - {story.readTime}</span>
                 <strong>{story.title}</strong>
@@ -508,7 +509,7 @@ function BlogSections() {
         <div className="shea-blog-grid">
           {sheaBlogTopics.map((topic, index) => (
             <article key={topic}>
-              <img
+              <StorefrontImage
                 src={[
                   "/assets/sheawellness/pure-raw-shea-butter.jpeg",
                   "/assets/sheawellness/pure-raw-shea-butter.jpeg",
@@ -543,7 +544,7 @@ function LivingPageSection({ kind }: { kind: SheaPageKind }) {
   return (
     <section className="shea-living-section">
       <figure>
-        <img src={copy.image} alt="" loading="lazy" />
+        <StorefrontImage src={copy.image} alt="" loading="lazy" />
         <figcaption><span>Shea Wellness</span><strong>Care inspired by nature</strong></figcaption>
       </figure>
       <div>
@@ -630,7 +631,7 @@ function CatalogueSections() {
         <div className="shea-video-slider">
           {sheaVideos.map((video) => (
             <article key={video.src}>
-              <video src={video.src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
+              <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
               <strong>{video.title}</strong>
             </article>
           ))}
@@ -651,7 +652,7 @@ function VideoShowcase({ title, body }: { title: string; body: string }) {
       <div className="shea-video-slider featured">
         {sheaVideos.slice(0, 3).map((video) => (
           <article key={video.src}>
-            <video src={video.src} autoPlay muted loop playsInline preload="metadata" poster="/assets/shea-wellness-tree-logo.jpeg" />
+            <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
             <strong>{video.title}</strong>
           </article>
         ))}

@@ -1,3 +1,4 @@
+import { StorefrontImage } from "@/components/storefront/StorefrontImage";
 import { formatMoney } from "@/lib/format";
 import type { Product, Store, ThemeLayout, ThemeSection } from "@/lib/types";
 
@@ -72,7 +73,7 @@ function ThemeSectionRenderer({
           </div>
         </div>
         <figure className="store-hero-media">
-          <img src={section.settings.mediaUrl} alt="Premium product collection" />
+          <StorefrontImage src={section.settings.mediaUrl} alt="Premium product collection" />
         </figure>
       </section>
     );
@@ -112,7 +113,7 @@ function ThemeSectionRenderer({
           {featuredProducts.map((product) => (
             <article key={product.id} className="store-product">
               <div className="product-art">
-                <img src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
+                <StorefrontImage src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
                 <span>{product.badge}</span>
               </div>
               <div>
@@ -132,7 +133,7 @@ function ThemeSectionRenderer({
     return (
       <section className="editorial-split">
         <div className="editorial-visual">
-          <img src="/assets/storefront-hero.png" alt="Curated ecommerce merchandising scene" />
+          <StorefrontImage src="/assets/storefront-hero.png" alt="Curated ecommerce merchandising scene" />
         </div>
         <div className="editorial-copy">
           <span className="store-kicker">{section.settings.kicker}</span>

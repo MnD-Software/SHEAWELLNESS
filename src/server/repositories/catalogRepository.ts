@@ -45,7 +45,7 @@ export class NeonCatalogRepository implements CatalogRepository {
       ...product,
       category: product.category ?? "New arrival",
       badge: product.badge ?? "Draft",
-      imageUrl: product.imageUrl ?? "/assets/storefront-hero.png",
+      imageUrl: product.imageUrl ?? "",
       imagePosition: product.imagePosition ?? "50% 50%",
       rating: product.rating ?? 0,
       reviewCount: product.reviewCount ?? 0,

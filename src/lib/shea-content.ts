@@ -1,3 +1,5 @@
+import { clearPresetImage } from "./shea-media";
+
 export const sheaBrand = {
   name: "Shea Wellness LTD",
   headline: "Pure Nilotica Shea. Modern Wellness.",
@@ -31,160 +33,32 @@ export type SheaMediaConfig = {
   videos: SheaMediaAsset[];
 };
 
-const retiredSyntheticImages: Record<string, string> = {
-  "/assets/shea-hero.png": "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-  "/assets/shea-essential-oils.png": "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
-  "/assets/shea-chebe-haircare.png": "/assets/sheawellness/pure-raw-shea-butter.jpeg",
-  "/assets/shea-body-butter.png": "/assets/sheawellness/lavender-shea-butter-front.jpeg",
-  "/assets/shea-black-soap.png": "/assets/website-edits/black-soap-collection.jpg",
-  "/assets/sheawellness/face-care-routine.png": "/assets/website-edits/facial-oils.jpg",
-  "/assets/sheawellness/face-care-routine-hero.png": "/assets/website-edits/facial-oils.jpg"
-};
-
-const legacyMediaPathPrefixes = ["/assets/WhatsApp Image ", "/assets/WhatsApp Video "];
-
-// Older deployments imported every received WhatsApp and August media file
-// into the editable library. Those generated identifiers are not an editorial
-// choice and caused retired imagery to return whenever the persisted content
-// record was read again.
-const legacyBulkMediaId = /^(?:product_image_\d+|august_2026_(?:image|video)_\d+|images_\d+|page_image_\d+)$/;
-
+// Retired presets stay empty on every read; owner uploads remain authoritative.
 export function isLegacySheaMediaPath(src: string) {
-  return legacyMediaPathPrefixes.some((prefix) => src.startsWith(prefix));
+  return src.startsWith("/assets/WhatsApp Image ") || src.startsWith("/assets/WhatsApp Video ");
 }
-
-export function replaceRetiredSyntheticImage(src: string) {
-  return retiredSyntheticImages[src] ?? src;
-}
-
-function sanitizeMediaAssets<T extends SheaMediaAsset>(assets: T[]) {
-  return assets.flatMap((asset) => {
-    const src = typeof asset?.src === "string" ? replaceRetiredSyntheticImage(asset.src) : "";
-    return src && !isLegacySheaMediaPath(src) ? [{ ...asset, src }] : [];
-  });
-}
-
-function isLegacyBulkMediaAsset(asset: SheaMediaAsset) {
-  return legacyBulkMediaId.test(asset.id);
-}
-
-function mergeCuratedMedia<T extends SheaMediaAsset>(defaults: T[], saved: T[]) {
-  const defaultIds = new Set(defaults.map((asset) => asset.id));
-  const defaultSources = new Set(defaults.map((asset) => asset.src));
-  const retainedSaved = saved.filter((asset) => (
-    !isLegacyBulkMediaAsset(asset)
-    && !defaultIds.has(asset.id)
-    && !defaultSources.has(asset.src)
-  ));
-
-  return [...defaults, ...retainedSaved];
-}
-
+export function replaceRetiredSyntheticImage(src: string) { return clearPresetImage(src); }
 export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfig {
   const heroSlides = Array.isArray(config?.heroSlides) ? config.heroSlides : [];
   const images = Array.isArray(config?.images) ? config.images : [];
   const videos = Array.isArray(config?.videos) ? config.videos : [];
-
-  const safeHeroSlides = sanitizeMediaAssets(heroSlides);
-  const safeImages = sanitizeMediaAssets(images);
-  const safeVideos = sanitizeMediaAssets(videos);
-  const includesLegacyBulkImport = [...safeHeroSlides, ...safeImages, ...safeVideos].some(isLegacyBulkMediaAsset);
-
-  if (includesLegacyBulkImport) {
-    return {
-      // Restore the concise, approved storefront media instead of exposing the
-      // historic bulk library. Explicitly added media is retained when it does
-      // not collide with an approved source or a retired generated identifier.
-      heroSlides: mergeCuratedMedia(sheaHeroSlides, safeHeroSlides),
-      images: mergeCuratedMedia(sheaImageMedia, safeImages),
-      videos: mergeCuratedMedia(sheaVideos, safeVideos)
-    };
-  }
-
   return {
-    heroSlides: sanitizeMediaAssets(heroSlides),
-    // An empty collection is a valid editorial decision. Do not merge defaults
-    // back into saved content, otherwise deleted media returns on the next load.
-    images: sanitizeMediaAssets(images),
-    videos: sanitizeMediaAssets(videos)
+    heroSlides: heroSlides.filter(asset => asset && typeof asset.id === "string").map(asset => {
+      const preset = sheaHeroSlides.find(slide => slide.id === asset.id);
+      const src = clearPresetImage(asset.src);
+      return preset && asset.src && !src ? { ...preset } : { ...asset, src };
+    }),
+    images: images.flatMap(asset => { const src = clearPresetImage(asset?.src); return src ? [{ ...asset, src }] : []; }),
+    videos: videos.filter(asset => asset && typeof asset.src === "string" && asset.src && !isLegacySheaMediaPath(asset.src))
   };
 }
-
 export const sheaHeroSlides: SheaHeroSlide[] = [
-  {
-    id: "skin_hair_face_spa",
-    title: "SKIN CARE. HAIR CARE. FACE CARE. SPA ESSENTIALS",
-    kicker: "Complete natural care",
-    body: "Shea Wellness believes healthy skin begins with nature.",
-    src: "/assets/website-edits/black-soap-routine.jpg",
-    type: "image",
-    tag: "Routine Guide",
-    ctaLabel: "Shop routines",
-    ctaHref: "/shop",
-    objectPosition: "50% 50%"
-  },
-  {
-    id: "sensitive_skin_safe",
-    title: "Natural Products for Problematic Skin Concerns.",
-    kicker: "Nature-led solutions",
-    body: "Gentle routines designed to cleanse, nourish, moisturize, and protect the skin's natural barrier.",
-    src: "/assets/website-edits/spa-facial.jpg",
-    type: "image",
-    tag: "Skin Care",
-    ctaLabel: "View skin care",
-    ctaHref: "/collections/skin-care",
-    objectPosition: "50% 50%"
-  },
-  {
-    id: "face_care_collection",
-    title: "Eczema, Psoriasis, Hyperpigmentation, Stretch Marks, Acne, Dark Marks.",
-    kicker: "Care by concern",
-    body: "Explore practical face, skin, hair, and body routines with clear product guidance.",
-    src: "/assets/website-edits/facial-oils.jpg",
-    type: "image",
-    tag: "Face Care",
-    ctaLabel: "Explore face care",
-    ctaHref: "/collections/face-care",
-    objectPosition: "50% 50%"
-  },
-  {
-    id: "body_glow_collection",
-    title: "100% Natural Ingredients, Safe and Effective for Sensitive Skin",
-    kicker: "Gentle and effective",
-    body: "Pure shea butter, botanical oils, and natural plant extracts for thoughtful everyday wellness.",
-    src: "/assets/website-edits/pure-raw-shea-butter.jpg",
-    type: "image",
-    tag: "Moisture Routine",
-    ctaLabel: "Start routine",
-    ctaHref: "/shop",
-    objectPosition: "50% 50%"
-  }
+  { id: "skin_hair_face_spa", title: "Nature, in your everyday ritual.", kicker: "Pure Nilotica shea", body: "Thoughtful care for skin, hair and moments of calm.", src: "", type: "image", tag: "Natural care", ctaLabel: "Explore the collection", ctaHref: "/shop" },
+  { id: "sensitive_skin_safe", title: "A gentler way to care.", kicker: "Skin essentials", body: "Discover simple, nourishing routines for your daily care.", src: "", type: "image", tag: "Skin care", ctaLabel: "Discover skin care", ctaHref: "/skin" },
+  { id: "face_care_collection", title: "Make time for yourself.", kicker: "Face & wellness", body: "Considered essentials, from your morning routine to your evening ritual.", src: "", type: "image", tag: "Face care", ctaLabel: "Explore face care", ctaHref: "/face" },
+  { id: "body_glow_collection", title: "Wellness, beautifully simple.", kicker: "Spa essentials", body: "Bring a little calm to your home and treatment space.", src: "", type: "image", tag: "Spa care", ctaLabel: "Explore spa essentials", ctaHref: "/spa-essentials" }
 ];
-
-const curatedImageMedia: Array<Omit<SheaMediaAsset, "id">> = [
-  { title: "Community impact", src: "/assets/website-edits/community-impact.png", type: "image", tag: "Brand story" },
-  { title: "Spa facial", src: "/assets/website-edits/spa-facial.jpg", type: "image", tag: "Spa care" },
-  { title: "Massage oils", src: "/assets/website-edits/massage-oils.jpg", type: "image", tag: "Spa essentials" },
-  { title: "Facial oils", src: "/assets/website-edits/facial-oils.jpg", type: "image", tag: "Face care" },
-  { title: "Body oils", src: "/assets/website-edits/body-oils-collection.jpg", type: "image", tag: "Skin care" },
-  { title: "Botanical oils", src: "/assets/website-edits/botanical-oils.jpg", type: "image", tag: "Wellness routine" },
-  { title: "Pure raw shea butter", src: "/assets/sheawellness/pure-raw-shea-butter.jpeg", type: "image", tag: "Verified product" },
-  { title: "Lavender shea butter", src: "/assets/sheawellness/lavender-shea-butter-front.jpeg", type: "image", tag: "Verified product" },
-  { title: "Lemongrass shea butter", src: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg", type: "image", tag: "Verified product" },
-  { title: "Grapefruit shea butter", src: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg", type: "image", tag: "Verified product" },
-  { title: "Vanilla mint shea butter", src: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg", type: "image", tag: "Verified product" },
-  { title: "Chebe hair serum", src: "/assets/media-library/aug-2026/aug-2026-026.jpeg", type: "image", tag: "Verified product" },
-  { title: "Chebe hair butter", src: "/assets/media-library/aug-2026/aug-2026-043.jpeg", type: "image", tag: "Verified product" },
-  { title: "Yellow castor oil", src: "/assets/media-library/aug-2026/aug-2026-028.jpeg", type: "image", tag: "Verified product" },
-  { title: "Essential oils", src: "/assets/media-library/aug-2026/aug-2026-025.jpeg", type: "image", tag: "Verified product" },
-  { title: "Aromatherapy bundle", src: "/assets/media-library/aug-2026/aug-2026-030.jpeg", type: "image", tag: "Verified product" },
-  { title: "Professional spa essentials", src: "/assets/media-library/aug-2026/aug-2026-057.jpeg", type: "image", tag: "Verified product" }
-];
-
-export const sheaImageMedia: SheaMediaAsset[] = curatedImageMedia.map((asset, index) => ({
-  id: `curated_image_${index + 1}`,
-  ...asset
-}));
+export const sheaImageMedia: SheaMediaAsset[] = [];
 
 export const sheaNav = [
   { label: "Home", href: "/" },
@@ -206,7 +80,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Pure & Raw Shea Butter",
-        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+        image: "",
         description: "Unfragranced raw shea butter for body, face, and hair.",
         ingredients: ["Raw Shea Butter"],
         benefits: ["Deep hydration", "Repairs dry skin", "Supports anti-aging routines"],
@@ -215,7 +89,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Lavender Shea Body Butter Infusion",
-        image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+        image: "",
         description: "A calming shea butter infusion for dry, sensitive, and irritated skin.",
         ingredients: ["Raw Shea Butter", "Lavender Essential Oil", "Vitamin E"],
         benefits: ["Deeply moisturizes skin", "Improves elasticity", "Calms irritated skin"],
@@ -224,7 +98,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Lemongrass Shea Body Butter Infusion",
-        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+        image: "",
         description: "A fresh botanical butter for daily body and face moisture.",
         ingredients: ["Raw Shea Butter", "Lemongrass Essential Oil", "Vitamin E"],
         benefits: ["Softens rough skin", "Refreshes the senses", "Supports a healthy-looking glow"],
@@ -233,7 +107,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Vanilla-Mint Shea Body Butter Infusion",
-        image: "/assets/sheawellness/vanilla-mint-shea-butter.jpeg",
+        image: "",
         description: "A cooling and comforting butter for body and face.",
         ingredients: ["Raw Shea Butter", "Vanilla", "Mint Oil", "Vitamin E"],
         benefits: ["Nourishes dry patches", "Leaves skin supple", "Comforting aromatic finish"],
@@ -242,7 +116,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Grapefruit Shea Body Butter Infusion",
-        image: "/assets/sheawellness/grapefruit-shea-butter-front.jpeg",
+        image: "",
         description: "A bright citrus butter for body and face care.",
         ingredients: ["Raw Shea Butter", "Grapefruit Essential Oil", "Vitamin E"],
         benefits: ["Hydrates deeply", "Bright citrus scent", "Helps revive dull-looking skin"],
@@ -257,7 +131,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "African Liquid Black Soap Body & Face Wash",
-        image: "/assets/website-edits/black-soap-body-wash-pair.jpg",
+        image: "",
         description: "Gentle daily cleanser for face and body that removes impurities without a stripped feeling.",
         ingredients: ["African Black Soap", "Shea Butter", "Botanical Extracts"],
         benefits: ["Gently cleanses", "Maintains moisture balance", "Prepares skin for facial oils"],
@@ -266,7 +140,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Rosehip Facial Oil",
-        image: "/assets/website-edits/facial-oils.jpg",
+        image: "",
         description: "Lightweight botanical facial oil for daily moisture and a healthy-looking glow.",
         ingredients: ["Rosehip Oil", "Botanical Oil Blend"],
         benefits: ["Deep hydration", "Softens and smooths", "Supports the moisture barrier"],
@@ -275,7 +149,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Lavender Shea Butter Overnight Barrier",
-        image: "/assets/sheawellness/lavender-shea-butter-front.jpeg",
+        image: "",
         description: "Rich overnight moisture support for dry areas on the face and neck.",
         ingredients: ["Raw Shea Butter", "Lavender Essential Oil", "Vitamin E"],
         benefits: ["Nourishes dry areas", "Helps reduce tightness", "Seals in moisture overnight"],
@@ -284,7 +158,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Cucumber Mint Sunscreen SPF Gel",
-        image: "/assets/website-edits/facial-oils.jpg",
+        image: "",
         description: "Daily SPF step for the morning routine to help protect skin from UV exposure.",
         ingredients: ["Cucumber", "Mint", "Broad-spectrum SPF"],
         benefits: ["Daily protection", "Light gel finish", "Supports a healthy barrier"],
@@ -299,7 +173,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Chebe Hair Growth Serum with Karkar Oil",
-        image: "/assets/media-library/aug-2026/aug-2026-026.jpeg",
+        image: "",
         description: "A nourishing serum for protective styles, length retention, and scalp care.",
         ingredients: ["Chebe Powder", "Karkar Oil", "Natural Oils"],
         benefits: ["Length retention", "Strengthens hair strands", "Adds shine"],
@@ -308,7 +182,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Chebe Hair Butter",
-        image: "/assets/media-library/aug-2026/aug-2026-043.jpeg",
+        image: "",
         description: "Rich hair butter for nourishment, shine, and breakage prevention.",
         ingredients: ["Shea Butter", "Chebe", "Natural Oils"],
         benefits: ["Rich nourishment", "Prevents breakage", "Improves manageability"],
@@ -317,7 +191,7 @@ export const sheaProductCategories = [
       },
       {
         name: "African Liquid Black Soap Shampoo",
-        image: "/assets/website-edits/black-soap-collection.jpg",
+        image: "",
         description: "A natural shampoo option for clean scalp and hair care routines.",
         ingredients: ["African Black Soap", "Shea Butter", "Botanical Extracts"],
         benefits: ["Cleanses scalp", "Removes buildup", "Supports natural hair care"],
@@ -326,7 +200,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Cold Pressed Yellow Castor Oil",
-        image: "/assets/media-library/aug-2026/aug-2026-028.jpeg",
+        image: "",
         description: "A rich oil for dry scalp, brittle hair, protective styles, and body moisture sealing.",
         ingredients: ["Cold Pressed Yellow Castor Oil"],
         benefits: ["Moisturizes dry scalp", "Softens brittle hair", "Seals in moisture"],
@@ -335,7 +209,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Rosemary Essential Oil Scalp Boost",
-        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+        image: "",
         description: "A concentrated essential oil for diluted scalp massage blends.",
         ingredients: ["Rosemary Essential Oil"],
         benefits: ["Refreshes the scalp", "Complements hair routines", "Provides herbal aroma"],
@@ -349,7 +223,7 @@ export const sheaProductCategories = [
     summary: "Pure oils for relaxation, sleep, focus, skincare boosts, and aromatherapy routines.",
     products: ["Lavender", "Lemongrass", "Tea Tree", "Eucalyptus", "Peppermint", "Rosemary", "Sweet Orange", "Vanilla", "Rosemary and Tea Tree"].map((oil) => ({
       name: `${oil} Essential Oil`,
-      image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+      image: "",
       description: `${oil} essential oil for wellness, aroma, and skincare routines.`,
       ingredients: [`${oil} Essential Oil`],
       benefits: ["Relaxation", "Sleep and focus support", "Skincare boosts"],
@@ -363,7 +237,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Aromatherapy Humidifier",
-        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+        image: "",
         description: "A diffuser-ready wellness device for essential oil routines.",
         ingredients: ["Humidifier Device", "Essential Oil Compatibility"],
         benefits: ["Relaxation", "Sleep support", "Spa ambience"],
@@ -378,7 +252,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Disposable Massage Bed Sheets",
-        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+        image: "",
         description: "Clean, professional disposable bed sheets for spa treatment rooms.",
         ingredients: ["Disposable spa-grade material"],
         benefits: ["Hygienic setup", "Easy room turnover", "Professional presentation"],
@@ -387,7 +261,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Disposable Pants & Bras",
-        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+        image: "",
         description: "Disposable client wear for massage, spa, and salon treatments.",
         ingredients: ["Disposable spa-grade material"],
         benefits: ["Client comfort", "Spa hygiene", "Treatment-room readiness"],
@@ -396,7 +270,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Massage Oils",
-        image: "/assets/sheawellness/lemongrass-shea-butter-front.jpeg",
+        image: "",
         description: "Energizing, relaxing, and detoxifying blends for body treatments.",
         ingredients: ["Natural Oils", "Essential Oil Blends"],
         benefits: ["Smooth massage glide", "Relaxing aroma", "Spa-grade treatment support"],
@@ -405,7 +279,7 @@ export const sheaProductCategories = [
       },
       {
         name: "Professional Salon Equipment",
-        image: "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+        image: "",
         description: "Professional wellness and salon supplies for treatment businesses.",
         ingredients: ["Salon equipment assortment"],
         benefits: ["Professional readiness", "Retail and spa support", "Distributor-friendly supply"],
@@ -420,7 +294,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Shea Wellness Gift Set",
-        image: "/assets/sheawellness/grapefruit-shea-butter-lid.jpeg",
+        image: "",
         description: "A curated set of body butter, black soap, and essential oil options.",
         ingredients: ["Shea Body Butter", "African Black Soap", "Essential Oil"],
         benefits: ["Complete routine", "Gift-ready", "Retail bundle"],
@@ -435,7 +309,7 @@ export const sheaProductCategories = [
     products: [
       {
         name: "Distributor Starter Offer",
-        image: "/assets/sheawellness/lavender-shea-butter-lid.jpeg",
+        image: "",
         description: "A wholesale-friendly introduction to Shea Wellness best sellers.",
         ingredients: ["Assorted Shea Wellness Products"],
         benefits: ["Retail trial pack", "Wholesale discovery", "Export-ready presentation"],

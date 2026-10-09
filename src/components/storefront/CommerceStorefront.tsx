@@ -1,5 +1,6 @@
 "use client";
 
+import { StorefrontImage } from "./StorefrontImage";
 import {
   ArrowLeft,
   ArrowRight,
@@ -22,7 +23,6 @@ import {
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
-import Image from "next/image";
 import { CampaignCarousel } from "./CampaignCarousel";
 import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize } from "@/lib/format";
@@ -451,7 +451,7 @@ export function CommerceStorefront({
 
           <section className="commerce-our-story" aria-labelledby="our-story-heading">
             <div className="commerce-story-visual">
-              <Image src="/assets/website-edits/community-impact.png" alt="Women celebrating the community impact behind Shea Wellness" fill sizes="(max-width: 980px) 100vw, 54vw" style={{ objectFit: "cover", objectPosition: "50% 42%" }} />
+              <StorefrontImage src="" alt="Community story" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
               <span>Rooted in African botanical heritage</span>
             </div>
             <div className="commerce-story-copy">
@@ -493,7 +493,7 @@ export function CommerceStorefront({
               {concernCards.map((guide, index) => (
                 <a href={guide.href} key={guide.title}>
                   <span>0{index + 1}</span>
-                  <img src={guide.image} alt="" loading="lazy" decoding="async" />
+                  <StorefrontImage src={guide.image} alt="" loading="lazy" decoding="async" />
                   <div><strong>{guide.title}</strong><small>{guide.body}</small></div>
                   <ArrowRight size={18} />
                 </a>
@@ -513,7 +513,7 @@ export function CommerceStorefront({
             <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
               {mediaVideos.slice(0, 4).map((video) => (
                 <article key={video.src}>
-                  <video src={video.src} controls playsInline preload="none" poster="/assets/shea-wellness-tree-logo.jpeg" />
+                  <video src={video.src} controls playsInline preload="none" />
                   <strong>{video.title}</strong>
                 </article>
               ))}
@@ -573,7 +573,7 @@ export function CommerceStorefront({
             return (
             <article className="commerce-product-card" key={product.id}>
               <a className={clsx("commerce-product-image", isSidewaysSheaProductAsset(product.imageUrl) && "is-rotated")} href={`/products/${encodeURIComponent(product.id)}`}>
-                <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
+                <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
                 <span className="commerce-card-badges"><em>{product.category}</em>{lowStock ? <em className="stock">Low stock</em> : null}</span>
                 <b>View product</b>
               </a>
@@ -605,7 +605,7 @@ export function CommerceStorefront({
       </section>
 
       <section className="commerce-merchandising-rails">
-        {[{ title: "Best sellers", body: "Customer favourites with strong reviews and repeat demand.", items: [...liveProducts].sort((a,b) => b.sales-a.sales).slice(0,4) }, { title: "New arrivals", body: "Fresh additions to skin, hair, gifting, and spa care.", items: [...liveProducts].reverse().slice(0,4) }].map((rail) => <div key={rail.title}><header><span>{rail.title}</span><p>{rail.body}</p></header><div>{rail.items.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><img src={item.imageUrl} alt={item.title} loading="lazy" /><span><strong>{item.title}</strong><small><Star size={12} fill="currentColor" /> {item.rating.toFixed(1)} · {formatMoney(item.price, store.currency)}</small></span></a>)}</div></div>)}
+        {[{ title: "Best sellers", body: "Customer favourites with strong reviews and repeat demand.", items: [...liveProducts].sort((a,b) => b.sales-a.sales).slice(0,4) }, { title: "New arrivals", body: "Fresh additions to skin, hair, gifting, and spa care.", items: [...liveProducts].reverse().slice(0,4) }].map((rail) => <div key={rail.title}><header><span>{rail.title}</span><p>{rail.body}</p></header><div>{rail.items.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><StorefrontImage src={item.imageUrl} alt={item.title} loading="lazy" /><span><strong>{item.title}</strong><small><Star size={12} fill="currentColor" /> {item.rating.toFixed(1)} · {formatMoney(item.price, store.currency)}</small></span></a>)}</div></div>)}
       </section>
 
       <section className="commerce-concerns-section" id="skin-concerns">
@@ -619,7 +619,7 @@ export function CommerceStorefront({
         <div className="commerce-concern-grid">
           {concernCards.map((concern) => (
             <a href={concern.href} key={concern.title}>
-              <img src={concern.image} alt="" loading="lazy" />
+              <StorefrontImage src={concern.image} alt="" loading="lazy" />
               <i />
               <strong>{concern.title}</strong>
               <span>{concern.body}</span>
@@ -629,26 +629,9 @@ export function CommerceStorefront({
         </div>
       </section>
 
-      <section className="commerce-seen-strip" aria-label="Shea Wellness credibility">
-        <span>As trusted by</span>
-          <div className="commerce-marquee-viewport">
-            <div className="commerce-marquee-track">
-              <div className="commerce-marquee-group">
-                {partnerLogos.map(([name, file]) => (
-                  <figure className="commerce-marquee-logo" key={name}>
-                    <img src={`/assets/partners/${file}`} alt={`${name} logo`} loading="eager" decoding="async" />
-                  </figure>
-                ))}
-              </div>
-              <div className="commerce-marquee-group" aria-hidden="true">
-                {partnerLogos.map(([name, file]) => (
-                  <figure className="commerce-marquee-logo" key={`${name}-repeat`}>
-                    <img src={`/assets/partners/${file}`} alt="" loading="eager" decoding="async" />
-                  </figure>
-                ))}
-              </div>
-            </div>
-          </div>
+      <section className="commerce-seen-strip" aria-label="Shea Wellness partners">
+        <span>Our partners</span>
+        <div className="shea-partner-names">{partnerLogos.map(([name]) => <span key={name}>{name}</span>)}</div>
       </section>
 
       <section className="commerce-guarantee-strip" aria-label="Store assurances">
@@ -670,22 +653,7 @@ export function CommerceStorefront({
           </div>
           <p>Build a consistent routine in clear stages. Customer before-and-after images are published only after consent and product-use verification.</p>
         </div>
-        <div className="commerce-before-after-rail" aria-label="Before and after carousel">
-          <div className="commerce-before-after-track">
-            {[0, 1].map((groupIndex) => (
-              <div className="commerce-before-after-group" key={groupIndex} aria-hidden={groupIndex === 1}>
-                {routineProgressSlides.map((slide) => (
-                  <article key={`${groupIndex}-${slide.title}`}>
-                    <img src={slide.image} alt={groupIndex === 0 ? slide.title : ""} loading="lazy" />
-                    <div>
-                      {slide.labels.map((label) => <strong key={label}>{label}</strong>)}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        <ol className="shea-routine-steps">{routineProgressSlides.map((slide, index) => <li key={slide.title}><span>0{index + 1}</span><strong>{slide.title}</strong><small>{slide.labels.join(" · ")}</small></li>)}</ol>
       </section>
 
       <section className="commerce-comparison-section">
@@ -750,7 +718,7 @@ export function CommerceStorefront({
 
       <section className="commerce-newsletter">
         <figure className="commerce-newsletter-media">
-          <img src="/assets/sheawellness/grapefruit-shea-butter-front.jpeg" alt="Shea Wellness grapefruit body and face butter" />
+          <StorefrontImage src="/assets/sheawellness/grapefruit-shea-butter-front.jpeg" alt="Shea Wellness grapefruit body and face butter" />
         </figure>
         <div>
           <span>Wellness education</span>
@@ -805,7 +773,7 @@ function CartDrawer({
         {cart.length === 0 ? <p>Your cart is ready for Shea Wellness products.</p> : null}
         {cart.map((line, index) => (
           <article className={isSidewaysSheaProductAsset(line.product.imageUrl) ? "is-rotated" : undefined} key={`${line.product.id}-${line.size}`}>
-            <img className={isSidewaysSheaProductAsset(line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl) ? "shea-rotated-product-image" : undefined} src={line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
+            <StorefrontImage className={isSidewaysSheaProductAsset(line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl) ? "shea-rotated-product-image" : undefined} src={line.product.sizeMedia?.[line.size]?.imageUrl ?? line.product.imageUrl} alt={line.product.title} style={{ objectPosition: line.product.imagePosition }} />
             <div>
               <strong>{line.product.title}</strong>
               <span>{line.size}</span>
@@ -885,7 +853,7 @@ function ProductModal({
           <X size={20} />
         </button>
         <div className={clsx("commerce-modal-media", isSidewaysSheaProductAsset(product.imageUrl) && "is-rotated")}>
-          <img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
+          <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
         </div>
         <div className="commerce-modal-copy">
           <h2>{product.title}</h2>

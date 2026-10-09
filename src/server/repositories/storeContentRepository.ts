@@ -5,6 +5,7 @@ import {
   replaceRetiredSyntheticImage,
   sanitizeSheaMediaConfig,
   sheaDefaultMediaConfig,
+  sheaHeroSlides,
   type SheaMediaConfig
 } from "@/lib/shea-content";
 import type { Product } from "@/lib/types";
@@ -21,34 +22,8 @@ export type PageOverrides = Record<string, { texts?: Record<string, string>; ima
 
 const STORE_KEY = "shea-wellness";
 const PAGE_OVERRIDE_SCHEMA_KEY = "__shea_page_overrides_schema";
-const PAGE_OVERRIDE_SCHEMA_VERSION = "3";
+const PAGE_OVERRIDE_SCHEMA_VERSION = "4";
 const PAGE_OVERRIDE_SCHEMA = { texts: { version: PAGE_OVERRIDE_SCHEMA_VERSION } };
-const VERIFIED_PRODUCT_IMAGES: Record<string, string> = {
-  prod_chebe_serum: "/assets/media-library/aug-2026/aug-2026-026.jpeg",
-  prod_chebe_butter: "/assets/media-library/aug-2026/aug-2026-043.jpeg",
-  prod_yellow_castor_oil: "/assets/media-library/aug-2026/aug-2026-028.jpeg",
-  prod_essential_oils: "/assets/media-library/aug-2026/aug-2026-025.jpeg",
-  prod_aromatherapy: "/assets/media-library/aug-2026/aug-2026-030.jpeg",
-  prod_spa_essentials: "/assets/media-library/aug-2026/aug-2026-057.jpeg",
-  prod_gift_set: "/assets/media-library/aug-2026/aug-2026-025.jpeg"
-};
-
-// These catalogue records previously displayed placeholders or a single jar as
-// an unrelated bundle. They remain drafts only while that exact placeholder is
-// attached, so an administrator can publish them after replacing it with a
-// verified product image.
-const UNVERIFIED_PRODUCT_IMAGES: Record<string, readonly string[]> = {
-  prod_rosehip_facial_oil: ["/assets/shea-wellness-tree-logo.jpeg"],
-  prod_cucumber_mint_sunscreen: ["/assets/shea-wellness-tree-logo.jpeg"],
-  prod_baobab_oil: ["/assets/shea-wellness-tree-logo.jpeg"],
-  prod_distributor_offer: ["/assets/sheawellness/lavender-shea-butter-lid.jpeg"]
-};
-
-function productNeedsVerifiedMedia(product: Product) {
-  const imageUrl = typeof product.imageUrl === "string" ? replaceRetiredSyntheticImage(product.imageUrl.trim()) : "";
-  return isLegacySheaMediaPath(imageUrl) || (UNVERIFIED_PRODUCT_IMAGES[product.id] ?? []).includes(imageUrl);
-}
-
 function sanitizePageOverrides(
   pageOverrides: PageOverrides | null | undefined,
   options: { acceptSubmittedImages?: boolean } = {}
@@ -57,7 +32,7 @@ function sanitizePageOverrides(
     return { [PAGE_OVERRIDE_SCHEMA_KEY]: PAGE_OVERRIDE_SCHEMA };
   }
 
-  // Version 3 excludes the shared header from page image indexes. Old
+  // Version 4 reflects removal of preset image strips and footer photography. Old
   // page-image overrides are index based and can silently put a historic
   // upload back into a completely different layout after a design update. Keep
   // legacy text so editors do not lose copy, but require the current schema
@@ -76,7 +51,7 @@ function sanitizePageOverrides(
         Object.entries(override.images ?? {}).flatMap(([key, value]) => {
           if (typeof value !== "string") return [];
           const src = replaceRetiredSyntheticImage(value.trim());
-          return acceptsImageOverrides && src && !isLegacySheaMediaPath(src) ? [[key, src]] : [];
+          return acceptsImageOverrides && !isLegacySheaMediaPath(src) ? [[key, src]] : [];
         })
       );
       const safeOverride = {
@@ -105,7 +80,7 @@ function normalizeStoredProducts(products: Product[]): Product[] {
       Object.entries(product.sizeMedia ?? {})
         .map(([size, media]) => {
           const imageUrl = typeof media?.imageUrl === "string" ? replaceRetiredSyntheticImage(media.imageUrl.trim()) : "";
-          const videoUrl = typeof media?.videoUrl === "string" ? replaceRetiredSyntheticImage(media.videoUrl.trim()) : "";
+          const videoUrl = typeof media?.videoUrl === "string" ? media.videoUrl.trim() : "";
           const imagePosition = typeof media?.imagePosition === "string" ? media.imagePosition.trim() : "";
           return [size.trim(), {
             ...(imageUrl && !isLegacySheaMediaPath(imageUrl) ? { imageUrl } : {}),
@@ -119,10 +94,7 @@ function normalizeStoredProducts(products: Product[]): Product[] {
     return {
       ...product,
       category: product.category === "Body Care" ? "Skin Care" : product.category,
-      imageUrl: isLegacySheaMediaPath(product.imageUrl)
-        ? VERIFIED_PRODUCT_IMAGES[product.id] ?? replaceRetiredSyntheticImage(product.imageUrl)
-        : replaceRetiredSyntheticImage(product.imageUrl),
-      status: productNeedsVerifiedMedia(product) ? "draft" : product.status,
+      imageUrl: replaceRetiredSyntheticImage(product.imageUrl),
       sizes: safeSizes,
       price: Number.isFinite(price) && price >= 0 ? price : fallbackPrice,
       sizePrices: Object.keys(sizePrices).length ? sizePrices : undefined,
@@ -171,6 +143,7 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
       `;
       await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS page_overrides JSONB NOT NULL DEFAULT '{}'::jsonb`;
       await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS catalogue_initialized BOOLEAN NOT NULL DEFAULT FALSE`;
+      await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS owner_image_reset_version INTEGER NOT NULL DEFAULT 0`;
       // Migrate the old media-only record once. Subsequent intentional empty
       // catalogues stay empty; there is no repeating read-time seed fallback.
       await sql`
@@ -180,9 +153,42 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
         WHERE store_key = ${STORE_KEY} AND catalogue_initialized = FALSE
       `;
       await sql`
-        INSERT INTO storefront_content (store_key, products, media, catalogue_initialized)
-        VALUES (${STORE_KEY}, ${JSON.stringify(defaultProducts())}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb, TRUE)
+        INSERT INTO storefront_content (store_key, products, media, catalogue_initialized, owner_image_reset_version)
+        VALUES (${STORE_KEY}, ${JSON.stringify(defaultProducts())}::jsonb, ${JSON.stringify(sheaDefaultMediaConfig)}::jsonb, TRUE, 1)
         ON CONFLICT (store_key) DO NOTHING
+      `;
+      // The owner requested a clean image slate. Detach existing image selections
+      // once, atomically, retaining catalogue values, videos, copy and original files.
+      // Future owner uploads are never cleared by this migration.
+      const campaignCopy = Object.fromEntries(sheaHeroSlides.map(slide => [slide.id, slide]));
+      await sql`
+        UPDATE storefront_content
+        SET products = (
+          SELECT COALESCE(jsonb_agg(product || jsonb_build_object(
+            'imageUrl', '',
+            'sizeMedia', (
+              SELECT COALESCE(jsonb_object_agg(option.key, option.value - 'imageUrl' - 'imagePosition'), '{}'::jsonb)
+              FROM jsonb_each(COALESCE(NULLIF(product->'sizeMedia', 'null'::jsonb), '{}'::jsonb)) AS option
+            )
+          )), '[]'::jsonb)
+          FROM jsonb_array_elements(products) AS product
+        ),
+        media = media || jsonb_build_object(
+          'images', '[]'::jsonb,
+          'heroSlides', (
+            SELECT COALESCE(jsonb_agg(CASE WHEN slide->>'type' = 'video' THEN slide ELSE
+              slide || COALESCE(${JSON.stringify(campaignCopy)}::jsonb -> (slide->>'id'), '{}'::jsonb) || '{"src":""}'::jsonb
+            END), '[]'::jsonb)
+            FROM jsonb_array_elements(COALESCE(media->'heroSlides', '[]'::jsonb)) AS slide
+          )
+        ),
+        page_overrides = (
+          SELECT COALESCE(jsonb_object_agg(page.key, page.value - 'images'), '{}'::jsonb)
+          FROM jsonb_each(page_overrides) AS page
+        ) || ${JSON.stringify({ [PAGE_OVERRIDE_SCHEMA_KEY]: PAGE_OVERRIDE_SCHEMA })}::jsonb,
+        owner_image_reset_version = 1,
+        updated_at = NOW()
+        WHERE store_key = ${STORE_KEY} AND owner_image_reset_version < 1
       `;
     })().catch((error) => {
       tableReady = null;

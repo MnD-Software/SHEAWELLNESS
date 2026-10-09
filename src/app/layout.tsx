@@ -14,14 +14,9 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://sheawellness.vercel.app"),
   title: { default: "Shea Wellness LTD | Pure Nilotica Shea", template: "%s | Shea Wellness" },
   description: "Premium handcrafted shea butter skincare and wellness products made from ethically sourced Nilotica shea.",
-  icons: {
-    icon: [{ url: "/assets/website-edits/shea-wellness-logo.jpg", type: "image/jpeg" }],
-    shortcut: "/assets/website-edits/shea-wellness-logo.jpg",
-    apple: "/assets/website-edits/shea-wellness-logo.jpg"
-  },
   alternates: { canonical: "/" },
-  openGraph: { title: "Shea Wellness LTD", description: "Natural skin, face, hair, and spa care rooted in African botanical heritage.", type: "website", url: "/", images: [{ url: "/assets/website-edits/community-impact.png", alt: "Women celebrating Shea Wellness community impact" }] },
-  twitter: { card: "summary_large_image", title: "Shea Wellness LTD", description: "Natural care rooted in African botanical heritage.", images: ["/assets/website-edits/community-impact.png"] }
+  openGraph: { title: "Shea Wellness LTD", description: "Natural skin, face, hair, and spa care rooted in African botanical heritage.", type: "website", url: "/" },
+  twitter: { card: "summary", title: "Shea Wellness LTD", description: "Natural care rooted in African botanical heritage." }
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

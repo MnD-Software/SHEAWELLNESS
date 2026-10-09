@@ -1,5 +1,6 @@
 "use client";
 
+import { StorefrontImage } from "./StorefrontImage";
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, ShoppingBag, ShoppingCart, Sparkles, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { platformSnapshot } from "@/lib/platform-data";
@@ -111,7 +112,7 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
             <>
               <div className="department-carousel-stage">
                 <a className={isSidewaysSheaProductAsset(featuredProduct.imageUrl) ? "department-carousel-image is-rotated" : "department-carousel-image"} href={`/products/${encodeURIComponent(featuredProduct.id)}`}>
-                  <img className={isSidewaysSheaProductAsset(featuredProduct.imageUrl) ? "shea-rotated-product-image" : undefined} src={featuredProduct.imageUrl} alt={featuredProduct.title} style={{ objectPosition: featuredProduct.imagePosition }} />
+                  <StorefrontImage className={isSidewaysSheaProductAsset(featuredProduct.imageUrl) ? "shea-rotated-product-image" : undefined} src={featuredProduct.imageUrl} alt={featuredProduct.title} style={{ objectPosition: featuredProduct.imagePosition }} />
                 </a>
                 <div className="department-carousel-product-copy">
                   <span>{featuredProduct.badge || featuredProduct.category}</span>
@@ -136,7 +137,7 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
         <header><div><span>{content.eyebrow}</span><h2>Products for this routine.</h2></div><a href="/shop">View complete shop <ArrowRight size={17} /></a></header>
         <div>
           {departmentProducts.map((product) => <article key={product.id} className="department-product-card">
-            <a className={isSidewaysSheaProductAsset(product.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(product.id)}`}><img className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} /></a>
+            <a className={isSidewaysSheaProductAsset(product.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(product.id)}`}><StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} /></a>
             <button type="button" className={wishlist.includes(product.id) ? "department-card-wishlist active" : "department-card-wishlist"} onClick={() => toggleWishlist(product.id)} aria-label={`Add ${product.title} to wishlist`}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "none"} /></button>
             <div><span>{product.badge}</span><h3>{product.title}</h3><div className="department-card-rating"><Star size={14} fill="currentColor" /> {product.rating.toFixed(1)} <small>({product.reviewCount} reviews)</small></div><p>{product.description}</p><div className="department-card-stock"><i />{product.status === "low_stock" ? `Only ${product.inventoryQty} left` : "In stock"}</div><footer><strong>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong><button type="button" onClick={() => quickAdd(product)}><ShoppingCart size={16} /> Quick add</button><a href={`/products/${encodeURIComponent(product.id)}`} aria-label={`View ${product.title}`}><ShoppingBag size={16} /></a></footer></div>
           </article>)}

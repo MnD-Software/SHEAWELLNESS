@@ -28,6 +28,7 @@ import {
 import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
+import { StorefrontImage } from "@/components/storefront/StorefrontImage";
 import { EnquiriesView } from "./EnquiriesView";
 import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize, titleCase } from "@/lib/format";
@@ -124,15 +125,7 @@ type ProductFormState = {
   variations: ProductVariationDraft[];
 };
 
-const ADMIN_KEY_STORAGE = "sheaWellnessAdminAccessKey";
-
-function adminRequestHeaders(headers: Record<string, string> = {}) {
-  const accessKey = typeof window === "undefined" ? "" : window.sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
-  return {
-    ...headers,
-    ...(accessKey ? { "x-shea-admin-key": accessKey } : {})
-  };
-}
+function adminRequestHeaders(headers: Record<string, string> = {}) { return headers; }
 
 type MediaSection = "hero" | "images" | "videos";
 
@@ -247,7 +240,7 @@ function productToDraft(product?: Product): ProductFormState {
     description: product?.description ?? "",
     category: product?.category ?? "Skin Care",
     badge: product?.badge ?? "Shea Wellness",
-    imageUrl: product?.imageUrl ?? "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+    imageUrl: product?.imageUrl ?? "",
     sizes: variations.map((variation) => variation.label).join(", "),
     material: product?.material ?? "Raw Shea Butter",
     deliveryBadge: product?.deliveryBadge ?? "Handcrafted skincare",
@@ -264,9 +257,9 @@ function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
   return {
     id: asset?.id ?? "",
     title: asset?.title ?? "",
-    src: asset?.src ?? "/assets/website-edits/facial-oils.jpg",
+    src: asset?.src ?? "",
     tag: asset?.tag ?? "Skin routine",
-    kicker: heroAsset.kicker ?? "Before and after",
+    kicker: heroAsset.kicker ?? "Naturally considered",
     body: heroAsset.body ?? "Show the customer care journey with real Shea Wellness media.",
     ctaLabel: heroAsset.ctaLabel ?? "Shop routines",
     ctaHref: heroAsset.ctaHref ?? "/shop",
@@ -312,9 +305,6 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [runtimeOrders, setRuntimeOrders] = useState<RuntimeOrder[]>([]);
   const [ordersState, setOrdersState] = useState<"loading" | "ready" | "error">("loading");
   const [ordersMessage, setOrdersMessage] = useState("");
-  const [adminKey, setAdminKey] = useState("");
-  const [accessState, setAccessState] = useState<"checking" | "required" | "ready">("checking");
-  const [accessMessage, setAccessMessage] = useState("");
   const [runtimeReviews, setRuntimeReviews] = useState<RuntimeReview[]>([]);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(emptyMediaConfig);
   const [pageOverrides, setPageOverrides] = useState<PageOverrides>({});
@@ -336,38 +326,18 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     const savedReviews = readStoredArray("sheaWellnessReviews") as RuntimeReview[];
     setRuntimeReviews(savedReviews.filter((review) => review.source === "shea_storefront_review"));
 
-    const storedKey = window.sessionStorage.getItem(ADMIN_KEY_STORAGE) ?? "";
-    if (storedKey) {
-      setAdminKey(storedKey);
-      setAccessState("ready");
-      return;
-    }
-    setAccessState("required");
   }, []);
 
-  function suspendAdminAccess(message: string) {
-    window.sessionStorage.removeItem(ADMIN_KEY_STORAGE);
-    setAdminKey("");
-    setAccessMessage(message);
-    setAccessState("required");
-  }
-
   useEffect(() => {
-    if (!adminKey) return;
     let cancelled = false;
     const headers = adminRequestHeaders();
 
-    setAccessState("ready");
     setOrdersState("loading");
     setContentLoaded(false);
 
     void fetch("/api/admin/orders?limit=100", { cache: "no-store", headers })
       .then(async (response) => {
         const payload = await response.json() as { data?: ServerOrder[]; error?: string };
-        if (response.status === 401 || response.status === 503) {
-          if (!cancelled) suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
-          return;
-        }
         if (!response.ok || !Array.isArray(payload.data)) throw new Error(payload.error ?? "Unable to load orders.");
         if (cancelled) return;
         setRuntimeOrders(payload.data.map(toRuntimeOrder));
@@ -382,10 +352,6 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     void fetch("/api/admin/content", { cache: "no-store", headers })
       .then(async (response) => {
         const payload = await response.json();
-        if (response.status === 401 || response.status === 503) {
-          if (!cancelled) suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
-          return;
-        }
         if (!response.ok) throw new Error(payload.error ?? "Unable to load content.");
         if (cancelled) return;
         setManagedProducts((payload.data.products as Product[]).map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
@@ -405,7 +371,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     return () => {
       cancelled = true;
     };
-  }, [adminKey]);
+  }, []);
 
   async function persistContent(body: object): Promise<ContentSaveResult> {
     setSaveState("saving");
@@ -417,9 +383,6 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         body: JSON.stringify(body)
       });
       const payload = await response.json();
-      if (response.status === 401 || response.status === 503) {
-        suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
-      }
       if (!response.ok) throw new Error(payload.error ?? "Unable to save changes.");
       setSaveState("saved");
       setSaveMessage("Saved to Neon");
@@ -461,9 +424,6 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         body: JSON.stringify({ id: orderId, ...update })
       });
       const payload = await response.json() as { data?: ServerOrder; error?: string };
-      if (response.status === 401 || response.status === 503) {
-        suspendAdminAccess(payload.error ?? "Admin access needs to be configured.");
-      }
       if (!response.ok || !payload.data) throw new Error(payload.error ?? "Unable to update order.");
       const saved = toRuntimeOrder(payload.data);
       setRuntimeOrders((orders) => orders.map((order) => order.id === saved.id ? saved : order));
@@ -477,28 +437,10 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     setCreateProductRequest((request) => request + 1);
   }
 
-  function unlockAdmin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const accessCode = String(new FormData(event.currentTarget).get("accessCode") ?? "").trim();
-    if (!accessCode) {
-      setAccessMessage("Enter the admin access code to continue.");
-      return;
-    }
-
-    window.sessionStorage.setItem(ADMIN_KEY_STORAGE, accessCode);
-    setAccessMessage("");
-    setAdminKey(accessCode);
-    setAccessState("ready");
-  }
-
   const adminOrders = runtimeOrders;
 
-  if (accessState !== "ready") {
-    return <AdminAccessGate state={accessState} message={accessMessage} onUnlock={unlockAdmin} />;
-  }
-
   return (
-    <div className={clsx("shea-admin", sidebarCollapsed && "sidebar-collapsed")}>
+    <div className={clsx("shea-admin", sidebarCollapsed && "sidebar-collapsed")} data-admin-ready={contentLoaded}>
       <aside className="shea-admin-sidebar">
         <div className="shea-admin-brand">
           <div>S</div>
@@ -536,7 +478,6 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
             <i aria-hidden="true" />
             {saveMessage}
           </span>
-          <button type="button" className="shea-admin-lock" onClick={() => suspendAdminAccess("Dashboard locked. Enter the access code to continue.")}>Lock</button>
           <button type="button" onClick={openNewProduct}><PackagePlus size={17} /> Add product</button>
         </header>
 
@@ -544,40 +485,11 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         {view === "orders" ? <OrdersView snapshot={snapshot} orders={adminOrders} state={ordersState} message={ordersMessage} onStatusUpdate={updateOrderStatus} /> : null}
         {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
-        {view === "media" ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : null}
+        {view === "media" ? contentLoaded ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : <p role="status">Loading your media library…</p> : null}
         {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
         {view === "enquiries" ? <EnquiriesView /> : null}
       </main>
     </div>
-  );
-}
-
-function AdminAccessGate({
-  state,
-  message,
-  onUnlock
-}: {
-  state: "checking" | "required";
-  message: string;
-  onUnlock: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  return (
-    <main className="shea-admin-access">
-      <section>
-        <span>Shea Wellness LTD</span>
-        <ShieldCheck size={30} />
-        <h1>{state === "checking" ? "Restoring secure dashboard access" : "Admin access required"}</h1>
-        <p>{state === "checking" ? "Checking this browser session…" : "Enter the deployment access code. It is kept only for this browser session and is never stored in the website source."}</p>
-        {state === "required" ? <form onSubmit={onUnlock}>
-          <label>
-            Access code
-            <input name="accessCode" type="password" autoComplete="current-password" autoFocus required />
-          </label>
-          {message ? <p role="alert">{message}</p> : null}
-          <button type="submit">Unlock dashboard</button>
-        </form> : null}
-      </section>
-    </main>
   );
 }
 
@@ -620,9 +532,9 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaRea
     const textNodes = Array.from(documentRoot.querySelectorAll<HTMLElement>("main h1, main h2, main h3, main h4, main p, main li, main blockquote, main figcaption"));
     const imageNodes = Array.from(documentRoot.querySelectorAll<HTMLImageElement>("main img"));
     const texts = textNodes.map((node, index) => ({ kind: "text" as const, index, label: `${node.tagName} ${index + 1}`, value: pageOverrides[editingPage.route]?.texts?.[String(index)] ?? node.textContent?.trim() ?? "" }));
-    const images = imageNodes.map((node, index) => ({ kind: "image" as const, index, label: `Image ${index + 1}: ${node.alt || "Untitled"}`, value: pageOverrides[editingPage.route]?.images?.[String(index)] ?? node.getAttribute("src") ?? "" }));
+    const images = imageNodes.map((node, index) => ({ kind: "image" as const, index, label: `Image ${index + 1}: ${node.dataset.imageLabel || node.alt || "Untitled"}`, value: pageOverrides[editingPage.route]?.images?.[String(index)] ?? node.getAttribute("src") ?? "" }));
     texts.forEach((element) => { textNodes[element.index].textContent = element.value; });
-    images.forEach((element) => { imageNodes[element.index].src = element.value; });
+    images.forEach((element) => { if (element.value) imageNodes[element.index].src = element.value; else imageNodes[element.index].removeAttribute("src"); });
     setElements([...texts, ...images]);
     setSelectedElement(null);
 
@@ -679,7 +591,7 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaRea
       if (node) node.textContent = value;
     } else {
       const node = documentRoot.querySelectorAll<HTMLImageElement>("main img")[nextElement.index];
-      if (node) node.src = value;
+      if (node) { if (value) node.src = value; else node.removeAttribute("src"); }
     }
   }
 
@@ -698,7 +610,7 @@ function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaRea
     setSelectedElement(nextElement);
     setElements((items) => items.map((item) => item.kind === "image" && item.index === element.index ? nextElement : item));
     const node = iframeRef.current?.contentDocument?.querySelectorAll<HTMLImageElement>("main img")[element.index];
-    if (node) node.src = src;
+    if (node) { if (src) node.src = src; else node.removeAttribute("src"); }
     setImagePickerElement(null);
   }
 
@@ -797,7 +709,7 @@ function OverviewView({
         </Panel>
         <Panel title="Media library" description={`${mediaConfig.images.length} images and ${mediaConfig.videos.length} videos available.`} action={<button onClick={() => setView("media")}>Open library</button>}>
           <div className="shea-admin-media-preview">
-            {mediaConfig.images.slice(0, 6).map((asset) => <img key={asset.id} src={asset.src} alt={asset.title} />)}
+            {mediaConfig.images.slice(0, 6).map((asset) => <StorefrontImage key={asset.id} src={asset.src} alt={asset.title} />)}
           </div>
         </Panel>
       </section>
@@ -917,7 +829,7 @@ function ProductsView({
       description: draft.description.trim(),
       category: draft.category.trim() || "Skin Care",
       badge: draft.badge.trim() || "Shea Wellness",
-      imageUrl: draft.imageUrl.trim() || "/assets/sheawellness/pure-raw-shea-butter.jpeg",
+      imageUrl: draft.imageUrl.trim(),
       imagePosition: existingProduct?.imagePosition ?? "50% 50%",
       rating: existingProduct?.rating ?? 0,
       reviewCount: existingProduct?.reviewCount ?? 0,
@@ -1069,7 +981,7 @@ function ProductsView({
             </div>
             <div className="shea-admin-image-field">
               <span>Product image</span>
-              {draft.imageUrl ? <img src={draft.imageUrl} alt="Selected product" /> : null}
+              {draft.imageUrl ? <StorefrontImage src={draft.imageUrl} alt="Selected product" /> : null}
               <div>
                 <button type="button" onClick={() => setIsMediaLibraryOpen(true)}><Image size={16} /> Choose from media library</button>
                 <small>Pick an existing image or upload a new one below.</small>
@@ -1150,7 +1062,7 @@ function ProductDetailsModal({ product, onClose, onEdit, onDelete }: { product: 
           <button type="button" onClick={onClose} aria-label="Close product details">×</button>
         </header>
         <div className="shea-product-modal-body">
-          <img src={product.imageUrl} alt={product.title} />
+          <StorefrontImage src={product.imageUrl} alt={product.title} />
           <div>
             <span className={clsx("shea-admin-status", product.status)}>{titleCase(product.status)}</span>
             <p>{product.description}</p>
@@ -1223,7 +1135,7 @@ function MediaLibraryPicker({
         <div className="shea-media-picker-grid">
           {isLoading ? <p className="shea-media-picker-loading">Loading your saved media library…</p> : pageAssets.map((asset) => (
             <button type="button" key={asset.src} className={clsx(asset.src === selectedSrc && "selected")} onClick={() => onSelect(asset.src)} title={asset.title}>
-              <img src={asset.src} alt={asset.title} loading="lazy" decoding="async" />
+              <StorefrontImage src={asset.src} alt={asset.title} loading="lazy" decoding="async" />
               <span>{asset.title}</span>
               <small>{mediaFilename(asset.src)}</small>
             </button>
@@ -1497,7 +1409,7 @@ function MediaView({
     if (section === "hero") {
       const nextSlide: SheaHeroSlide = {
         id: mediaId,
-        title: draft.title.trim() || "Before and after Shea Wellness routine",
+        title: draft.title.trim() || "Your everyday ritual",
         src: draft.src.trim(),
         type: "image",
         tag: draft.tag.trim() || "Before and after",
@@ -1571,7 +1483,7 @@ function MediaView({
 
   async function resetMedia() {
     if (isSavingMedia) return;
-    const confirmed = window.confirm("Reset all Shea Wellness media entries to the default site media?");
+    const confirmed = window.confirm("Reset carousel copy and clear the image library? Your current media entries will be replaced.");
     if (!confirmed) return;
     const saved = await commitMediaConfig(sheaDefaultMediaConfig);
     if (!saved) return;
@@ -1590,14 +1502,14 @@ function MediaView({
       <div className="shea-admin-segments">
         {(["hero", "images", "videos"] as MediaSection[]).map((item) => (
           <button key={item} type="button" className={clsx(section === item && "active")} onClick={() => switchSection(item)} disabled={isSavingMedia}>
-            {item === "hero" ? "Before/after carousel" : titleCase(item)}
+            {item === "hero" ? "Homepage carousel" : titleCase(item)}
           </button>
         ))}
       </div>
       <p className={clsx("shea-admin-save-notice", mediaSaveState)} role={mediaSaveState === "error" ? "alert" : "status"}>{mediaSaveMessage}</p>
       <section className="shea-admin-grid wide-left shea-admin-media-layout">
         <Panel
-          title={section === "hero" ? "Before/after carousel" : section === "images" ? "Image library" : "Video library"}
+          title={section === "hero" ? "Homepage carousel" : section === "images" ? "Image library" : "Video library"}
           description="Every entry here is editable and saved to the live Neon-backed storefront."
           action={<button type="button" onClick={startCreate} disabled={isSavingMedia}>Add media</button>}
         >
@@ -1607,7 +1519,7 @@ function MediaView({
                 {asset.type === "video" ? (
                   <video src={asset.src} muted loop playsInline preload="metadata" />
                 ) : (
-                  <img src={asset.src} alt={asset.title} style={{ objectPosition: asset.objectPosition ?? "50% 50%" }} />
+                  <StorefrontImage src={asset.src} alt={asset.title} style={{ objectPosition: asset.objectPosition ?? "50% 50%" }} />
                 )}
                 <span>{asset.tag}</span>
                 <strong>{asset.title}</strong>
@@ -1628,7 +1540,7 @@ function MediaView({
         </Panel>
         <Panel
           title={editingId ? "Edit media" : "Add media"}
-          description="Use public paths like /assets/file.jpeg or paste a full hosted media URL."
+          description="Upload your own image or paste a hosted image URL. Landscape banners and portrait photos fit without cropping."
         >
           <div ref={mediaEditorRef} className="shea-admin-editor-anchor">
           <div className="shea-admin-editing-banner" aria-live="polite">
@@ -1642,7 +1554,7 @@ function MediaView({
             </label>
             <label>
               Media URL
-              <input required value={draft.src} onChange={(event) => updateDraft("src", event.target.value)} />
+              <input required={section !== "hero"} value={draft.src} onChange={(event) => updateDraft("src", event.target.value)} />
             </label>
             <>
               <label className={`shea-admin-upload ${imageUploadState}`}>
@@ -1650,7 +1562,7 @@ function MediaView({
                 <small>{imageUploadMessage}</small>
                 <input type="file" accept={section === "videos" ? "video/mp4,video/webm,video/quicktime" : "image/jpeg,image/png,image/webp,image/gif,image/avif"} onChange={uploadMediaFile} disabled={imageUploadState === "uploading"} />
               </label>
-              {draft.src ? section === "videos" ? <video className="shea-admin-upload-preview" src={draft.src} controls preload="metadata" /> : <img className="shea-admin-upload-preview" src={draft.src} alt="Media upload preview" /> : null}
+              {draft.src ? section === "videos" ? <video className="shea-admin-upload-preview" src={draft.src} controls preload="metadata" /> : <StorefrontImage className="shea-admin-upload-preview" src={draft.src} alt="Media upload preview" /> : null}
             </>
             <div className="shea-admin-form-row">
               <label>
@@ -1855,7 +1767,7 @@ function ProductTable({
             <tr key={product.id}>
               <td>
                 <button type="button" className="shea-admin-product-cell" onClick={() => onView?.(product)} disabled={!onView} aria-label={onView ? `View ${product.title} details` : undefined}>
-                  <img src={product.imageUrl} alt="" />
+                  <StorefrontImage src={product.imageUrl} alt="" />
                   <div>
                     <strong>{product.title}</strong>
                     <small>{product.deliveryBadge}</small>

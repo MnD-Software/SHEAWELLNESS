@@ -19,7 +19,8 @@ export function applyPageOverrides(pageOverrides: PageOverrides, path = window.l
     const node = imageNodes[Number(key)];
     if (node && !node.closest("[data-live-content], .department-product-carousel") && node.getAttribute("src") !== value) {
       node.removeAttribute("srcset");
-      node.src = value;
+      if (value) { node.src = value; node.alt = node.dataset.imageLabel || "Page image"; }
+      else { node.removeAttribute("src"); node.alt = ""; }
     }
   });
 }

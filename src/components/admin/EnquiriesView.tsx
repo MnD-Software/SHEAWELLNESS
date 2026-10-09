@@ -6,7 +6,7 @@ export function EnquiriesView() {
   const [message, setMessage] = useState('Loading enquiries…');
   useEffect(() => {
     let active = true;
-    fetch('/api/admin/enquiries', { headers: { 'x-shea-admin-key': sessionStorage.getItem('sheaWellnessAdminAccessKey') ?? '' }, cache: 'no-store' })
+    fetch('/api/admin/enquiries', { cache: 'no-store' })
       .then(async response => { const payload = await response.json(); if (!response.ok) throw new Error(payload.error); if (active) { setItems(payload.data); setMessage(payload.data.length ? '' : 'No enquiries yet.'); } })
       .catch(error => { if (active) setMessage(error.message); });
     return () => { active = false; };

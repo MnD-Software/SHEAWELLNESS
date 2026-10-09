@@ -1,3 +1,18 @@
+import { retiredPresetImagePaths } from "./retired-preset-images";
+
+/** Retire existing presets while allowing the owner to upload or add new files. */
+export function clearPresetImage(src: string | null | undefined): string {
+  if (!src) return "";
+  const source = src.trim();
+  try {
+    const path = decodeURIComponent(new URL(source, "https://shea.local").pathname);
+    if (retiredPresetImagePaths.has(path) || path.startsWith("/assets/WhatsApp Image ")) return "";
+  } catch {
+    return "";
+  }
+  return source;
+}
+
 /**
  * Some of the supplied black-soap source photos were exported without EXIF
  * orientation metadata. Keep the correction explicit and narrowly scoped so

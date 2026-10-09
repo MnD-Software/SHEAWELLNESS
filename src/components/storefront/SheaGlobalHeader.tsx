@@ -109,7 +109,7 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
     <aside ref={sidebarRef} className={`shea-desktop-sidebar${mobileOpen ? " open" : ""}`} aria-label="Complete site navigation" aria-hidden={!mobileOpen}>
       <div className="shea-sidebar-topline">
         <a href="/" aria-label={`${sheaBrand.name} home`}>
-          <img src="/assets/website-edits/shea-wellness-logo.jpg" alt="Shea Wellness" />
+          <b className="shea-wordmark" aria-hidden="true">S</b>
           <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
         </a>
         <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close site navigation"><X size={22} /></button>
@@ -148,7 +148,7 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
       <div className={styles.promo}>100% natural. Ethically sourced Nilotica shea.</div>
       <div className={styles.bar}>
         <a className={styles.brand} href="/" aria-label={sheaBrand.name + " home"}>
-          <img src="/assets/website-edits/shea-wellness-logo.jpg" alt={sheaBrand.name} width={54} height={54} />
+          <b className="shea-wordmark" aria-hidden="true">S</b>
           <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
         </a>
         <nav className={styles.desktop} aria-label="Primary navigation">
