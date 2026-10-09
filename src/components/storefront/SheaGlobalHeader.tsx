@@ -60,6 +60,7 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const sidebarRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLElement | null>(null);
   const value = searchValue ?? localSearch;
   const searchTerm = value.trim().toLowerCase();
   const searchResults = [
@@ -79,6 +80,19 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
     if (mobileOpen && sidebarRef.current) sidebarRef.current.scrollTop = 0;
     return () => document.body.classList.remove("shea-menu-open");
   }, [mobileOpen]);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const updateHeight = () => document.documentElement.style.setProperty("--shea-fixed-header", `${header.getBoundingClientRect().height}px`);
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(header);
+    return () => {
+      observer.disconnect();
+      document.documentElement.style.removeProperty("--shea-fixed-header");
+    };
+  }, []);
 
   function setValue(nextValue: string) {
     if (onSearchChange) {
@@ -144,7 +158,7 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
       </div>
     </aside>
 
-    <header className={styles.shell} data-testid="global-header" data-cart-ready={ready}>
+    <header ref={headerRef} className={styles.shell} data-testid="global-header" data-cart-ready={ready}>
       <div className={styles.promo}>100% natural. Ethically sourced Nilotica shea.</div>
       <div className={styles.bar}>
         <a className={styles.brand} href="/" aria-label={sheaBrand.name + " home"}>
@@ -170,6 +184,7 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
         <div>{searchResults.map(item => <a href={item.href} key={item.href + item.label}><span><strong>{item.label}</strong><small>{item.body}</small></span><ArrowRight size={16} /></a>)}</div>
       </section>}
     </header>
+    <div className={styles.spacer} aria-hidden="true" data-testid="header-spacer" />
     </>
   );
 }

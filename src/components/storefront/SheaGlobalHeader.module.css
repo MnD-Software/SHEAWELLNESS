@@ -1,4 +1,5 @@
-.shell { position: sticky; top: 0; z-index: 900; width: 100%; color: #173d2b; background: #f4f6f0; border-bottom: 1px solid #dfe5db; }
+.shell { position: fixed; inset: 0 0 auto; z-index: 900; width: 100%; color: #173d2b; background: #f4f6f0; border-bottom: 1px solid #dfe5db; }
+.spacer { height: var(--shea-fixed-header, 119px); }
 .promo { padding: 8px 16px; background: #10231a; color: #fff; text-align: center; font: 750 10px/1.4 Arial, sans-serif; letter-spacing: .05em; text-transform: uppercase; }
 .bar { display: flex; align-items: center; gap: 24px; max-width: 1440px; min-height: 88px; margin: auto; padding: 14px 28px; }
 .brand { display: flex; align-items: center; flex-shrink: 0; gap: 10px; text-decoration: none; color: inherit; }

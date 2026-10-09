@@ -32,7 +32,9 @@ import { replaceRetiredSyntheticImage, sanitizeSheaMediaConfig, sheaDefaultMedia
 import { useStorefrontCart } from "./StorefrontCart";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import type { Product, Store } from "@/lib/types";
-import { partnerLogos, quickFaqs } from "@/lib/shea-website-content";
+import { quickFaqs } from "@/lib/shea-website-content";
+import { ownerAsset, ownerRoutineImages } from "@/lib/owner-media";
+import { OwnerPartners, OwnerRoutineProgress } from "./OwnerSuppliedMedia";
 
 type CartLine = {
   product: Product;
@@ -193,7 +195,7 @@ export function CommerceStorefront({
   const wellnessGuidesEnabled = initialWellnessGuidesEnabled;
 
   const heroSlides = mediaConfig.heroSlides;
-  const mediaVideos = mediaConfig.videos;
+  const mediaVideos = [...mediaConfig.videos].sort((left, right) => Number(right.id.startsWith("owner_oct_")) - Number(left.id.startsWith("owner_oct_")));
 
 
   useEffect(() => {
@@ -493,7 +495,7 @@ export function CommerceStorefront({
               {concernCards.map((guide, index) => (
                 <a href={guide.href} key={guide.title}>
                   <span>0{index + 1}</span>
-                  <StorefrontImage src={guide.image} alt="" loading="lazy" decoding="async" />
+                  <StorefrontImage src={ownerAsset(ownerRoutineImages[guide.href.split("#")[1]].front)} alt="" loading="lazy" decoding="async" />
                   <div><strong>{guide.title}</strong><small>{guide.body}</small></div>
                   <ArrowRight size={18} />
                 </a>
@@ -513,7 +515,7 @@ export function CommerceStorefront({
             <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
               {mediaVideos.slice(0, 4).map((video) => (
                 <article key={video.src}>
-                  <video src={video.src} controls playsInline preload="none" />
+                  <video src={video.src} poster={video.src.startsWith("/assets/owner-oct-2026/") ? video.src.replace(".mp4", "-poster.webp") : undefined} controls playsInline preload="none" />
                   <strong>{video.title}</strong>
                 </article>
               ))}
@@ -574,7 +576,7 @@ export function CommerceStorefront({
             <article className="commerce-product-card" key={product.id}>
               <a className={clsx("commerce-product-image", isSidewaysSheaProductAsset(product.imageUrl) && "is-rotated")} href={`/products/${encodeURIComponent(product.id)}`}>
                 <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
-                <span className="commerce-card-badges"><em>{product.category}</em>{lowStock ? <em className="stock">Low stock</em> : null}</span>
+                <span className="commerce-card-badges"><em>{product.category}</em>{lowStock ? <em className="stock">{product.inventoryQty < 1 ? "Enquire" : "Low stock"}</em> : null}</span>
                 <b>View product</b>
               </a>
               <button type="button" className={clsx("commerce-card-wishlist", wished && "active")} onClick={() => toggleWishlist(product.id)} aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}><Heart size={18} fill={wished ? "currentColor" : "none"} /></button>
@@ -584,7 +586,7 @@ export function CommerceStorefront({
                   <p>{product.description}</p>
                 </div>
                 <div className="commerce-card-footer">
-                  <span className={clsx("commerce-stock-status", lowStock && "low")}><i />{lowStock ? `${product.inventoryQty} left` : "In stock"}</span>
+                  <span className={clsx("commerce-stock-status", lowStock && "low")}><i />{product.inventoryQty < 1 ? "Enquire for availability" : lowStock ? `${product.inventoryQty} left` : "In stock"}</span>
                   <button type="button" onClick={() => viewProduct(product.id)} aria-label={`View ${product.title}`}>
                     <Eye size={17} />
                     View product
@@ -619,7 +621,7 @@ export function CommerceStorefront({
         <div className="commerce-concern-grid">
           {concernCards.map((concern) => (
             <a href={concern.href} key={concern.title}>
-              <StorefrontImage src={concern.image} alt="" loading="lazy" />
+              <StorefrontImage src={ownerAsset(ownerRoutineImages[concern.href.split("#")[1]].front)} alt={concern.title} loading="lazy" />
               <i />
               <strong>{concern.title}</strong>
               <span>{concern.body}</span>
@@ -631,7 +633,7 @@ export function CommerceStorefront({
 
       <section className="commerce-seen-strip" aria-label="Shea Wellness partners">
         <span>Our partners</span>
-        <div className="shea-partner-names">{partnerLogos.map(([name]) => <span key={name}>{name}</span>)}</div>
+        <OwnerPartners />
       </section>
 
       <section className="commerce-guarantee-strip" aria-label="Store assurances">
@@ -655,6 +657,7 @@ export function CommerceStorefront({
         </div>
         <ol className="shea-routine-steps">{routineProgressSlides.map((slide, index) => <li key={slide.title}><span>0{index + 1}</span><strong>{slide.title}</strong><small>{slide.labels.join(" · ")}</small></li>)}</ol>
       </section>
+      <OwnerRoutineProgress />
 
       <section className="commerce-comparison-section">
         <div className="commerce-comparison-copy">

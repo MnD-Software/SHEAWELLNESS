@@ -1,6 +1,7 @@
 "use client";
 
 import { StorefrontImage } from "./StorefrontImage";
+import { ownerAsset, ownerProductImages, ownerRoutineImages } from "@/lib/owner-media";
 import { CheckCircle2, Droplets, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import { productPairings } from "@/lib/shea-website-content";
@@ -190,12 +191,12 @@ export function SheaWellnessGuides() {
         <article className="wellness-guide" id={guide.id} key={guide.id}>
           <header>
             <div><span>Guide {String(index + 1).padStart(2, "0")}</span><h2>{guide.title}</h2><p>{guide.intro}</p></div>
-            <StorefrontImage src={guide.image} alt={`Shea Wellness ${guide.title}`} />
+            <StorefrontImage src={ownerAsset(ownerRoutineImages[guide.id].detail)} alt={`Shea Wellness ${guide.title}`} />
           </header>
           <div className="guide-products">
             {guide.products.map((product, productIndex) => (
               <section key={product.name}>
-                {product.image ? <StorefrontImage className="guide-product-image" src={product.image} alt={`Shea Wellness ${product.name}`} /> : <div className="guide-product-image guide-product-image--pending" role="img" aria-label={`Verified product image for ${product.name} is pending`}><ShieldCheck size={28} /><span>Verified product image pending</span></div>}
+                {(product.productId && ownerProductImages[product.productId]) || product.name === "Soothing Body Oil" ? <StorefrontImage className="guide-product-image" src={ownerAsset(ownerProductImages[product.productId ?? "prod_soothing_body_oil"])} alt={`Shea Wellness ${product.name}`} /> : <div className="guide-product-image guide-product-image--pending" role="img" aria-label={`Product photo for ${product.name} is not yet available`}><ShieldCheck size={28} /><span>Photo coming soon</span></div>}
                 <span>Step {productIndex + 1}</span>
                 <h3>{product.name}</h3>
                 <strong>{product.role}</strong>

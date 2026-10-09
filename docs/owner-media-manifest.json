@@ -1,0 +1,432 @@
+{
+  "images": {
+    "price-list": {
+      "src": "/assets/owner-oct-2026/price-list.webp",
+      "width": 720,
+      "height": 1280
+    },
+    "progress-face-1": {
+      "src": "/assets/owner-oct-2026/progress-face-1.webp",
+      "width": 449,
+      "height": 449
+    },
+    "routine-dry-skin": {
+      "src": "/assets/owner-oct-2026/routine-dry-skin.webp",
+      "width": 579,
+      "height": 869
+    },
+    "routine-dry-care": {
+      "src": "/assets/owner-oct-2026/routine-dry-care.webp",
+      "width": 1024,
+      "height": 1280
+    },
+    "routine-sensitive-skin": {
+      "src": "/assets/owner-oct-2026/routine-sensitive-skin.webp",
+      "width": 444,
+      "height": 444
+    },
+    "routine-sensitive-care": {
+      "src": "/assets/owner-oct-2026/routine-sensitive-care.webp",
+      "width": 1200,
+      "height": 1200
+    },
+    "routine-body-glow": {
+      "src": "/assets/owner-oct-2026/routine-body-glow.webp",
+      "width": 570,
+      "height": 713
+    },
+    "routine-body-care": {
+      "src": "/assets/owner-oct-2026/routine-body-care.webp",
+      "width": 731,
+      "height": 1280
+    },
+    "routine-face": {
+      "src": "/assets/owner-oct-2026/routine-face.webp",
+      "width": 1024,
+      "height": 1280
+    },
+    "routine-face-care": {
+      "src": "/assets/owner-oct-2026/routine-face-care.webp",
+      "width": 1200,
+      "height": 1174
+    },
+    "routine-spa-front": {
+      "src": "/assets/owner-oct-2026/routine-spa-front.webp",
+      "width": 278,
+      "height": 416
+    },
+    "routine-spa-care": {
+      "src": "/assets/owner-oct-2026/routine-spa-care.webp",
+      "width": 800,
+      "height": 1200
+    },
+    "black-soap-body": {
+      "src": "/assets/owner-oct-2026/black-soap-body.webp",
+      "width": 455,
+      "height": 607
+    },
+    "black-soap-face": {
+      "src": "/assets/owner-oct-2026/black-soap-face.webp",
+      "width": 449,
+      "height": 599
+    },
+    "pure-raw-shea": {
+      "src": "/assets/owner-oct-2026/pure-raw-shea.webp",
+      "width": 563,
+      "height": 704
+    },
+    "vanilla-mint-330": {
+      "src": "/assets/owner-oct-2026/vanilla-mint-330.webp",
+      "width": 559,
+      "height": 636
+    },
+    "vanilla-mint-200": {
+      "src": "/assets/owner-oct-2026/vanilla-mint-200.webp",
+      "width": 483,
+      "height": 644
+    },
+    "lavender-330": {
+      "src": "/assets/owner-oct-2026/lavender-330.webp",
+      "width": 658,
+      "height": 877
+    },
+    "lavender-200": {
+      "src": "/assets/owner-oct-2026/lavender-200.webp",
+      "width": 753,
+      "height": 880
+    },
+    "grapefruit-200": {
+      "src": "/assets/owner-oct-2026/grapefruit-200.webp",
+      "width": 533,
+      "height": 711
+    },
+    "grapefruit-330": {
+      "src": "/assets/owner-oct-2026/grapefruit-330.webp",
+      "width": 541,
+      "height": 718
+    },
+    "essential-tea-tree": {
+      "src": "/assets/owner-oct-2026/essential-tea-tree.webp",
+      "width": 500,
+      "height": 667
+    },
+    "essential-eucalyptus": {
+      "src": "/assets/owner-oct-2026/essential-eucalyptus.webp",
+      "width": 516,
+      "height": 689
+    },
+    "essential-lemongrass": {
+      "src": "/assets/owner-oct-2026/essential-lemongrass.webp",
+      "width": 498,
+      "height": 664
+    },
+    "essential-peppermint": {
+      "src": "/assets/owner-oct-2026/essential-peppermint.webp",
+      "width": 634,
+      "height": 846
+    },
+    "essential-sweet-orange": {
+      "src": "/assets/owner-oct-2026/essential-sweet-orange.webp",
+      "width": 509,
+      "height": 679
+    },
+    "essential-lavender": {
+      "src": "/assets/owner-oct-2026/essential-lavender.webp",
+      "width": 490,
+      "height": 653
+    },
+    "diffuser-wood": {
+      "src": "/assets/owner-oct-2026/diffuser-wood.webp",
+      "width": 528,
+      "height": 704
+    },
+    "diffuser-pattern": {
+      "src": "/assets/owner-oct-2026/diffuser-pattern.webp",
+      "width": 537,
+      "height": 717
+    },
+    "diffuser-white": {
+      "src": "/assets/owner-oct-2026/diffuser-white.webp",
+      "width": 529,
+      "height": 520
+    },
+    "massage-oils": {
+      "src": "/assets/owner-oct-2026/massage-oils.webp",
+      "width": 646,
+      "height": 861
+    },
+    "massage-oils-detail": {
+      "src": "/assets/owner-oct-2026/massage-oils-detail.webp",
+      "width": 638,
+      "height": 851
+    },
+    "mosquito-repellents": {
+      "src": "/assets/owner-oct-2026/mosquito-repellents.webp",
+      "width": 630,
+      "height": 841
+    },
+    "progress-face-2": {
+      "src": "/assets/owner-oct-2026/progress-face-2.webp",
+      "width": 454,
+      "height": 454
+    },
+    "progress-heels": {
+      "src": "/assets/owner-oct-2026/progress-heels.webp",
+      "width": 528,
+      "height": 659
+    },
+    "progress-hands": {
+      "src": "/assets/owner-oct-2026/progress-hands.webp",
+      "width": 634,
+      "height": 659
+    },
+    "partner-19": {
+      "src": "/assets/owner-oct-2026/partner-19.webp",
+      "width": 196,
+      "height": 48
+    },
+    "partner-16": {
+      "src": "/assets/owner-oct-2026/partner-16.webp",
+      "width": 400,
+      "height": 262
+    },
+    "partner-18": {
+      "src": "/assets/owner-oct-2026/partner-18.webp",
+      "width": 379,
+      "height": 133
+    },
+    "partner-01": {
+      "src": "/assets/owner-oct-2026/partner-01.webp",
+      "width": 366,
+      "height": 138
+    },
+    "partner-02": {
+      "src": "/assets/owner-oct-2026/partner-02.webp",
+      "width": 1366,
+      "height": 768
+    },
+    "partner-03": {
+      "src": "/assets/owner-oct-2026/partner-03.webp",
+      "width": 358,
+      "height": 141
+    },
+    "partner-04": {
+      "src": "/assets/owner-oct-2026/partner-04.webp",
+      "width": 423,
+      "height": 200
+    },
+    "partner-05": {
+      "src": "/assets/owner-oct-2026/partner-05.webp",
+      "width": 1600,
+      "height": 1081
+    },
+    "partner-06": {
+      "src": "/assets/owner-oct-2026/partner-06.webp",
+      "width": 213,
+      "height": 237
+    },
+    "partner-07": {
+      "src": "/assets/owner-oct-2026/partner-07.webp",
+      "width": 400,
+      "height": 400
+    },
+    "partner-08": {
+      "src": "/assets/owner-oct-2026/partner-08.webp",
+      "width": 600,
+      "height": 200
+    },
+    "partner-09": {
+      "src": "/assets/owner-oct-2026/partner-09.webp",
+      "width": 200,
+      "height": 200
+    },
+    "partner-10": {
+      "src": "/assets/owner-oct-2026/partner-10.webp",
+      "width": 413,
+      "height": 122
+    },
+    "partner-11": {
+      "src": "/assets/owner-oct-2026/partner-11.webp",
+      "width": 400,
+      "height": 400
+    },
+    "partner-12": {
+      "src": "/assets/owner-oct-2026/partner-12.webp",
+      "width": 200,
+      "height": 200
+    },
+    "partner-13": {
+      "src": "/assets/owner-oct-2026/partner-13.webp",
+      "width": 797,
+      "height": 397
+    },
+    "partner-14": {
+      "src": "/assets/owner-oct-2026/partner-14.webp",
+      "width": 225,
+      "height": 225
+    },
+    "partner-15": {
+      "src": "/assets/owner-oct-2026/partner-15.webp",
+      "width": 900,
+      "height": 500
+    },
+    "partner-17": {
+      "src": "/assets/owner-oct-2026/partner-17.webp",
+      "width": 200,
+      "height": 200
+    },
+    "partner-20": {
+      "src": "/assets/owner-oct-2026/partner-20.webp",
+      "width": 472,
+      "height": 107
+    },
+    "partner-21": {
+      "src": "/assets/owner-oct-2026/partner-21.webp",
+      "width": 352,
+      "height": 163
+    },
+    "partner-23": {
+      "src": "/assets/owner-oct-2026/partner-23.webp",
+      "width": 550,
+      "height": 550
+    },
+    "partner-24": {
+      "src": "/assets/owner-oct-2026/partner-24.webp",
+      "width": 459,
+      "height": 305
+    },
+    "partner-25": {
+      "src": "/assets/owner-oct-2026/partner-25.webp",
+      "width": 447,
+      "height": 447
+    },
+    "partner-26": {
+      "src": "/assets/owner-oct-2026/partner-26.webp",
+      "width": 447,
+      "height": 447
+    },
+    "partner-27": {
+      "src": "/assets/owner-oct-2026/partner-27.webp",
+      "width": 738,
+      "height": 258
+    },
+    "partner-28": {
+      "src": "/assets/owner-oct-2026/partner-28.webp",
+      "width": 530,
+      "height": 205
+    },
+    "partner-29": {
+      "src": "/assets/owner-oct-2026/partner-29.webp",
+      "width": 447,
+      "height": 447
+    },
+    "partner-30": {
+      "src": "/assets/owner-oct-2026/partner-30.webp",
+      "width": 825,
+      "height": 249
+    },
+    "cosmetics-flyer-cover": {
+      "src": "/assets/owner-oct-2026/cosmetics-flyer-cover.webp",
+      "width": 596,
+      "height": 843
+    },
+    "wellness-brochure-cover": {
+      "src": "/assets/owner-oct-2026/wellness-brochure-cover.webp",
+      "width": 843,
+      "height": 596
+    }
+  },
+  "videos": {
+    "african-liquid-black-soap": {
+      "src": "/assets/owner-oct-2026/african-liquid-black-soap.mp4",
+      "bytes": 3436770,
+      "sha256": "be5fcca11e14c12fc589db1434ed0f78b11304bc01f383727fad8947c1d75546"
+    },
+    "pureand-raw-shea-butter": {
+      "src": "/assets/owner-oct-2026/pureand-raw-shea-butter.mp4",
+      "bytes": 2745789,
+      "sha256": "89f64b18e45bf66e49a48e45e465ebcf05e2f5b2f380a7937c42b638101f49b4"
+    },
+    "vanilla-mint": {
+      "src": "/assets/owner-oct-2026/vanilla-mint.mp4",
+      "bytes": 1443001,
+      "sha256": "6ff5b673634ae24802f6a097eac058aca1aa561469663c483ab9a639e19cbd55"
+    },
+    "lavender-video": {
+      "src": "/assets/owner-oct-2026/lavender-video.mp4",
+      "bytes": 1511336,
+      "sha256": "cf30611889dc5a265930d28af41198771af564c7ddb467684ad2a559db33bdba"
+    },
+    "hair-oil": {
+      "src": "/assets/owner-oct-2026/hair-oil.mp4",
+      "bytes": 2682147,
+      "sha256": "86928dc2de6fa0edd97e74622fded72b25d981130fbebd551dc5d3e66afb2300"
+    },
+    "hair-butter": {
+      "src": "/assets/owner-oct-2026/hair-butter.mp4",
+      "bytes": 2200036,
+      "sha256": "4551f6323cba1c2dad521a9e6d9c3b3bc0fa097b5c2b599faad769149f377d54"
+    },
+    "humidifier": {
+      "src": "/assets/owner-oct-2026/humidifier.mp4",
+      "bytes": 4708094,
+      "sha256": "3a7aa03b1a0665517f7c5f1cda92898f5273bf396e713e6c4c50b611927995d1"
+    },
+    "humidifier2": {
+      "src": "/assets/owner-oct-2026/humidifier2.mp4",
+      "bytes": 2769623,
+      "sha256": "9cae06c688f813eb79dccb1cce617ae2efcae275d1636a9ea6f2d8171f2c938f"
+    },
+    "humidifer-3": {
+      "src": "/assets/owner-oct-2026/humidifer-3.mp4",
+      "bytes": 2494441,
+      "sha256": "73d57db5431ffcbb4e0bb904fed1b70d3600b8e6eda8937967cb4cbf67f8dcf4"
+    },
+    "energize-massage-oil": {
+      "src": "/assets/owner-oct-2026/energize-massage-oil.mp4",
+      "bytes": 2317897,
+      "sha256": "c4f1b3444b54015116be7b9a94d7ddcbf0f9c8bbc418467dfef7bcf062839e74"
+    },
+    "caster-oil": {
+      "src": "/assets/owner-oct-2026/caster-oil.mp4",
+      "bytes": 3297193,
+      "sha256": "b9c1f1b768237aa3da89c0f1521b65686b240bc046a6a6da8dadcabcfd2dafcb"
+    },
+    "vitamine": {
+      "src": "/assets/owner-oct-2026/vitamine.mp4",
+      "bytes": 1787803,
+      "sha256": "1f553c1bed0062031b8973e9b4f90bd4dc436ed3137f4931f378d39b8f08c9cb"
+    },
+    "neem-oil": {
+      "src": "/assets/owner-oct-2026/neem-oil.mp4",
+      "bytes": 1805257,
+      "sha256": "5d7fe545ef3adc32b87603b44a1c09ac968ab95fc6a9b9e8434a2c08c7a55a97"
+    },
+    "mosquito-repelant": {
+      "src": "/assets/owner-oct-2026/mosquito-repelant.mp4",
+      "bytes": 2080018,
+      "sha256": "2bf1be94d7c53e7797a50ef66624962a4c1b9d9ea9d0a73fdfb697d7a447121a"
+    },
+    "deep-tissue-massage": {
+      "src": "/assets/owner-oct-2026/deep-tissue-massage.mp4",
+      "bytes": 2480517,
+      "sha256": "808221ac1a74aae7801cd0fb6c29ae9a9ea8bbf3b24cbe6122e0b35d38246ab0"
+    },
+    "owner-film-01": {
+      "src": "/assets/owner-oct-2026/owner-film-01.mp4",
+      "bytes": 8433408,
+      "sha256": "9ba02580664108dcf75357235d6187005d316316fa28becb50a7c186a1cc75b1"
+    },
+    "owner-film-02": {
+      "src": "/assets/owner-oct-2026/owner-film-02.mp4",
+      "bytes": 4986260,
+      "sha256": "23f501a88bda6180c8744dfe44f419c9d440909690231552c343a2341c86dc15"
+    },
+    "owner-film-03": {
+      "src": "/assets/owner-oct-2026/owner-film-03.mp4",
+      "bytes": 9016783,
+      "sha256": "09329070f6f52b0a6df999120e22af1e502324a02751b6c743649f441e938990"
+    }
+  },
+  "sources": []
+}

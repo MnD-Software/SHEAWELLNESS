@@ -1,0 +1,881 @@
+{
+  "version": "owner-supplied-2026-10-09",
+  "updates": [
+    {
+      "id": "prod_pure_raw",
+      "imageUrl": "/assets/owner-oct-2026/pure-raw-shea.webp",
+      "video": "pureand-raw-shea-butter"
+    },
+    {
+      "id": "prod_vanilla_mint",
+      "imageUrl": "/assets/owner-oct-2026/vanilla-mint-200.webp",
+      "sizes": [
+        "200ml",
+        "330ml"
+      ],
+      "sizePrices": {
+        "200ml": 1100,
+        "330ml": 1500
+      },
+      "sizeMedia": {
+        "200ml": {
+          "imageUrl": "/assets/owner-oct-2026/vanilla-mint-200.webp",
+          "videoUrl": "/assets/owner-oct-2026/vanilla-mint.mp4"
+        },
+        "330ml": {
+          "imageUrl": "/assets/owner-oct-2026/vanilla-mint-330.webp",
+          "videoUrl": "/assets/owner-oct-2026/vanilla-mint.mp4"
+        }
+      },
+      "price": 1100
+    },
+    {
+      "id": "prod_lavender",
+      "imageUrl": "/assets/owner-oct-2026/lavender-200.webp",
+      "sizes": [
+        "200ml",
+        "330ml"
+      ],
+      "sizePrices": {
+        "200ml": 1100,
+        "330ml": 1500
+      },
+      "sizeMedia": {
+        "200ml": {
+          "imageUrl": "/assets/owner-oct-2026/lavender-200.webp",
+          "videoUrl": "/assets/owner-oct-2026/lavender-video.mp4"
+        },
+        "330ml": {
+          "imageUrl": "/assets/owner-oct-2026/lavender-330.webp",
+          "videoUrl": "/assets/owner-oct-2026/lavender-video.mp4"
+        }
+      },
+      "price": 1100
+    },
+    {
+      "id": "prod_grapefruit",
+      "imageUrl": "/assets/owner-oct-2026/grapefruit-200.webp",
+      "sizes": [
+        "200ml",
+        "330ml"
+      ],
+      "sizePrices": {
+        "200ml": 1100,
+        "330ml": 1500
+      },
+      "sizeMedia": {
+        "200ml": {
+          "imageUrl": "/assets/owner-oct-2026/grapefruit-200.webp"
+        },
+        "330ml": {
+          "imageUrl": "/assets/owner-oct-2026/grapefruit-330.webp"
+        }
+      },
+      "price": 1100
+    },
+    {
+      "id": "prod_black_soap",
+      "imageUrl": "/assets/owner-oct-2026/black-soap-face.webp",
+      "sizeMedia": {
+        "Face Wash 100ml": {
+          "imageUrl": "/assets/owner-oct-2026/black-soap-face.webp",
+          "videoUrl": "/assets/owner-oct-2026/african-liquid-black-soap.mp4"
+        },
+        "Body Wash 330ml": {
+          "imageUrl": "/assets/owner-oct-2026/black-soap-body.webp",
+          "videoUrl": "/assets/owner-oct-2026/african-liquid-black-soap.mp4"
+        }
+      }
+    },
+    {
+      "id": "prod_chebe_serum",
+      "price": 1700,
+      "sizes": [
+        "120ml"
+      ],
+      "sizePrices": {
+        "120ml": 1700
+      },
+      "video": "hair-oil",
+      "imageUrl": "/assets/owner-oct-2026/hair-oil-poster.webp"
+    },
+    {
+      "id": "prod_chebe_butter",
+      "video": "hair-butter",
+      "imageUrl": "/assets/owner-oct-2026/hair-butter-poster.webp"
+    },
+    {
+      "id": "prod_essential_oils",
+      "title": "Essential Oils",
+      "imageUrl": "/assets/owner-oct-2026/essential-lavender.webp",
+      "sizeMedia": {
+        "Tea Tree 10ml": {
+          "imageUrl": "/assets/owner-oct-2026/essential-tea-tree.webp"
+        },
+        "Eucalyptus 10ml": {
+          "imageUrl": "/assets/owner-oct-2026/essential-eucalyptus.webp"
+        },
+        "Lemongrass 10ml": {
+          "imageUrl": "/assets/owner-oct-2026/essential-lemongrass.webp"
+        },
+        "Peppermint 10ml": {
+          "imageUrl": "/assets/owner-oct-2026/essential-peppermint.webp"
+        },
+        "Sweet Orange 10ml": {
+          "imageUrl": "/assets/owner-oct-2026/essential-sweet-orange.webp"
+        },
+        "Lavender 10ml": {
+          "imageUrl": "/assets/owner-oct-2026/essential-lavender.webp"
+        },
+        "Rosemary 10ml": {
+          "imageUrl": ""
+        }
+      }
+    },
+    {
+      "id": "prod_aromatherapy",
+      "imageUrl": "/assets/owner-oct-2026/diffuser-wood.webp",
+      "video": "humidifier"
+    },
+    {
+      "id": "prod_gift_set",
+      "status": "draft",
+      "price": 0,
+      "sizePrices": {},
+      "imageUrl": ""
+    }
+  ],
+  "additions": [
+    {
+      "id": "prod_tea_tree_butter",
+      "title": "Tea Tree Shea Body Butter",
+      "category": "Skin Care",
+      "description": "Shea body butter with tea tree. Select the size for the owner-supplied price.",
+      "sizes": [
+        "200ml",
+        "330ml"
+      ],
+      "price": 1100,
+      "sizePrices": {
+        "200ml": 1100,
+        "330ml": 1500
+      }
+    },
+    {
+      "id": "prod_massage_oils",
+      "title": "Massage Therapy Oils",
+      "category": "Spa Essentials",
+      "description": "Shea Wellness massage oils for your treatment routine. Select the blend.",
+      "sizes": [
+        "Energizing 120ml",
+        "Revitalizing 120ml",
+        "Hydrating 120ml",
+        "Deep-Tissue 120ml",
+        "Pain-Relief 120ml",
+        "Soothing Body Oil 120ml"
+      ],
+      "price": 2000,
+      "imageUrl": "/assets/owner-oct-2026/massage-oils.webp",
+      "sizeMedia": {
+        "Energizing 120ml": {
+          "videoUrl": "/assets/owner-oct-2026/energize-massage-oil.mp4"
+        },
+        "Deep-Tissue 120ml": {
+          "videoUrl": "/assets/owner-oct-2026/deep-tissue-massage.mp4"
+        }
+      }
+    },
+    {
+      "id": "prod_jamaican_castor",
+      "title": "Jamaican Black Castor Oil",
+      "category": "Hair Care",
+      "description": "Cold-pressed castor oil for hair and body care.",
+      "sizes": [
+        "120ml"
+      ],
+      "price": 2500,
+      "video": "caster-oil"
+    },
+    {
+      "id": "prod_avocado_oil",
+      "title": "Cold-Pressed Avocado Oil",
+      "category": "Skin Care",
+      "description": "Avocado oil for your daily moisture routine.",
+      "sizes": [
+        "120ml"
+      ],
+      "price": 1500
+    },
+    {
+      "id": "prod_neem_oil",
+      "title": "Neem Oil",
+      "category": "Skin Care",
+      "description": "Shea Wellness neem oil. Follow product label directions.",
+      "sizes": [
+        "120ml"
+      ],
+      "price": 1500,
+      "video": "neem-oil"
+    },
+    {
+      "id": "prod_vitamin_oil_pending",
+      "title": "Vitamin Oil (name pending)",
+      "category": "Skin Care",
+      "description": "Owner confirmation of Vitamin E or Vitamin F is pending.",
+      "sizes": [
+        "120ml"
+      ],
+      "price": 2500,
+      "video": "vitamine",
+      "status": "draft"
+    },
+    {
+      "id": "prod_mosquito_repellents",
+      "title": "Mosquito Repellents",
+      "category": "Spa Essentials",
+      "description": "Shea Wellness repellents in lemongrass, lavender and clove. Follow the label directions.",
+      "sizes": [
+        "Lemongrass 120ml",
+        "Lavender 120ml",
+        "Clove 120ml"
+      ],
+      "price": 950,
+      "imageUrl": "/assets/owner-oct-2026/mosquito-repellents.webp",
+      "video": "mosquito-repelant"
+    }
+  ],
+  "heroSlides": [
+    {
+      "id": "owner_oct_skin",
+      "title": "Nature, in your everyday ritual.",
+      "kicker": "Pure Nilotica shea",
+      "body": "Discover the Shea Wellness collection, made for moments of everyday care.",
+      "src": "/assets/owner-oct-2026/lavender-330.webp",
+      "type": "image",
+      "tag": "Skin care",
+      "ctaLabel": "Explore skin care",
+      "ctaHref": "/skin"
+    },
+    {
+      "id": "owner_oct_face",
+      "title": "A fresh start for your skin.",
+      "kicker": "Face & body care",
+      "body": "Explore African liquid black soap and a simple routine for your skin.",
+      "src": "/assets/owner-oct-2026/black-soap-face.webp",
+      "type": "image",
+      "tag": "Face care",
+      "ctaLabel": "Explore face care",
+      "ctaHref": "/face"
+    },
+    {
+      "id": "owner_oct_spa",
+      "title": "Make room for calm.",
+      "kicker": "Wellness & spa",
+      "body": "Essential oils and aroma diffusers for your home or treatment space.",
+      "src": "/assets/owner-oct-2026/diffuser-wood.webp",
+      "type": "image",
+      "tag": "Spa care",
+      "ctaLabel": "Explore spa essentials",
+      "ctaHref": "/spa-essentials"
+    }
+  ],
+  "images": [
+    {
+      "id": "owner_oct_price-list",
+      "title": "price list",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/price-list.webp"
+    },
+    {
+      "id": "owner_oct_progress-face-1",
+      "title": "progress face 1",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/progress-face-1.webp"
+    },
+    {
+      "id": "owner_oct_routine-dry-skin",
+      "title": "routine dry skin",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-dry-skin.webp"
+    },
+    {
+      "id": "owner_oct_routine-dry-care",
+      "title": "routine dry care",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-dry-care.webp"
+    },
+    {
+      "id": "owner_oct_routine-sensitive-skin",
+      "title": "routine sensitive skin",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-sensitive-skin.webp"
+    },
+    {
+      "id": "owner_oct_routine-sensitive-care",
+      "title": "routine sensitive care",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-sensitive-care.webp"
+    },
+    {
+      "id": "owner_oct_routine-body-glow",
+      "title": "routine body glow",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-body-glow.webp"
+    },
+    {
+      "id": "owner_oct_routine-body-care",
+      "title": "routine body care",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-body-care.webp"
+    },
+    {
+      "id": "owner_oct_routine-face",
+      "title": "routine face",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-face.webp"
+    },
+    {
+      "id": "owner_oct_routine-face-care",
+      "title": "routine face care",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-face-care.webp"
+    },
+    {
+      "id": "owner_oct_routine-spa-front",
+      "title": "routine spa front",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-spa-front.webp"
+    },
+    {
+      "id": "owner_oct_routine-spa-care",
+      "title": "routine spa care",
+      "type": "image",
+      "tag": "Routine photography",
+      "src": "/assets/owner-oct-2026/routine-spa-care.webp"
+    },
+    {
+      "id": "owner_oct_black-soap-body",
+      "title": "black soap body",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/black-soap-body.webp"
+    },
+    {
+      "id": "owner_oct_black-soap-face",
+      "title": "black soap face",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/black-soap-face.webp"
+    },
+    {
+      "id": "owner_oct_pure-raw-shea",
+      "title": "pure raw shea",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/pure-raw-shea.webp"
+    },
+    {
+      "id": "owner_oct_vanilla-mint-330",
+      "title": "vanilla mint 330",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/vanilla-mint-330.webp"
+    },
+    {
+      "id": "owner_oct_vanilla-mint-200",
+      "title": "vanilla mint 200",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/vanilla-mint-200.webp"
+    },
+    {
+      "id": "owner_oct_lavender-330",
+      "title": "lavender 330",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/lavender-330.webp"
+    },
+    {
+      "id": "owner_oct_lavender-200",
+      "title": "lavender 200",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/lavender-200.webp"
+    },
+    {
+      "id": "owner_oct_grapefruit-200",
+      "title": "grapefruit 200",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/grapefruit-200.webp"
+    },
+    {
+      "id": "owner_oct_grapefruit-330",
+      "title": "grapefruit 330",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/grapefruit-330.webp"
+    },
+    {
+      "id": "owner_oct_essential-tea-tree",
+      "title": "essential tea tree",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/essential-tea-tree.webp"
+    },
+    {
+      "id": "owner_oct_essential-eucalyptus",
+      "title": "essential eucalyptus",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/essential-eucalyptus.webp"
+    },
+    {
+      "id": "owner_oct_essential-lemongrass",
+      "title": "essential lemongrass",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/essential-lemongrass.webp"
+    },
+    {
+      "id": "owner_oct_essential-peppermint",
+      "title": "essential peppermint",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/essential-peppermint.webp"
+    },
+    {
+      "id": "owner_oct_essential-sweet-orange",
+      "title": "essential sweet orange",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/essential-sweet-orange.webp"
+    },
+    {
+      "id": "owner_oct_essential-lavender",
+      "title": "essential lavender",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/essential-lavender.webp"
+    },
+    {
+      "id": "owner_oct_diffuser-wood",
+      "title": "diffuser wood",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/diffuser-wood.webp"
+    },
+    {
+      "id": "owner_oct_diffuser-pattern",
+      "title": "diffuser pattern",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/diffuser-pattern.webp"
+    },
+    {
+      "id": "owner_oct_diffuser-white",
+      "title": "diffuser white",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/diffuser-white.webp"
+    },
+    {
+      "id": "owner_oct_massage-oils",
+      "title": "massage oils",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/massage-oils.webp"
+    },
+    {
+      "id": "owner_oct_massage-oils-detail",
+      "title": "massage oils detail",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/massage-oils-detail.webp"
+    },
+    {
+      "id": "owner_oct_mosquito-repellents",
+      "title": "mosquito repellents",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/mosquito-repellents.webp"
+    },
+    {
+      "id": "owner_oct_progress-face-2",
+      "title": "progress face 2",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/progress-face-2.webp"
+    },
+    {
+      "id": "owner_oct_progress-heels",
+      "title": "progress heels",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/progress-heels.webp"
+    },
+    {
+      "id": "owner_oct_progress-hands",
+      "title": "progress hands",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/progress-hands.webp"
+    },
+    {
+      "id": "owner_oct_partner-19",
+      "title": "partner 19",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-19.webp"
+    },
+    {
+      "id": "owner_oct_partner-16",
+      "title": "partner 16",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-16.webp"
+    },
+    {
+      "id": "owner_oct_partner-18",
+      "title": "partner 18",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-18.webp"
+    },
+    {
+      "id": "owner_oct_partner-01",
+      "title": "partner 01",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-01.webp"
+    },
+    {
+      "id": "owner_oct_partner-02",
+      "title": "partner 02",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-02.webp"
+    },
+    {
+      "id": "owner_oct_partner-03",
+      "title": "partner 03",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-03.webp"
+    },
+    {
+      "id": "owner_oct_partner-04",
+      "title": "partner 04",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-04.webp"
+    },
+    {
+      "id": "owner_oct_partner-05",
+      "title": "partner 05",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-05.webp"
+    },
+    {
+      "id": "owner_oct_partner-06",
+      "title": "partner 06",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-06.webp"
+    },
+    {
+      "id": "owner_oct_partner-07",
+      "title": "partner 07",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-07.webp"
+    },
+    {
+      "id": "owner_oct_partner-08",
+      "title": "partner 08",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-08.webp"
+    },
+    {
+      "id": "owner_oct_partner-09",
+      "title": "partner 09",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-09.webp"
+    },
+    {
+      "id": "owner_oct_partner-10",
+      "title": "partner 10",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-10.webp"
+    },
+    {
+      "id": "owner_oct_partner-11",
+      "title": "partner 11",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-11.webp"
+    },
+    {
+      "id": "owner_oct_partner-12",
+      "title": "partner 12",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-12.webp"
+    },
+    {
+      "id": "owner_oct_partner-13",
+      "title": "partner 13",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-13.webp"
+    },
+    {
+      "id": "owner_oct_partner-14",
+      "title": "partner 14",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-14.webp"
+    },
+    {
+      "id": "owner_oct_partner-15",
+      "title": "partner 15",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-15.webp"
+    },
+    {
+      "id": "owner_oct_partner-17",
+      "title": "partner 17",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-17.webp"
+    },
+    {
+      "id": "owner_oct_partner-20",
+      "title": "partner 20",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-20.webp"
+    },
+    {
+      "id": "owner_oct_partner-21",
+      "title": "partner 21",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-21.webp"
+    },
+    {
+      "id": "owner_oct_partner-23",
+      "title": "partner 23",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-23.webp"
+    },
+    {
+      "id": "owner_oct_partner-24",
+      "title": "partner 24",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-24.webp"
+    },
+    {
+      "id": "owner_oct_partner-25",
+      "title": "partner 25",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-25.webp"
+    },
+    {
+      "id": "owner_oct_partner-26",
+      "title": "partner 26",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-26.webp"
+    },
+    {
+      "id": "owner_oct_partner-27",
+      "title": "partner 27",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-27.webp"
+    },
+    {
+      "id": "owner_oct_partner-28",
+      "title": "partner 28",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-28.webp"
+    },
+    {
+      "id": "owner_oct_partner-29",
+      "title": "partner 29",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-29.webp"
+    },
+    {
+      "id": "owner_oct_partner-30",
+      "title": "partner 30",
+      "type": "image",
+      "tag": "Partner logos",
+      "src": "/assets/owner-oct-2026/partner-30.webp"
+    },
+    {
+      "id": "owner_oct_cosmetics-flyer-cover",
+      "title": "cosmetics flyer cover",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/cosmetics-flyer-cover.webp"
+    },
+    {
+      "id": "owner_oct_wellness-brochure-cover",
+      "title": "wellness brochure cover",
+      "type": "image",
+      "tag": "Owner-supplied media",
+      "src": "/assets/owner-oct-2026/wellness-brochure-cover.webp"
+    }
+  ],
+  "videos": [
+    {
+      "id": "owner_oct_african-liquid-black-soap",
+      "title": "african liquid black soap",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/african-liquid-black-soap.mp4"
+    },
+    {
+      "id": "owner_oct_pureand-raw-shea-butter",
+      "title": "pureand raw shea butter",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/pureand-raw-shea-butter.mp4"
+    },
+    {
+      "id": "owner_oct_vanilla-mint",
+      "title": "vanilla mint",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/vanilla-mint.mp4"
+    },
+    {
+      "id": "owner_oct_lavender-video",
+      "title": "lavender video",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/lavender-video.mp4"
+    },
+    {
+      "id": "owner_oct_hair-oil",
+      "title": "hair oil",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/hair-oil.mp4"
+    },
+    {
+      "id": "owner_oct_hair-butter",
+      "title": "hair butter",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/hair-butter.mp4"
+    },
+    {
+      "id": "owner_oct_humidifier",
+      "title": "humidifier",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/humidifier.mp4"
+    },
+    {
+      "id": "owner_oct_humidifier2",
+      "title": "humidifier2",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/humidifier2.mp4"
+    },
+    {
+      "id": "owner_oct_humidifer-3",
+      "title": "humidifer 3",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/humidifer-3.mp4"
+    },
+    {
+      "id": "owner_oct_energize-massage-oil",
+      "title": "energize massage oil",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/energize-massage-oil.mp4"
+    },
+    {
+      "id": "owner_oct_caster-oil",
+      "title": "caster oil",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/caster-oil.mp4"
+    },
+    {
+      "id": "owner_oct_vitamine",
+      "title": "vitamine",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/vitamine.mp4"
+    },
+    {
+      "id": "owner_oct_neem-oil",
+      "title": "neem oil",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/neem-oil.mp4"
+    },
+    {
+      "id": "owner_oct_mosquito-repelant",
+      "title": "mosquito repelant",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/mosquito-repelant.mp4"
+    },
+    {
+      "id": "owner_oct_deep-tissue-massage",
+      "title": "deep tissue massage",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/deep-tissue-massage.mp4"
+    },
+    {
+      "id": "owner_oct_owner-film-01",
+      "title": "owner film 01",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/owner-film-01.mp4"
+    },
+    {
+      "id": "owner_oct_owner-film-02",
+      "title": "owner film 02",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/owner-film-02.mp4"
+    },
+    {
+      "id": "owner_oct_owner-film-03",
+      "title": "owner film 03",
+      "type": "video",
+      "tag": "Owner-supplied product film",
+      "src": "/assets/owner-oct-2026/owner-film-03.mp4"
+    }
+  ]
+}

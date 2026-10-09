@@ -12,6 +12,8 @@
     "test:smoke": "node scripts/smoke.mjs",
     "test:sanity": "node scripts/sanity.mjs",
     "test:media": "node scripts/media-sanity.mjs",
+    "test:layout": "node scripts/mobile-layout-sanity.mjs",
+    "test:owner-media": "node scripts/owner-media-sanity.mjs",
     "test:chrome": "node scripts/chrome-sanity.mjs",
     "test:database": "node scripts/db-sanity.mjs"
   },

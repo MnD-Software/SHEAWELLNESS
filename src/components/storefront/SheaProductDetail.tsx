@@ -98,7 +98,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   }
 
   function addToCart() {
-    if (!product) return;
+    if (!product || product.inventoryQty < 1) return;
     sharedCart.add(product, size);
     setNotice(`${product.title} added to cart.`);
   }
@@ -160,7 +160,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
           <strong className="shea-product-price">{formatMoney(productPriceForSize(product, size), platformSnapshot.activeStore.currency)}</strong>
           <p>{product.description}</p>
-          <div className="shea-live-stock"><i />{product.status === "low_stock" || product.inventoryQty <= 10 ? `Only ${product.inventoryQty} left — order soon` : `${product.inventoryQty} available and ready to ship`}</div>
+          <div className="shea-live-stock"><i />{product.inventoryQty < 1 ? "Contact us for availability" : product.status === "low_stock" || product.inventoryQty <= 10 ? `Only ${product.inventoryQty} left — order soon` : `${product.inventoryQty} available and ready to ship`}</div>
 
           <div className="shea-product-facts">
             <div><strong>Material</strong><span>{product.material}</span></div>
@@ -176,9 +176,9 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
             <small>{selectedMedia?.imageUrl || selectedMedia?.videoUrl ? `${size} media selected` : `${size} uses the primary product media`}</small>
           </fieldset>
 
-          <div className="shea-product-primary-actions"><button type="button" className="shea-product-add" onClick={addToCart}>
+          <div className="shea-product-primary-actions"><button type="button" className="shea-product-add" onClick={addToCart} disabled={product.inventoryQty < 1}>
             <ShoppingCart size={20} />
-            Add to cart
+            {product.inventoryQty < 1 ? "Unavailable online" : "Add to cart"}
           </button><button type="button" className={wished ? "shea-product-wishlist active" : "shea-product-wishlist"} onClick={toggleWishlist} aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}><Heart size={20} fill={wished ? "currentColor" : "none"} /></button></div>
           {notice ? <p className="shea-product-notice">{notice}</p> : null}
 
@@ -268,10 +268,11 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
       {recentlyViewed.length ? <section className="shea-product-related recently-viewed"><div className="shea-section-title"><span>Recently viewed</span><h2>Continue where you left off.</h2></div><div>{recentlyViewed.map((item) => <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><StorefrontImage className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
 
+      <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(productPriceForSize(product, size), platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart} disabled={product.inventoryQty < 1}><ShoppingCart size={18} /> {product.inventoryQty < 1 ? "Unavailable online" : "Add to cart"}</button></div>
+      {product.inventoryQty < 1 ? <p className="owner-availability"><a href="/contact">Ask about availability</a></p> : null}
       <SheaTrustGrid />
       <SheaCommerceFooter />
       <SheaWhatsApp />
-      <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(productPriceForSize(product, size), platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart}><ShoppingCart size={18} /> Add to cart</button></div>
     </main>
   );
 }

@@ -33,7 +33,8 @@ import { platformSnapshot } from "@/lib/platform-data";
 import { ContactForm } from "./ContactForm";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
-import { partnerLogos } from "@/lib/shea-website-content";
+import { ownerAsset, ownerVideos } from "@/lib/owner-media";
+import { OwnerDownloads, OwnerPartners, OwnerProductFilms } from "./OwnerSuppliedMedia";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { useEffect, useMemo, useState } from "react";
 
@@ -379,7 +380,7 @@ function WholesaleSections() {
     <>
       <section className="shea-partners-section">
         <header><span>Our partners</span><h2>Trusted across hospitality, retail, trade and wellness.</h2><p>Shea Wellness has built relationships with organisations and destinations in Kenya, Africa and beyond.</p></header>
-        <div>{partnerLogos.map(([name]) => <figure key={name}><strong>{name}</strong><figcaption>{name}</figcaption></figure>)}</div>
+        <OwnerPartners />
       </section>
       <section className="shea-split-section">
         <div>
@@ -438,7 +439,7 @@ function BlogSections() {
     <>
       <section className="shea-blog-editorial">
         <article className="shea-blog-feature">
-          <video src={sheaVideos[2].src} autoPlay muted loop playsInline preload="metadata" />
+          <video src={ownerAsset("vanilla-mint.mp4")} poster={ownerAsset("vanilla-mint-poster.webp")} controls playsInline preload="none" />
           <div>
             <span>Cinematic feature</span>
             <h2>The Shea Wellness routine: cleanse, nourish, seal, and glow.</h2>
@@ -612,12 +613,7 @@ function ContactSections() {
 function CatalogueSections() {
   return (
     <>
-      <section className="shea-cta-panel catalogue">
-        <Download size={28} />
-        <h2>{sheaCatalogueDownload.title}</h2>
-        <p>{sheaCatalogueDownload.body}</p>
-        <a href="/contact">{sheaCatalogueDownload.cta}</a>
-      </section>
+      <OwnerDownloads />
       <section className="shea-section">
         <SectionTitle label="Social proof" title="Instagram, testimonials, expo participation, and media mentions." />
         <div className="shea-card-grid four">
@@ -626,17 +622,7 @@ function CatalogueSections() {
           ))}
         </div>
       </section>
-      <section className="shea-section">
-        <SectionTitle label="Video media" title="Product videos ready for campaigns and social proof." />
-        <div className="shea-video-slider">
-          {sheaVideos.map((video) => (
-            <article key={video.src}>
-              <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
-              <strong>{video.title}</strong>
-            </article>
-          ))}
-        </div>
-      </section>
+      <OwnerProductFilms />
     </>
   );
 }
@@ -650,10 +636,10 @@ function VideoShowcase({ title, body }: { title: string; body: string }) {
         <p>{body}</p>
       </div>
       <div className="shea-video-slider featured">
-        {sheaVideos.slice(0, 3).map((video) => (
-          <article key={video.src}>
-            <video src={video.src} autoPlay muted loop playsInline preload="metadata" />
-            <strong>{video.title}</strong>
+        {ownerVideos.slice(0, 3).map(([title, file]) => (
+          <article key={file}>
+            <video src={ownerAsset(file)} poster={ownerAsset(file.replace(".mp4", "-poster.webp"))} controls playsInline preload="none" />
+            <strong>{title}</strong>
           </article>
         ))}
       </div>
