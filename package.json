@@ -15,11 +15,14 @@
     "test:layout": "node scripts/mobile-layout-sanity.mjs",
     "test:owner-media": "node scripts/owner-media-sanity.mjs",
     "test:chrome": "node scripts/chrome-sanity.mjs",
-    "test:database": "node scripts/db-sanity.mjs"
+    "test:database": "node scripts/db-sanity.mjs",
+    "test:refinements": "node scripts/refinement-sanity.mjs",
+    "test:chunks": "node scripts/chunk-media-sanity.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
     "clsx": "^2.1.1",
+    "fflate": "0.8.3",
     "lucide-react": "^0.468.0",
     "next": "^15.0.3",
     "react": "^19.0.0",
@@ -27,10 +30,10 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "playwright": "1.53.0",
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
+    "playwright": "1.53.0",
     "typescript": "^5.7.2"
   }
 }

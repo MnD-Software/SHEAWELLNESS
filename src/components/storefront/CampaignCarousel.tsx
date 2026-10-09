@@ -53,7 +53,7 @@ export function CampaignCarousel({ slides }: { slides: SheaHeroSlide[] }) {
         }}>
         <div className={styles.media} data-testid="campaign-stage" role="group" aria-roledescription="slide" aria-label={`${current + 1} of ${slides.length}: ${slide.title}`}>
           {source ? slide.type === "video" ? <video ref={video} key={source} src={source} muted playsInline loop autoPlay={!paused} />
-            : <img key={source} src={source} alt={slide.tag || slide.title} fetchPriority="high" style={{ objectPosition: slide.objectPosition ?? "center" }} /> : null}
+            : <img key={source} src={source} alt={slide.alt || slide.tag || slide.title} fetchPriority="high" style={{ objectPosition: slide.objectPosition ?? "center", objectFit: slide.fit ?? "cover", transform: slide.rotation ? `rotate(${slide.rotation}deg)` : undefined }} /> : null}
         </div>
         <div className={styles.copy} key={slide.id} aria-live={paused ? "polite" : "off"} aria-atomic="true">
           <span>{slide.kicker}</span><h1>{slide.title}</h1><p>{slide.body}</p>

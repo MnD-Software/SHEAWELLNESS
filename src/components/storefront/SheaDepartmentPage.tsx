@@ -1,4 +1,6 @@
 "use client";
+import { ProductCard } from "./ProductCard";
+import { arrangeProducts } from "@/lib/product-presentation";
 
 import { StorefrontImage } from "./StorefrontImage";
 import { ArrowRight, CheckCircle2, ChevronLeft, ChevronRight, Heart, ShoppingBag, ShoppingCart, Sparkles, Star } from "lucide-react";
@@ -81,7 +83,7 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
   }, []);
 
   const departmentProducts = useMemo(() => products.filter((product) => content.categories.includes(product.category) && (product.status === "active" || product.status === "low_stock")), [content.categories, products]);
-  const featuredProducts = departmentProducts.slice(0, 8);
+  const featuredProducts = arrangeProducts(departmentProducts).slice(0, 8);
 
   useEffect(() => {
     setCarouselIndex(0);
@@ -136,11 +138,7 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
       <section className="department-products" id="department-products">
         <header><div><span>{content.eyebrow}</span><h2>Products for this routine.</h2></div><a href="/shop">View complete shop <ArrowRight size={17} /></a></header>
         <div>
-          {departmentProducts.map((product) => <article key={product.id} className="department-product-card">
-            <a className={isSidewaysSheaProductAsset(product.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(product.id)}`}><StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} /></a>
-            <button type="button" className={wishlist.includes(product.id) ? "department-card-wishlist active" : "department-card-wishlist"} onClick={() => toggleWishlist(product.id)} aria-label={`Add ${product.title} to wishlist`}><Heart size={17} fill={wishlist.includes(product.id) ? "currentColor" : "none"} /></button>
-            <div><span>{product.badge}</span><h3>{product.title}</h3><div className="department-card-rating"><Star size={14} fill="currentColor" /> {product.rating.toFixed(1)} <small>({product.reviewCount} reviews)</small></div><p>{product.description}</p><div className="department-card-stock"><i />{product.inventoryQty < 1 ? "Enquire for availability" : product.status === "low_stock" ? `Only ${product.inventoryQty} left` : "In stock"}</div><footer><strong>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</strong><button type="button" onClick={() => quickAdd(product)} disabled={product.inventoryQty < 1}><ShoppingCart size={16} /> {product.inventoryQty < 1 ? "Unavailable online" : "Quick add"}</button><a href={`/products/${encodeURIComponent(product.id)}`} aria-label={`View ${product.title}`}><ShoppingBag size={16} /></a></footer></div>
-          </article>)}
+          {arrangeProducts(departmentProducts).map(product => <ProductCard key={product.id} product={product} currency={platformSnapshot.activeStore.currency} wished={wishlist.includes(product.id)} onWishlist={() => toggleWishlist(product.id)} />)}
         </div>
       </section>
 

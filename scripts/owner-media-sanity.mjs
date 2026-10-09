@@ -4,6 +4,7 @@ const { chromium } = await import(process.env.QA_PLAYWRIGHT_MODULE || 'playwrigh
 const browser = await chromium.launch({headless:true,executablePath:process.env.QA_BROWSER_PATH || undefined});
 const base = process.env.SMOKE_URL || 'http://localhost:3140';
 const specification = JSON.parse(await readFile(new URL('./owner-content-2026-10-09.json',import.meta.url),'utf8'));
+const zipSpecification = JSON.parse(await readFile(new URL('./owner-zips-2026-10-09.json',import.meta.url),'utf8'));
 await mkdir('artifacts/owner-media',{recursive:true});
 const results=[];
 try {
@@ -11,11 +12,12 @@ try {
   assert.equal(response.status,200);
   const {data}=await response.json();
   assert.equal(data.persisted,true);
-  assert.equal(data.media.heroSlides.filter(item=>item.id.startsWith('owner_oct_')).length,3);
+  assert.equal(data.media.heroSlides.filter(item=>item.id.startsWith('beauty_')).length,3);
   for (const update of specification.updates) {
     const product=data.products.find(item=>item.id===update.id);assert.ok(product,update.id);
     if (update.price!==undefined) assert.equal(product.price,update.price,update.id+' price');
-    if (update.imageUrl) assert.equal(product.imageUrl,update.imageUrl,update.id+' primary image');
+    const primary = zipSpecification.productUpdates.find(item=>item.id===update.id)?.imageUrl || update.imageUrl;
+    if (primary) assert.equal(product.imageUrl,primary,update.id+' primary image');
     for (const [size,option] of Object.entries(update.sizeMedia || {})) {
       for (const [field,value] of Object.entries(option)) assert.equal(product.sizeMedia?.[size]?.[field] || '',value,update.id+' '+size+' '+field);
     }
@@ -41,6 +43,7 @@ try {
   page.setDefaultTimeout(90000);
   const errors=[];page.on('pageerror',error=>errors.push(error.message));
   await page.goto(base+'/catalogue',{waitUntil:'domcontentloaded',timeout:90000});
+  await page.locator('.owner-resources a[download]').first().waitFor();
   assert.equal(await page.locator('.owner-resources a[download]').count(),2);
   assert.equal(await page.locator('.owner-films video').count(),18);
   assert.equal(await page.locator('.owner-films video[autoplay]').count(),0,'Films should play on demand');
@@ -51,14 +54,15 @@ try {
   console.log('PASS real MP4 playback metadata.');
   await page.screenshot({path:'artifacts/owner-media/catalogue-mobile.png',animations:'disabled'});
   await page.goto(base+'/wholesale',{waitUntil:'domcontentloaded'});
-  const logos=page.locator('.owner-partner-grid img[src]');assert.equal(await logos.count(),29);
+  await page.locator('.owner-partner-grid [data-carousel-original] img[src]').first().waitFor();
+  const logos=page.locator('.owner-partner-grid [data-carousel-original] img[src]');assert.equal(await logos.count(),29);
   await logos.evaluateAll(async images=>Promise.all(images.map(image=>{image.loading='eager';return image.decode();})));
   assert.ok(await logos.evaluateAll(images=>images.every(image=>image.naturalWidth>0)));
   await page.goto(base+'/products/prod_vanilla_mint',{waitUntil:'domcontentloaded'});
-  await page.getByRole('button',{name:'200ml',exact:true}).click();
+  await page.locator('.shea-product-size').getByRole('button',{name:'200ml',exact:true}).click();
   assert.ok((await page.locator('.shea-product-main-image img').getAttribute('src')).includes('vanilla-mint-200.webp'));
   assert.equal(await page.locator('.shea-product-price').innerText(),'KSh 1,100');
-  await page.getByRole('button',{name:'330ml',exact:true}).click();
+  await page.locator('.shea-product-size').getByRole('button',{name:'330ml',exact:true}).click();
   assert.ok((await page.locator('.shea-product-main-image img').getAttribute('src')).includes('vanilla-mint-330.webp'));
   assert.equal(await page.locator('.shea-product-price').innerText(),'KSh 1,500');
   await page.goto(base+'/products/prod_mosquito_repellents',{waitUntil:'domcontentloaded'});

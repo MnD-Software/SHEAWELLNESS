@@ -83,7 +83,7 @@ function normalizeStoredProducts(products: Product[]): Product[] {
           const videoUrl = typeof media?.videoUrl === "string" ? media.videoUrl.trim() : "";
           const imagePosition = typeof media?.imagePosition === "string" ? media.imagePosition.trim() : "";
           return [size.trim(), {
-            ...(imageUrl && !isLegacySheaMediaPath(imageUrl) ? { imageUrl } : {}),
+            ...(typeof media?.imageUrl === "string" && !isLegacySheaMediaPath(imageUrl) ? { imageUrl } : {}),
             ...(videoUrl && !isLegacySheaMediaPath(videoUrl) ? { videoUrl } : {}),
             ...(imagePosition ? { imagePosition } : {})
           }] as const;
@@ -95,6 +95,7 @@ function normalizeStoredProducts(products: Product[]): Product[] {
       ...product,
       category: product.category === "Body Care" ? "Skin Care" : product.category,
       imageUrl: replaceRetiredSyntheticImage(product.imageUrl),
+      gallery: Array.isArray(product.gallery) ? [...new Set(product.gallery.filter(src => typeof src === "string").map(src => replaceRetiredSyntheticImage(src.trim())).filter(Boolean))].slice(0, 16) : [],
       sizes: safeSizes,
       price: Number.isFinite(price) && price >= 0 ? price : fallbackPrice,
       sizePrices: Object.keys(sizePrices).length ? sizePrices : undefined,

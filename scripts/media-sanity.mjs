@@ -4,12 +4,14 @@ import ts from 'typescript';
 const moduleUrl = text => 'data:text/javascript;base64,' + Buffer.from(text).toString('base64');
 const retiredCode = ts.transpileModule(await readFile('src/lib/retired-preset-images.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
 const mediaCode = ts.transpileModule(await readFile('src/lib/shea-media.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText.replace('"./retired-preset-images"', JSON.stringify(moduleUrl(retiredCode)));
-const contentCode = ts.transpileModule(await readFile('src/lib/shea-content.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText.replace('"./shea-media"', JSON.stringify(moduleUrl(mediaCode)));
+const websiteCode = ts.transpileModule(await readFile('src/lib/shea-website-content.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+const ownerCode = ts.transpileModule(await readFile('src/lib/owner-media.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText;
+const contentCode = ts.transpileModule(await readFile('src/lib/shea-content.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.ESNext } }).outputText.replace('"./shea-media"', JSON.stringify(moduleUrl(mediaCode))).replace('"./shea-website-content"', JSON.stringify(moduleUrl(websiteCode))).replace('"./owner-media"', JSON.stringify(moduleUrl(ownerCode)));
 const { clearPresetImage } = await import(moduleUrl(mediaCode));
 const { sanitizeSheaMediaConfig, sheaHeroSlides } = await import(moduleUrl(contentCode));
 for (const source of ['/assets/website-edits/facial-oils.jpg', '/assets/shea-hero.png', 'https://example.invalid/assets/website-edits/facial-oils.jpg', '/%61ssets/shea-hero.png']) assert.equal(clearPresetImage(source), '');
 for (const source of ['/api/media?id=owner-image', '/uploads/my-photo.jpg', '/assets/my-new-banner.jpg', 'https://example.invalid/my-photo.jpg']) assert.equal(clearPresetImage(source), source);
-assert.deepEqual(sanitizeSheaMediaConfig({ heroSlides: [], images: [], videos: [] }), { heroSlides: [], images: [], videos: [] });
+assert.deepEqual(sanitizeSheaMediaConfig({ heroSlides: [], images: [], videos: [], documents: [], presentationVersion: 1 }), { heroSlides: [], images: [], videos: [], documents: [], presentationVersion: 1 });
 const changed = { ...sheaHeroSlides[0], title: 'Owner edited copy', src: '' };
 assert.equal(sanitizeSheaMediaConfig({ heroSlides: [changed], images: [], videos: [] }).heroSlides[0].title, changed.title, 'Copy edits work before photos are uploaded');
 assert.equal(sanitizeSheaMediaConfig({ heroSlides: [{ ...changed, src: '/assets/shea-hero.png' }], images: [{ id: 'legacy', type: 'image', src: '/assets/shea-hero.png' }], videos: [] }).images.length, 0);
@@ -27,8 +29,8 @@ try {
   const fixture = (width, height) => 'data:image/svg+xml;base64,' + Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#e4e7dc"/><rect x="8" y="8" width="${width - 16}" height="${height - 16}" fill="none" stroke="#173d2b" stroke-width="8"/><text x="50%" y="50%" text-anchor="middle" fill="#173d2b" font-size="60">${width} × ${height}</text></svg>`).toString('base64');
   // Browser-only fixtures exercise owner-selected media without writing test banners to the store.
   const slides = [
-    { ...sheaHeroSlides[0], id: 'qa-landscape', title: 'Landscape image', src: fixture(1600, 600) },
-    { ...sheaHeroSlides[1], id: 'qa-portrait', title: 'Portrait image', src: fixture(600, 1200) }
+    { ...sheaHeroSlides[0], id: 'qa-landscape', title: 'Landscape image', src: fixture(1600, 600), fit: 'contain' },
+    { ...sheaHeroSlides[1], id: 'qa-portrait', title: 'Portrait image', src: fixture(600, 1200), fit: 'contain' }
   ];
   for (const [width, height] of [[320, 844], [390, 844], [430, 932], [768, 1024], [1024, 768], [1440, 900], [844, 390]]) {
     const context = await browser.newContext({ viewport: { width, height }, hasTouch: width < 768, reducedMotion: 'reduce' });

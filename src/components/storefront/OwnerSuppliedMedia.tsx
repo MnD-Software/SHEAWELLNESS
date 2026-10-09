@@ -1,16 +1,29 @@
-import { ownerAsset, ownerDownloads, ownerVideos } from "@/lib/owner-media";
-import { partnerLogos } from "@/lib/shea-website-content";
+import type { CSSProperties } from "react";
+import type { SheaMediaAsset, SheaMediaConfig } from "@/lib/shea-content";
 import { StorefrontImage } from "./StorefrontImage";
+import { AutoScrollRail } from "./AutoScrollRail";
 
-export function OwnerPartners() {
-  return <div className="owner-partner-grid">{partnerLogos.map(([name, file]) => <figure key={name}><StorefrontImage src={ownerAsset(`partner-${file.match(/\d+/)?.[0].padStart(2, "0")}.webp`)} alt={name} loading="lazy" /><figcaption>{name}</figcaption></figure>)}</div>;
+function imageStyle(asset: SheaMediaAsset): CSSProperties {
+  return { objectPosition: asset.objectPosition ?? "center", transform: asset.rotation ? `rotate(${asset.rotation}deg)` : undefined };
 }
-export function OwnerDownloads() {
-  return <section className="owner-resources" aria-label="Download Shea Wellness brochures"><header><span>Explore the collection</span><h2>Brochures to keep and share.</h2></header><div>{ownerDownloads.map(item => <article key={item.file}><a href={ownerAsset(item.file)} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`}><StorefrontImage src={ownerAsset(item.cover)} alt={`${item.title} cover`} loading="lazy" /></a><div><small>{item.detail}</small><h3>{item.title}</h3><p>{item.body}</p><a href={ownerAsset(item.file)} download>Download PDF</a><a href={ownerAsset(item.file)} target="_blank" rel="noreferrer">View brochure</a></div></article>)}</div></section>;
+
+export function OwnerPartners({ media }: { media: SheaMediaConfig }) {
+  const partners = media.images.filter(item => item.placements?.includes("partners"));
+  if (!partners.length) return null;
+  return <div className="owner-partner-grid"><AutoScrollRail label="partner logos" kind="partners">{partners.map(asset => <figure key={asset.id}><StorefrontImage src={asset.src} alt={asset.alt || asset.title} loading="lazy" style={imageStyle(asset)} /><figcaption>{asset.title}</figcaption></figure>)}</AutoScrollRail></div>;
 }
-export function OwnerProductFilms() {
-  return <section className="owner-films" aria-label="Shea Wellness product films"><header><span>Closer to the collection</span><h2>See our products in motion.</h2></header><div>{ownerVideos.map(([title,file]) => <article key={file}><video src={ownerAsset(file)} poster={ownerAsset(file.replace('.mp4','-poster.webp'))} controls playsInline preload="none" aria-label={title} /><h3>{title}</h3></article>)}</div></section>;
+export function OwnerDownloads({ media }: { media: SheaMediaConfig }) {
+  const downloads = (media.documents ?? []).filter(item => item.placements?.includes("downloads"));
+  if (!downloads.length) return null;
+  return <section className="owner-resources" aria-label="Download Shea Wellness brochures"><header><span>Explore the collection</span><h2>Brochures to keep and share.</h2></header><div>{downloads.map(item => <article key={item.id}>{item.poster && <a href={item.src} target="_blank" rel="noreferrer" aria-label={`Open ${item.title}`}><StorefrontImage src={item.poster} alt={`${item.title} cover`} loading="lazy" /></a>}<div><small>{item.tag || "PDF brochure"}</small><h3>{item.title}</h3><a href={item.src} download>Download PDF</a><a href={item.src} target="_blank" rel="noreferrer">View brochure</a></div></article>)}</div></section>;
 }
-export function OwnerRoutineProgress() {
-  return <section className="owner-progress" aria-label="Customer routine photographs"><header><span>Routine milestones</span><h2>Customer routine photographs.</h2><p>Before-and-after photographs supplied by Shea Wellness. Individual results vary.</p></header><div>{[["progress-face-1.webp", "Facial care"], ["progress-face-2.webp", "Skin care"], ["progress-heels.webp", "Heel care"], ["progress-hands.webp", "Hand care"]].map(([file,title]) => <figure key={file}><StorefrontImage src={ownerAsset(file)} alt={`${title}: before and after comparison supplied by Shea Wellness`} loading="lazy" /><figcaption>{title}</figcaption></figure>)}</div></section>;
+export function OwnerProductFilms({ media }: { media: SheaMediaConfig }) {
+  const films = media.videos.filter(item => item.placements?.includes("films"));
+  if (!films.length) return null;
+  return <section className="owner-films" aria-label="Shea Wellness product films"><header><span>Closer to the collection</span><h2>See our products in motion.</h2></header><div>{films.map(item => <article key={item.id}><video src={item.src} poster={item.poster || (item.src.startsWith("/assets/owner-oct-2026/") ? item.src.replace('.mp4','-poster.webp') : undefined)} controls playsInline preload="none" aria-label={item.title} /><h3>{item.title}</h3></article>)}</div></section>;
+}
+export function OwnerRoutineProgress({ media }: { media: SheaMediaConfig }) {
+  const photos = media.images.filter(item => item.placements?.includes("beforeAfter"));
+  if (!photos.length) return null;
+  return <section className="owner-progress" aria-label="Before and after"><header><span>Routine milestones</span><h2>Before &amp; after.</h2><p>Photographs supplied by Shea Wellness. Individual results vary.</p></header><AutoScrollRail label="before and after" kind="results">{photos.map(asset => <figure key={asset.id}><StorefrontImage src={asset.src} alt={asset.alt || "Before and after comparison supplied by Shea Wellness"} loading="lazy" style={imageStyle(asset)} /><figcaption>Before &amp; after</figcaption></figure>)}</AutoScrollRail></section>;
 }

@@ -1,4 +1,6 @@
 import { clearPresetImage } from "./shea-media";
+import { partnerLogos } from "./shea-website-content";
+import { ownerAsset, ownerDownloads } from "./owner-media";
 
 export const sheaBrand = {
   name: "Shea Wellness LTD",
@@ -15,10 +17,17 @@ export type SheaMediaAsset = {
   id: string;
   title: string;
   src: string;
-  type: "image" | "video";
+  type: "image" | "video" | "document";
   tag: string;
   objectPosition?: string;
+  alt?: string;
+  fit?: "cover" | "contain";
+  rotation?: 0 | 90 | 180 | 270;
+  placements?: MediaPlacement[];
+  poster?: string;
 };
+
+export type MediaPlacement = "beforeAfter" | "partners" | "films" | "downloads";
 
 export type SheaHeroSlide = SheaMediaAsset & {
   kicker: string;
@@ -31,6 +40,8 @@ export type SheaMediaConfig = {
   heroSlides: SheaHeroSlide[];
   images: SheaMediaAsset[];
   videos: SheaMediaAsset[];
+  documents?: SheaMediaAsset[];
+  presentationVersion?: number;
 };
 
 // Retired presets stay empty on every read; owner uploads remain authoritative.
@@ -42,14 +53,31 @@ export function sanitizeSheaMediaConfig(config: SheaMediaConfig): SheaMediaConfi
   const heroSlides = Array.isArray(config?.heroSlides) ? config.heroSlides : [];
   const images = Array.isArray(config?.images) ? config.images : [];
   const videos = Array.isArray(config?.videos) ? config.videos : [];
+  const upgrade = config?.presentationVersion !== 1;
+  const normalize = <T extends SheaMediaAsset>(asset: T): T => {
+    const placements = (asset.placements ?? []).filter(value => ["beforeAfter", "partners", "films", "downloads"].includes(value));
+    let title = asset.title;
+    if (upgrade && asset.src?.startsWith("/assets/owner-oct-2026/")) {
+      if (/\/progress-/.test(asset.src)) { placements.push("beforeAfter"); title = "Before & after"; }
+      if (/\/partner-/.test(asset.src)) {
+        placements.push("partners");
+        title = partnerLogos.find(([, file]) => ownerAsset(`partner-${file.match(/\d+/)?.[0].padStart(2, "0")}.webp`) === asset.src)?.[0] ?? title;
+      }
+      if (asset.type === "video") placements.push("films");
+    }
+    return { ...asset, title, placements: [...new Set(placements)], rotation: [0, 90, 180, 270].includes(asset.rotation ?? 0) ? asset.rotation : 0 };
+  };
+  const documents = Array.isArray(config?.documents) ? config.documents : upgrade && images.some(asset => asset.src?.startsWith("/assets/owner-oct-2026/")) ? ownerDownloads.map(item => ({ id: `owner_doc_${item.file}`, title: item.title, src: ownerAsset(item.file), type: "document" as const, tag: item.detail, poster: ownerAsset(item.cover), placements: ["downloads" as const] })) : [];
   return {
     heroSlides: heroSlides.filter(asset => asset && typeof asset.id === "string").map(asset => {
       const preset = sheaHeroSlides.find(slide => slide.id === asset.id);
       const src = clearPresetImage(asset.src);
-      return preset && asset.src && !src ? { ...preset } : { ...asset, src };
+      return normalize(preset && asset.src && !src ? { ...preset } : { ...asset, src });
     }),
-    images: images.flatMap(asset => { const src = clearPresetImage(asset?.src); return src ? [{ ...asset, src }] : []; }),
-    videos: videos.filter(asset => asset && typeof asset.src === "string" && asset.src && !isLegacySheaMediaPath(asset.src))
+    images: images.flatMap(asset => { const src = clearPresetImage(asset?.src); return src ? [normalize({ ...asset, src })] : []; }),
+    videos: videos.filter(asset => asset && typeof asset.src === "string" && asset.src && !isLegacySheaMediaPath(asset.src)).map(normalize),
+    documents: documents.filter(asset => asset && typeof asset.src === "string" && asset.src).map(normalize),
+    presentationVersion: 1
   };
 }
 export const sheaHeroSlides: SheaHeroSlide[] = [

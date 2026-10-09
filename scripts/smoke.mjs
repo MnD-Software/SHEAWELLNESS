@@ -46,7 +46,11 @@ for (const width of [320, 390, 430, 768, 1024, 1440]) {
       await Promise.all(images.filter(img => {
         const box = img.getBoundingClientRect();
         return box.width > 0 && box.bottom > 0 && box.top < innerHeight;
-      }).map(img => img.decode().catch(() => {})));
+      }).map(async img => {
+        // A decode can remain pending after its source changes during hydration.
+        // Bound that wait, then the resource gate below still rejects failed images.
+        await Promise.race([img.decode().catch(() => {}), new Promise(resolve => setTimeout(resolve, 10000))]);
+      }));
     });
     const overflow = await page.evaluate(() => ({ viewport: innerWidth, body: document.documentElement.scrollWidth }));
     const broken = await page.locator('img[src]').evaluateAll(images => images.filter(img => img.complete && img.naturalWidth === 0 && img.getBoundingClientRect().width > 0).map(img => img.getAttribute('src')));

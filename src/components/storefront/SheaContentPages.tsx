@@ -1,4 +1,6 @@
 "use client";
+import { ProductCard } from "./ProductCard";
+import { arrangeProducts } from "@/lib/product-presentation";
 
 import { StorefrontImage } from "./StorefrontImage";
 import {
@@ -34,6 +36,7 @@ import { ContactForm } from "./ContactForm";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import { ownerAsset, ownerVideos } from "@/lib/owner-media";
+import { sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig } from "@/lib/shea-content";
 import { OwnerDownloads, OwnerPartners, OwnerProductFilms } from "./OwnerSuppliedMedia";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { useEffect, useMemo, useState } from "react";
@@ -93,19 +96,21 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
 
 export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
+  const [media, setMedia] = useState<SheaMediaConfig>(() => sanitizeSheaMediaConfig(sheaDefaultMediaConfig));
   const [catalogueProducts, setCatalogueProducts] = useState<Product[]>(() => (
     platformSnapshot.products.filter((product) => product.status === "active" || product.status === "low_stock")
   ));
 
   useEffect(() => {
-    if (kind !== "products") return;
+
     let cancelled = false;
 
     void fetch("/api/storefront/content", { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) return;
-        const payload = await response.json() as { data?: { products?: Product[] } };
+        const payload = await response.json() as { data?: { products?: Product[]; media?: SheaMediaConfig } };
         const products = payload.data?.products;
+        if (!cancelled && payload.data?.media) setMedia(sanitizeSheaMediaConfig(payload.data.media));
         if (!cancelled && Array.isArray(products)) {
           setCatalogueProducts(products.filter((product) => product.status === "active" || product.status === "low_stock"));
         }
@@ -137,12 +142,12 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
 
       {kind === "about" ? <AboutSections /> : null}
       {kind === "products" ? <ProductsSections products={catalogueProducts} currency={platformSnapshot.activeStore.currency} /> : null}
-      {kind === "wholesale" ? <WholesaleSections /> : null}
+      {kind === "wholesale" ? <WholesaleSections media={media} /> : null}
       {kind === "sustainability" ? <SustainabilitySections /> : null}
       {kind === "blog" ? <BlogSections /> : null}
       {kind === "quality" ? <QualitySections /> : null}
       {kind === "contact" ? <ContactSections /> : null}
-      {kind === "catalogue" ? <CatalogueSections /> : null}
+      {kind === "catalogue" ? <CatalogueSections media={media} /> : null}
 
       <LivingPageSection kind={kind} />
       <SheaFooter />
@@ -351,21 +356,8 @@ function ProductsSections({ products, currency }: { products: Product[]; currenc
                 <span>{category}</span>
                 <p>Current Shea Wellness products available to order.</p>
               </div>
-              <div className="shea-product-list">
-                {categoryProducts.map((product) => (
-                  <article className={`shea-product-detail-card${isSidewaysSheaProductAsset(product.imageUrl) ? " is-rotated" : ""}`} key={product.id}>
-                    <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
-                    <div>
-                      <strong>{product.title}</strong>
-                      <p>{product.description}</p>
-                      <ProductFact label="Collection" items={[product.category, product.badge]} />
-                      <ProductFact label="Size options" items={product.sizes} />
-                      <small>{product.deliveryBadge} · {formatMoney(product.price, currency)}</small>
-                      <a href={`/products/${encodeURIComponent(product.id)}`}>View product <ArrowRight size={15} /></a>
-                    </div>
-                  </article>
-                ))}
-              </div>
+              <div className="commerce-product-grid">{arrangeProducts(categoryProducts).map(product => <ProductCard key={product.id} product={product} currency={currency} />)}</div>
+
             </section>
           ))}
           {!productsByCategory.length ? <p className="shea-empty-catalogue">The current catalogue is being prepared. Please check back shortly.</p> : null}
@@ -375,12 +367,12 @@ function ProductsSections({ products, currency }: { products: Product[]; currenc
   );
 }
 
-function WholesaleSections() {
+function WholesaleSections({ media }: {media: SheaMediaConfig}) {
   return (
     <>
       <section className="shea-partners-section">
         <header><span>Our partners</span><h2>Trusted across hospitality, retail, trade and wellness.</h2><p>Shea Wellness has built relationships with organisations and destinations in Kenya, Africa and beyond.</p></header>
-        <OwnerPartners />
+        <OwnerPartners media={media} />
       </section>
       <section className="shea-split-section">
         <div>
@@ -610,10 +602,10 @@ function ContactSections() {
   );
 }
 
-function CatalogueSections() {
+function CatalogueSections({ media }: {media: SheaMediaConfig}) {
   return (
     <>
-      <OwnerDownloads />
+      <OwnerDownloads media={media} />
       <section className="shea-section">
         <SectionTitle label="Social proof" title="Instagram, testimonials, expo participation, and media mentions." />
         <div className="shea-card-grid four">
@@ -622,7 +614,7 @@ function CatalogueSections() {
           ))}
         </div>
       </section>
-      <OwnerProductFilms />
+      <OwnerProductFilms media={media} />
     </>
   );
 }

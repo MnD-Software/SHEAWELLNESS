@@ -23,6 +23,7 @@ export type Product = {
   badge: string;
   imageUrl: string;
   imagePosition: string;
+  gallery?: string[];
   rating: number;
   reviewCount: number;
   colors: string[];

@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { NextResponse, type NextRequest } from "next/server";
 import { saveUploadedImage } from "@/server/repositories/mediaUploadRepository";
 import { requireAdminAccess } from "@/server/adminAuth";
+import { validMediaSignature } from "@/lib/media-file-types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -49,11 +50,14 @@ export async function POST(request: NextRequest) {
     if (!(file instanceof File)) return NextResponse.json({ error: "Choose an image or video to upload." }, { status: 400 });
     const isImage = ALLOWED_IMAGE_TYPES.has(file.type);
     const isVideo = ALLOWED_VIDEO_TYPES.has(file.type);
-    if (!isImage && !isVideo) return NextResponse.json({ error: "Use a JPG, PNG, WebP, GIF, AVIF, MP4, WebM, or MOV file." }, { status: 415 });
-    const sizeLimit = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+    const isDocument = file.type === "application/pdf";
+    if (!isImage && !isVideo && !isDocument) return NextResponse.json({ error: "Use an image, MP4, WebM, MOV, or PDF file." }, { status: 415 });
+    const sizeLimit = isVideo ? MAX_VIDEO_BYTES : isDocument ? 20 * 1024 * 1024 : MAX_IMAGE_BYTES;
     if (file.size > sizeLimit) return NextResponse.json({ error: isVideo ? "Videos must be 25 MB or smaller." : "Images must be 10 MB or smaller." }, { status: 413 });
 
-    if (cloudName && apiKey && apiSecret) {
+    const bytes = Buffer.from(await file.arrayBuffer());
+    if (!validMediaSignature(bytes, file.type)) return NextResponse.json({error: "The file does not match its media type."}, {status: 415});
+    if (!isDocument && cloudName && apiKey && apiSecret) {
       try {
         return NextResponse.json({ data: await uploadToCloudinary(file, cloudName, apiKey, apiSecret, isVideo ? "video" : "image") }, { status: 201 });
       } catch {
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const dataBase64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+    const dataBase64 = bytes.toString("base64");
     const stored = await saveUploadedImage({ filename: file.name, contentType: file.type, dataBase64 });
     return NextResponse.json({ data: { url: stored.url, publicId: stored.id, storage: "database" } }, { status: 201 });
   } catch (error) {

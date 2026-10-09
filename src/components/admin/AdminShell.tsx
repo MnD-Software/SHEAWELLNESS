@@ -29,6 +29,8 @@ import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { StorefrontImage } from "@/components/storefront/StorefrontImage";
+import { BulkMediaManager } from "./BulkMediaManager";
+import { uploadMedia } from "@/lib/bulk-media";
 import { EnquiriesView } from "./EnquiriesView";
 import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize, titleCase } from "@/lib/format";
@@ -110,6 +112,7 @@ type RuntimeReview = {
 };
 
 type ProductFormState = {
+  gallery: string;
   id: string;
   title: string;
   description: string;
@@ -147,6 +150,10 @@ type MediaFormState = {
   ctaLabel: string;
   ctaHref: string;
   objectPosition: string;
+  alt: string;
+  fit: "cover" | "contain";
+  rotation: string;
+  poster: string;
 };
 
 type ContentSaveResult =
@@ -241,6 +248,7 @@ function productToDraft(product?: Product): ProductFormState {
     category: product?.category ?? "Skin Care",
     badge: product?.badge ?? "Shea Wellness",
     imageUrl: product?.imageUrl ?? "",
+    gallery: (product?.gallery ?? []).join("\n"),
     sizes: variations.map((variation) => variation.label).join(", "),
     material: product?.material ?? "Raw Shea Butter",
     deliveryBadge: product?.deliveryBadge ?? "Handcrafted skincare",
@@ -263,7 +271,11 @@ function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
     body: heroAsset.body ?? "Show the customer care journey with real Shea Wellness media.",
     ctaLabel: heroAsset.ctaLabel ?? "Shop routines",
     ctaHref: heroAsset.ctaHref ?? "/shop",
-    objectPosition: asset?.objectPosition ?? "50% 50%"
+    objectPosition: asset?.objectPosition ?? "50% 50%",
+    alt: asset?.alt ?? "",
+    fit: asset?.fit ?? (heroAsset.kicker ? "cover" : "contain"),
+    rotation: String(asset?.rotation ?? 0),
+    poster: asset?.poster ?? ""
   };
 }
 
@@ -277,6 +289,7 @@ function mediaFilename(src: string) {
 }
 
 async function uploadAdminMedia(file: File) {
+  if (file.size > 3 * 1024 * 1024) return (await uploadMedia(file)).url;
   const form = new FormData();
   form.set("file", file);
   const response = await fetch("/api/admin/upload", { method: "POST", headers: adminRequestHeaders(), body: form });
@@ -745,6 +758,7 @@ function ProductsView({
   const [imageUploadState, setImageUploadState] = useState<"idle" | "uploading" | "error">("idle");
   const [imageUploadMessage, setImageUploadMessage] = useState("Choose a JPG, PNG, WebP, GIF, or AVIF image up to 10 MB.");
   const [isMediaLibraryOpen, setIsMediaLibraryOpen] = useState(false);
+  const [mediaTarget, setMediaTarget] = useState<string>("primary");
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const productEditorRef = useRef<HTMLDivElement | null>(null);
@@ -830,6 +844,7 @@ function ProductsView({
       category: draft.category.trim() || "Skin Care",
       badge: draft.badge.trim() || "Shea Wellness",
       imageUrl: draft.imageUrl.trim(),
+      gallery: draft.gallery.split(/\r?\n/).map(value => value.trim()).filter(Boolean),
       imagePosition: existingProduct?.imagePosition ?? "50% 50%",
       rating: existingProduct?.rating ?? 0,
       reviewCount: existingProduct?.reviewCount ?? 0,
@@ -956,6 +971,7 @@ function ProductsView({
                     <label className="shea-admin-variation-media-field">
                       <span>Size image URL <em>optional</em></span>
                       <input value={variation.imageUrl} onChange={(event) => updateVariation(variation.id, "imageUrl", event.target.value)} placeholder="/assets/product-100g.jpg" />
+                      <button type="button" onClick={() => {setMediaTarget(variation.id);setIsMediaLibraryOpen(true);}}>Choose variation image</button>
                     </label>
                     <label className="shea-admin-variation-media-field">
                       <span>Size video URL <em>optional</em></span>
@@ -983,7 +999,7 @@ function ProductsView({
               <span>Product image</span>
               {draft.imageUrl ? <StorefrontImage src={draft.imageUrl} alt="Selected product" /> : null}
               <div>
-                <button type="button" onClick={() => setIsMediaLibraryOpen(true)}><Image size={16} /> Choose from media library</button>
+                <button type="button" onClick={() => {setMediaTarget("primary");setIsMediaLibraryOpen(true);}}><Image size={16} /> Choose from media library</button>
                 <small>Pick an existing image or upload a new one below.</small>
               </div>
             </div>
@@ -992,6 +1008,9 @@ function ProductsView({
               <small>{imageUploadMessage}</small>
               <input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" onChange={uploadProductImage} disabled={imageUploadState === "uploading"} />
             </label>
+            <label>Product gallery URLs (one per line)<textarea value={draft.gallery} onChange={event => updateDraft("gallery", event.target.value)} placeholder="Choose media in the library and paste its URL here" /></label>
+            <button type="button" onClick={() => {setMediaTarget("gallery");setIsMediaLibraryOpen(true);}}>Add image to gallery</button>
+            <div className="admin-gallery-preview">{draft.gallery.split(/\r?\n/).filter(Boolean).map(src => <figure key={src}><StorefrontImage src={src} alt="Gallery image" loading="lazy" /><button type="button" onClick={() => updateDraft("gallery", draft.gallery.split(/\r?\n/).filter(value => value !== src).join("\n"))}>Remove gallery image</button></figure>)}</div>
             <details className="shea-admin-advanced-fields">
               <summary>More product details <span>Optional</span></summary>
               <div>
@@ -1022,7 +1041,9 @@ function ProductsView({
           selectedSrc={draft.imageUrl}
           onClose={() => setIsMediaLibraryOpen(false)}
           onSelect={(src) => {
-            updateDraft("imageUrl", src);
+            if (mediaTarget === "gallery") updateDraft("gallery", [...new Set([...draft.gallery.split(/\r?\n/).filter(Boolean),src])].join("\n"));
+            else if (mediaTarget !== "primary") updateVariation(mediaTarget, "imageUrl", src);
+            else updateDraft("imageUrl", src);
             setIsMediaLibraryOpen(false);
           }}
         />
@@ -1335,13 +1356,14 @@ function MediaView({
   const [mediaSaveState, setMediaSaveState] = useState<"idle" | "saving" | "error">("idle");
   const [mediaSaveMessage, setMediaSaveMessage] = useState("Changes are saved only after Neon confirms them.");
   const [mediaPage, setMediaPage] = useState(0);
+  const [bulkBusy, setBulkBusy] = useState(false);
   const mediaEditorRef = useRef<HTMLDivElement | null>(null);
 
   const activeItems = section === "hero" ? mediaConfig.heroSlides : section === "images" ? mediaConfig.images : mediaConfig.videos;
   const mediaPageSize = 20;
   const mediaPageCount = Math.max(1, Math.ceil(activeItems.length / mediaPageSize));
   const visibleItems = activeItems.slice(mediaPage * mediaPageSize, (mediaPage + 1) * mediaPageSize);
-  const isSavingMedia = mediaSaveState === "saving";
+  const isSavingMedia = mediaSaveState === "saving" || bulkBusy;
 
   async function commitMediaConfig(nextMediaConfig: SheaMediaConfig) {
     setMediaSaveState("saving");
@@ -1408,6 +1430,7 @@ function MediaView({
 
     if (section === "hero") {
       const nextSlide: SheaHeroSlide = {
+        ...mediaConfig.heroSlides.find(item => item.id === editingId),
         id: mediaId,
         title: draft.title.trim() || "Your everyday ritual",
         src: draft.src.trim(),
@@ -1417,7 +1440,8 @@ function MediaView({
         body: draft.body.trim(),
         ctaLabel: draft.ctaLabel.trim() || "Shop routines",
         ctaHref: draft.ctaHref.trim() || "/shop",
-        objectPosition: draft.objectPosition.trim() || "50% 50%"
+        alt: draft.alt.trim(), fit: draft.fit, rotation: Number(draft.rotation) as SheaMediaAsset["rotation"], poster: draft.poster.trim(),
+      objectPosition: draft.objectPosition.trim() || "50% 50%"
       };
       const nextSlides = editingId
         ? mediaConfig.heroSlides.map((slide) => (slide.id === editingId ? nextSlide : slide))
@@ -1430,11 +1454,13 @@ function MediaView({
     }
 
     const nextAsset: SheaMediaAsset = {
+      ...activeItems.find(item => item.id === editingId),
       id: mediaId,
       title: draft.title.trim() || (section === "images" ? "Shea Wellness image" : "Shea Wellness video"),
       src: draft.src.trim(),
       type: section === "images" ? "image" : "video",
       tag: draft.tag.trim() || "Brand media",
+      alt: draft.alt.trim(), fit: draft.fit, rotation: Number(draft.rotation) as SheaMediaAsset["rotation"], poster: draft.poster.trim(),
       objectPosition: draft.objectPosition.trim() || "50% 50%"
     };
     const listKey = section === "images" ? "images" : "videos";
@@ -1499,6 +1525,7 @@ function MediaView({
         title="Editable storefront media"
         action={<button type="button" onClick={resetMedia} disabled={isSavingMedia}>Reset defaults</button>}
       />
+      <BulkMediaManager media={mediaConfig} save={saveMediaConfig} onBusyChange={setBulkBusy} />
       <div className="shea-admin-segments">
         {(["hero", "images", "videos"] as MediaSection[]).map((item) => (
           <button key={item} type="button" className={clsx(section === item && "active")} onClick={() => switchSection(item)} disabled={isSavingMedia}>
@@ -1540,7 +1567,7 @@ function MediaView({
         </Panel>
         <Panel
           title={editingId ? "Edit media" : "Add media"}
-          description="Upload your own image or paste a hosted image URL. Landscape banners and portrait photos fit without cropping."
+          description="Edit a slide or library entry. Choose fill for banners and fit for logos and before-and-after photographs."
         >
           <div ref={mediaEditorRef} className="shea-admin-editor-anchor">
           <div className="shea-admin-editing-banner" aria-live="polite">
@@ -1574,6 +1601,9 @@ function MediaView({
                 <input value={draft.objectPosition} onChange={(event) => updateDraft("objectPosition", event.target.value)} placeholder="50% 50%" />
               </label>
             </div>
+            <label>Alternative text<input value={draft.alt} onChange={event => updateDraft("alt", event.target.value)} /></label>
+            <div className="shea-admin-form-row"><label>Image fitting<select value={draft.fit} onChange={event => updateDraft("fit", event.target.value)}><option value="cover">Fill the card</option><option value="contain">Fit the whole image</option></select></label><label>Image rotation<select value={draft.rotation} onChange={event => updateDraft("rotation", event.target.value)}>{[0,90,180,270].map(value => <option key={value} value={value}>{value}°</option>)}</select></label></div>
+            {section === "videos" && <label>Video poster URL<input value={draft.poster} onChange={event => updateDraft("poster", event.target.value)} /></label>}
             {section === "hero" ? (
               <>
                 <label>

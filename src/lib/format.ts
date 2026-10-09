@@ -17,6 +17,18 @@ export function productPriceForSize(product: { price: number; sizePrices?: Recor
   return size && product.sizePrices?.[size] !== undefined ? product.sizePrices[size] : product.price;
 }
 
+export function productMinimumPrice(product: {price: number; sizes: string[]; sizePrices?: Record<string, number>}) {
+  const prices = product.sizes.map(size => productPriceForSize(product, size)).filter(value => Number.isFinite(value) && value > 0);
+  return prices.length ? Math.min(...prices) : product.price;
+}
+
+export function productPriceLabel(product: {price: number; sizes: string[]; sizePrices?: Record<string, number>}, currency = 'KES', option?: string) {
+  if (option) return formatMoney(productPriceForSize(product, option), currency);
+  const minimum = productMinimumPrice(product);
+  const varied = product.sizes.some(size => productPriceForSize(product, size) !== minimum);
+  return `${varied && minimum > 0 ? 'From ' : ''}${formatMoney(minimum, currency)}`;
+}
+
 export function formatNumber(value: number) {
   return new Intl.NumberFormat("en-US").format(value);
 }

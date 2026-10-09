@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {neon} from '@neondatabase/serverless';
+const spec=JSON.parse(await readFile(new URL('./owner-zips-2026-10-09.json',import.meta.url),'utf8'));
+const env=await readFile('.env.local','utf8').catch(()=> '');
+const connection=process.env.DATABASE_URL || env.match(/^DATABASE_URL\s*=\s*["']?([^\r\n"']+)/m)?.[1];
+assert.ok(connection,'DATABASE_URL must be configured');
+const sql=neon(connection);
+const [original]=await sql`SELECT products,media,updated_at::text AS revision FROM storefront_content WHERE store_key='shea-wellness'`;
+assert.ok(original,'Existing storefront required');
+const updates=new Map(spec.productUpdates.map(item=>[item.id,item]));
+const products=original.products.map(product=>{const change=updates.get(product.id);return change?{...product,...change,gallery:[...new Set([...(change.gallery || []),...(product.gallery || [])])]}:product;});
+const media={...original.media,heroSlides:spec.heroSlides,images:[...original.media.images.filter(item=>!item.id.startsWith('owner_zip_')),...spec.images],videos:[...original.media.videos.filter(item=>!item.id.startsWith('owner_zip_')),...spec.videos]};
+for(const item of [...spec.images,...spec.videos,...spec.heroSlides]) await readFile('public'+item.src);
+for(const [index,product] of products.entries()) {assert.equal(product.inventoryQty,original.products[index].inventoryQty);assert.equal(product.status,original.products[index].status);}
+console.log(JSON.stringify({products:products.length,updatedProducts:updates.size,images:spec.images.length,newUniqueVideos:spec.videos.length,apply:process.argv.includes('--apply')}));
+if(!process.argv.includes('--apply'))process.exit(0);
+await mkdir('artifacts/owner-import',{recursive:true});
+await writeFile(`artifacts/owner-import/before-zips-${Date.now()}.json`,JSON.stringify(original,null,2));
+const rows=await sql`UPDATE storefront_content SET products=${JSON.stringify(products)}::jsonb,media=${JSON.stringify(media)}::jsonb,updated_at=NOW() WHERE store_key='shea-wellness' AND updated_at=${original.revision}::timestamptz RETURNING updated_at`;
+assert.equal(rows.length,1,'Concurrent dashboard change detected; review before retrying');
+console.log('Owner ZIP assets and compact campaigns saved atomically; stock and publication status preserved.');

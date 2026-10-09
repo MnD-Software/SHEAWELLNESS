@@ -1,4 +1,7 @@
 "use client";
+import { ProductCard } from "./ProductCard";
+import { arrangeProducts } from "@/lib/product-presentation";
+import { productMinimumPrice } from "@/lib/format";
 
 import { StorefrontImage } from "./StorefrontImage";
 import {
@@ -190,7 +193,6 @@ export function CommerceStorefront({
   const checkoutRequestId = useRef<string | null>(null);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [saleSeconds, setSaleSeconds] = useState(47 * 60 * 60 + 36 * 60);
   const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(initialMedia ?? defaultStorefrontMedia);
   const wellnessGuidesEnabled = initialWellnessGuidesEnabled;
 
@@ -215,11 +217,7 @@ export function CommerceStorefront({
     if (cartOnly && new URLSearchParams(window.location.search).get("cart") === "open") setCartOpen(true);
   }, []);
 
-  useEffect(() => {
-    if (cartOnly) return;
-    const timer = window.setInterval(() => setSaleSeconds((value) => Math.max(0, value - 1)), 1000);
-    return () => window.clearInterval(timer);
-  }, []);
+
 
   useEffect(() => {
     const savedReviews = window.localStorage.getItem("sheaWellnessReviews");
@@ -251,11 +249,11 @@ export function CommerceStorefront({
       return matchesCategory && matchesQuery;
     });
 
-    return [...nextProducts].sort((a, b) => {
-      if (sort === "price-low") return a.price - b.price;
-      if (sort === "price-high") return b.price - a.price;
+    return arrangeProducts(nextProducts).sort((a, b) => {
+      if (sort === "price-low") return productMinimumPrice(a) - productMinimumPrice(b);
+      if (sort === "price-high") return productMinimumPrice(b) - productMinimumPrice(a);
       if (sort === "rating") return b.rating - a.rating;
-      return b.sales - a.sales;
+      return 0;
     });
   }, [activeCategory, liveProducts, query, sort]);
 
@@ -528,10 +526,10 @@ export function CommerceStorefront({
         <div className="commerce-section-title split">
           <div>
             <span>{isHomePage ? "Products" : "Catalogue"}</span>
-            <h2>{isHomePage ? "Featured products." : "All Shea Wellness products."}</h2>
+            <h2>{isHomePage ? "Featured products." : "Shop the collection."}</h2>
             <p className="commerce-shop-intro">
               {isHomePage
-                ? "A focused preview of the retail catalogue. Visit the shop for every product and category."
+                ? "Pure Nilotica shea, gentle cleansers and botanical essentials for your daily ritual."
                 : "Browse every active product in the Shea Wellness catalogue."}
             </p>
           </div>
@@ -569,46 +567,13 @@ export function CommerceStorefront({
         ) : null}
 
         <div className="commerce-product-grid">
-          {displayedProducts.map((product) => {
-            const lowStock = product.status === "low_stock" || product.inventoryQty <= 10;
-            const wished = wishlist.includes(product.id);
-            return (
-            <article className="commerce-product-card" key={product.id}>
-              <a className={clsx("commerce-product-image", isSidewaysSheaProductAsset(product.imageUrl) && "is-rotated")} href={`/products/${encodeURIComponent(product.id)}`}>
-                <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={`${product.title} by Shea Wellness`} loading="lazy" decoding="async" style={{ objectPosition: product.imagePosition }} />
-                <span className="commerce-card-badges"><em>{product.category}</em>{lowStock ? <em className="stock">{product.inventoryQty < 1 ? "Enquire" : "Low stock"}</em> : null}</span>
-                <b>View product</b>
-              </a>
-              <button type="button" className={clsx("commerce-card-wishlist", wished && "active")} onClick={() => toggleWishlist(product.id)} aria-label={wished ? `Remove ${product.title} from wishlist` : `Add ${product.title} to wishlist`}><Heart size={18} fill={wished ? "currentColor" : "none"} /></button>
-              <div className="commerce-product-body">
-                <div>
-                  <strong>{product.title}</strong>
-                  <p>{product.description}</p>
-                </div>
-                <div className="commerce-card-footer">
-                  <span className={clsx("commerce-stock-status", lowStock && "low")}><i />{product.inventoryQty < 1 ? "Enquire for availability" : lowStock ? `${product.inventoryQty} left` : "In stock"}</span>
-                  <button type="button" onClick={() => viewProduct(product.id)} aria-label={`View ${product.title}`}>
-                    <Eye size={17} />
-                    View product
-                  </button>
-                </div>
-              </div>
-            </article>
-          );
-          })}
+          {displayedProducts.map(product => <ProductCard key={product.id} product={product} currency={store.currency} wished={wishlist.includes(product.id)} onWishlist={() => toggleWishlist(product.id)} />)}
         </div>
       </section>
 
       {isHomePage ? (
       <>
-      <section className="commerce-sale-banner" aria-label="Limited wellness offer">
-        <div><span>Limited wellness offer</span><h2>Build a complete routine and save.</h2><p>Pair any body butter with a cleansing or botanical oil step for a more complete routine.</p><a href="/shop">Shop bundle offers <ArrowRight size={17} /></a></div>
-        <div className="commerce-countdown" aria-label="Offer countdown"><strong>{String(Math.floor(saleSeconds / 3600)).padStart(2, "0")}</strong><span>Hours</span><strong>{String(Math.floor((saleSeconds % 3600) / 60)).padStart(2, "0")}</strong><span>Minutes</span><strong>{String(saleSeconds % 60).padStart(2, "0")}</strong><span>Seconds</span></div>
-      </section>
-
-      <section className="commerce-merchandising-rails">
-        {[{ title: "Best sellers", body: "Customer favourites with strong reviews and repeat demand.", items: [...liveProducts].sort((a,b) => b.sales-a.sales).slice(0,4) }, { title: "New arrivals", body: "Fresh additions to skin, hair, gifting, and spa care.", items: [...liveProducts].reverse().slice(0,4) }].map((rail) => <div key={rail.title}><header><span>{rail.title}</span><p>{rail.body}</p></header><div>{rail.items.map((item) => <a href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><StorefrontImage src={item.imageUrl} alt={item.title} loading="lazy" /><span><strong>{item.title}</strong><small><Star size={12} fill="currentColor" /> {item.rating.toFixed(1)} · {formatMoney(item.price, store.currency)}</small></span></a>)}</div></div>)}
-      </section>
+      <section className="beauty-routine-banner"><div><span>Your everyday ritual</span><h2>Cleanse. Nourish. Glow.</h2><p>Build a simple routine with care for your skin, hair and moments of calm.</p></div><a href="/wellness-guides">Find your routine <ArrowRight size={18} /></a></section>
 
       <section className="commerce-concerns-section" id="skin-concerns">
         <div className="commerce-section-title split">
@@ -633,7 +598,7 @@ export function CommerceStorefront({
 
       <section className="commerce-seen-strip" aria-label="Shea Wellness partners">
         <span>Our partners</span>
-        <OwnerPartners />
+        <OwnerPartners media={mediaConfig} />
       </section>
 
       <section className="commerce-guarantee-strip" aria-label="Store assurances">
@@ -642,22 +607,7 @@ export function CommerceStorefront({
         <span><CheckCircle2 size={19} /> Export-ready quality</span>
       </section>
 
-      <section className="commerce-before-after-section" aria-label="Real skin routine progress">
-        <div className="commerce-before-after-proof">
-          <span><CheckCircle2 size={20} /> Patch-test first</span>
-          <span><CheckCircle2 size={20} /> Routine guidance</span>
-          <span><CheckCircle2 size={20} /> Care inspired by nature</span>
-        </div>
-        <div className="commerce-before-after-head">
-          <div>
-            <span>Routine milestones</span>
-            <h2>Real skin routine progress.</h2>
-          </div>
-          <p>Build a consistent routine in clear stages. Customer before-and-after images are published only after consent and product-use verification.</p>
-        </div>
-        <ol className="shea-routine-steps">{routineProgressSlides.map((slide, index) => <li key={slide.title}><span>0{index + 1}</span><strong>{slide.title}</strong><small>{slide.labels.join(" · ")}</small></li>)}</ol>
-      </section>
-      <OwnerRoutineProgress />
+      <OwnerRoutineProgress media={mediaConfig} />
 
       <section className="commerce-comparison-section">
         <div className="commerce-comparison-copy">

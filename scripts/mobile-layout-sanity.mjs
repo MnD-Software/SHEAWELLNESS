@@ -51,6 +51,11 @@ try {
         }
       }
       await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
+      // Safari scroll anchoring and newly visible lazy images settle on the next frames.
+      await page.waitForFunction(() => {
+        scrollTo({top: document.documentElement.scrollHeight, behavior: 'instant'});
+        return document.documentElement.scrollHeight - innerHeight - scrollY < 2;
+      });
       const footerGap = await page.locator('.shea-commerce-footer').evaluate(element => document.documentElement.scrollHeight - (element.getBoundingClientRect().bottom + scrollY));
       assert.ok(footerGap <= 2, `${route}: ${footerGap}px empty space after footer`);
       const chat = page.locator('.shea-whatsapp-chat');

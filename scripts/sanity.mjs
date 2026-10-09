@@ -42,7 +42,7 @@ assert.notEqual(await collection.locator('h2').innerText(), productTitle);
 await collection.getByRole('button', { name: 'Previous product', exact: true }).click();
 assert.equal(await collection.locator('h2').innerText(), productTitle);
 await visit('/shop');
-await page.locator('.commerce-product-image').first().click();
+await page.locator('.shop-card-photo').first().click();
 await page.locator('[data-cart-ready="true"]').waitFor();
 await page.getByRole('button', { name: /Add to cart/i }).first().waitFor();
 await page.getByRole('button', { name: /Add to cart/i }).first().click();

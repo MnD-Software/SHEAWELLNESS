@@ -1,0 +1,936 @@
+{
+  "images": [
+    {
+      "id": "owner_zip_s1-01",
+      "title": "Grapefruit Open",
+      "src": "/assets/owner-zips-2026/grapefruit-open.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.57.jpeg",
+      "sha256": "aa001942a7be0eaa2252bc8fc0e6e352d9c4205225ead7e39b988f859b25f4c2",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-02",
+      "title": "Vanilla Mint Open",
+      "src": "/assets/owner-zips-2026/vanilla-mint-open.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.57 (1).jpeg",
+      "sha256": "a0937d95ae8d5bdb65d8b8c9c5e235cf112d9d0b0e1844b9ceb16748c965ad54",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-03",
+      "title": "Pure Raw Front",
+      "src": "/assets/owner-zips-2026/pure-raw-front.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.58.jpeg",
+      "sha256": "2031bdd5bcf70594ec4d2aff982c9c6f2dd3641b76ced51234f4bddd86fd74ad",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-04",
+      "title": "Lavender Open",
+      "src": "/assets/owner-zips-2026/lavender-open.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.58 (1).jpeg",
+      "sha256": "9f4df106566aa0591772fcbb2c717a16ad01bf3fef2a67385de53605f2e871ae",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-05",
+      "title": "Lemongrass Front",
+      "src": "/assets/owner-zips-2026/lemongrass-front.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.58 (2).jpeg",
+      "sha256": "9d406e307db8b8384af3cf813d2f83d41269a1cec6f94d483cd26864bd0964d3",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-06",
+      "title": "Grapefruit Front",
+      "src": "/assets/owner-zips-2026/grapefruit-front.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.58 (3).jpeg",
+      "sha256": "c00bbf0dafb55a0c96dfbf59dbaccc848efd8370770eda4ad48fc84e10c45cb5",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-07",
+      "title": "Lavender Front",
+      "src": "/assets/owner-zips-2026/lavender-front.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.59.jpeg",
+      "sha256": "236968ecbfe6173f344fb47ca1acd0f07d1ecd6c747f29ec2110d38e8a5fbc4b",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-08",
+      "title": "Lavender Back",
+      "src": "/assets/owner-zips-2026/lavender-back.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.59 (1).jpeg",
+      "sha256": "ad21d096018f44b160ae38c540b0a2e825539a8ff05a4a3caab796a361d4092e",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s1-09",
+      "title": "Lemongrass Open",
+      "src": "/assets/owner-zips-2026/lemongrass-open.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea1.zip",
+      "sourceName": "WhatsApp Image 2026-06-14 at 09.02.59 (2).jpeg",
+      "sha256": "13a7be7dbcefeb0c752d3618951e1b215f13c69cd9772809b1b3627e2950b3d6",
+      "dimensions": [
+        1280,
+        853
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-01",
+      "title": "Massage Ritual",
+      "src": "/assets/owner-zips-2026/massage-ritual.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.20.jpeg",
+      "sha256": "c5b65d431d532d202f8ba51e7d3a016e7c1e841ebe1a96dfab0eb93a461ae443",
+      "dimensions": [
+        1000,
+        1000
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-02",
+      "title": "Aromatherapy At Home",
+      "src": "/assets/owner-zips-2026/aromatherapy-at-home.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.20 (1).jpeg",
+      "sha256": "1413e2c0b631705de04b7309280993b70d0f0c4df0b5b4e77ff80e45870934ef",
+      "dimensions": [
+        704,
+        1034
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-03",
+      "title": "Spa Collection",
+      "src": "/assets/owner-zips-2026/spa-collection.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.21.jpeg",
+      "sha256": "c03ab1bd50797a5ad8298f8fa71ba36d16ccdc1431bd8a03a3c509c80734c033",
+      "dimensions": [
+        1080,
+        1356
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-04",
+      "title": "S2 04 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-04-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.21 (1).jpeg",
+      "sha256": "942b24441a95aaf6916c67fa57d1f3a4180cfe62b5bb8baaf1291fcadbb269a5",
+      "dimensions": [
+        800,
+        1200
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-05",
+      "title": "S2 05 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-05-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.21 (2).jpeg",
+      "sha256": "fb9c3a738fccdffdc947164801646edadde84cfb790efdc4be1c3c79d6d7f19e",
+      "dimensions": [
+        278,
+        416
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-06",
+      "title": "S2 06 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-06-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.22.jpeg",
+      "sha256": "d103eca422de914aac0ef747cc8f87599174b225e8479ef31a0ccbf9d5052bfa",
+      "dimensions": [
+        768,
+        1344
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-07",
+      "title": "S2 07 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-07-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.22 (1).jpeg",
+      "sha256": "d1e9cf6fc5d9daadde97bef06989117b672e9f8e257e04ce52f0f6b9d380361b",
+      "dimensions": [
+        1200,
+        1500
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-08",
+      "title": "S2 08 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-08-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.22 (2).jpeg",
+      "sha256": "b15310ba706ff65073c2d30d6f2b60f1e81744b2bea08543c8a1800d7041a528",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-09",
+      "title": "Body Glow",
+      "src": "/assets/owner-zips-2026/body-glow.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.23.jpeg",
+      "sha256": "5b73c912272599a725f63a5001c0d481aab1e4baf5dc20ec87b0173e9b6252fc",
+      "dimensions": [
+        1200,
+        1500
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-10",
+      "title": "S2 10 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-10-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.23 (1).jpeg",
+      "sha256": "fea082b7bb974f88eb907e3fc8abae11a0ac0f1f1d46c0c1a2c48bcecddc82f2",
+      "dimensions": [
+        1122,
+        1402
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-11",
+      "title": "S2 11 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-11-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.23 (2).jpeg",
+      "sha256": "6df7d787b3896c962743698f9ae03a7d93869cd9d47e0283f995eeccb4143fc4",
+      "dimensions": [
+        900,
+        1600
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-12",
+      "title": "S2 12 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-12-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.24.jpeg",
+      "sha256": "c11211bfb5fa80bd4e303e0e9f4429f0e0c023c8150e69095b1726f4f8e889d6",
+      "dimensions": [
+        634,
+        792
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-13",
+      "title": "S2 13 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-13-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.24 (1).jpeg",
+      "sha256": "78e945990c25e7bfb034d3f0c1a99411a43013d3973ddc30bc5e0c8fa5756f21",
+      "dimensions": [
+        1200,
+        1500
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-14",
+      "title": "S2 14 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-14-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.25.jpeg",
+      "sha256": "efd055d404e24560b631efa3f433aebca8645b9d3660c2518660dd9e4a089767",
+      "dimensions": [
+        659,
+        1000
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-15",
+      "title": "S2 15 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-15-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.25 (1).jpeg",
+      "sha256": "587f89826d65c130b1f679d79f87d2d4d88b5ca70f3c1ab8c3811bbe0895eefb",
+      "dimensions": [
+        533,
+        800
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-16",
+      "title": "S2 16 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-16-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.25 (2).jpeg",
+      "sha256": "9d21c283570cb22d234a8697bd2139221fba1ee7e75228e56ddaaecaa085998d",
+      "dimensions": [
+        800,
+        1200
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-17",
+      "title": "S2 17 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-17-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.26.jpeg",
+      "sha256": "ac03b01f7d23a58c492365acf4ec1a22c82a1003013b1c82a3912d935dd9b9bd",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-18",
+      "title": "S2 18 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-18-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.26 (1).jpeg",
+      "sha256": "ed89369bbc563d05762c281af7bec17317a1ac804f05438e11a44da3d1a75cc2",
+      "dimensions": [
+        1200,
+        1200
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-19",
+      "title": "S2 19 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-19-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.26 (2).jpeg",
+      "sha256": "a64a2c43c7bc9843aa561bf6e06f78d41fd4911ea5ef08612a699585bc25125b",
+      "dimensions": [
+        920,
+        1314
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-20",
+      "title": "S2 20 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-20-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.27.jpeg",
+      "sha256": "64893ca2d398efdaa469048f7306e496293b8c41ea6f388dbfa8e07745b0fdb4",
+      "dimensions": [
+        896,
+        1600
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-21",
+      "title": "Face Oil Ritual",
+      "src": "/assets/owner-zips-2026/face-oil-ritual.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.27 (1).jpeg",
+      "sha256": "76860b14fc01b0b3482095680359df92e29ce9c1634c954a05243f79ec12d7ff",
+      "dimensions": [
+        1200,
+        1500
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-22",
+      "title": "S2 22 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-22-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.27 (2).jpeg",
+      "sha256": "667b06b81ffa1c666445ee852d54e467b34cb242734b60a1f04780487f42ee47",
+      "dimensions": [
+        650,
+        813
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-23",
+      "title": "S2 23 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-23-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.27 (3).jpeg",
+      "sha256": "d0fbfc06da9176685d87c96b270eaad806cfec3285b971e913a40eaffc77d994",
+      "dimensions": [
+        736,
+        1104
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-24",
+      "title": "S2 24 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-24-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.28.jpeg",
+      "sha256": "3bc338ec5c4dee57027322bb607eadd52189952e4d7152260f7aec879f74619e",
+      "dimensions": [
+        1000,
+        1500
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-25",
+      "title": "S2 25 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-25-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.28 (1).jpeg",
+      "sha256": "725a33e5839c9fa96852746090fe81fb1b12b7777179c12b114690cd5097b20f",
+      "dimensions": [
+        1200,
+        1600
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-26",
+      "title": "S2 26 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-26-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.28 (2).jpeg",
+      "sha256": "773b7bc1770f2e4a7850f3e5a1e45836e42e8aae8351dcb1c69cc041f8dad1a0",
+      "dimensions": [
+        800,
+        1200
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-27",
+      "title": "S2 27 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-27-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.28 (3).jpeg",
+      "sha256": "1bb9644d9e54f153f53be6479f6196f18a74c15bc31899b9cd9d45b434e6b283",
+      "dimensions": [
+        1200,
+        1174
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-28",
+      "title": "S2 28 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-28-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.28 (4).jpeg",
+      "sha256": "67e9462fd7a9c5d4b9e265d76fef3827ec693a52b89724cf425a8d2db9c35258",
+      "dimensions": [
+        736,
+        725
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-29",
+      "title": "S2 29 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-29-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.29.jpeg",
+      "sha256": "b2ed6014a89f1ee6434f6cce020b4127ea1eb7dc3edd053ac6dee441824d4460",
+      "dimensions": [
+        1080,
+        1333
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-30",
+      "title": "S2 30 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-30-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.29 (1).jpeg",
+      "sha256": "4c7b7a2e10966e7956bd5049e08b971e2c869bc77e4635eec8864b18ea60704e",
+      "dimensions": [
+        750,
+        938
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-31",
+      "title": "S2 31 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-31-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.29 (2).jpeg",
+      "sha256": "8f5b574aeac40303119dcc3876a8ffad98cffb5c1a370508f14332821d6ccc8e",
+      "dimensions": [
+        1199,
+        1491
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-32",
+      "title": "S2 32 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-32-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.29 (3).jpeg",
+      "sha256": "b967d06806cdfb4e319284ce6a0dd37e1ebfa9830b983a26e8e4da67022256d1",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-33",
+      "title": "S2 33 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-33-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.30.jpeg",
+      "sha256": "00f33e6803baa94f5e7b08b86a674720880dac731d490d9c05c771a979ec6fbe",
+      "dimensions": [
+        736,
+        964
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-34",
+      "title": "S2 34 Wellness Photo",
+      "src": "/assets/owner-zips-2026/s2-34-wellness-photo.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.30 (1).jpeg",
+      "sha256": "384c76851cf8522904ce088153e36f9b0bb4428e1d4c83ef079d8174d52f08e7",
+      "dimensions": [
+        736,
+        1108
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s2-35",
+      "title": "Before & after",
+      "src": "/assets/owner-zips-2026/before-after-arm.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.30 (2).jpeg",
+      "sha256": "473df5b29d66c0a3906630b20a04d7ece5eef8f675da90c9bd9540af9b2dfe55",
+      "dimensions": [
+        736,
+        736
+      ],
+      "placements": [
+        "beforeAfter"
+      ],
+      "alt": "Before and after comparison supplied by Shea Wellness"
+    },
+    {
+      "id": "owner_zip_s2-36",
+      "title": "Before & after",
+      "src": "/assets/owner-zips-2026/before-after-hands.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea2.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.44.30 (3).jpeg",
+      "sha256": "7ee3d2717278ba9648a88137403a2cec2d9a326b3fa814982b435e9249b0973d",
+      "dimensions": [
+        660,
+        686
+      ],
+      "placements": [],
+      "alt": "Before and after comparison supplied by Shea Wellness"
+    },
+    {
+      "id": "owner_zip_s3-01",
+      "title": "Before & after",
+      "src": "/assets/owner-zips-2026/before-after-heels.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea3.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.04.41.jpeg",
+      "sha256": "a9ee3c24b414ed974551318149f2d1f802b2156461747d0f55f1c6b8f2227b08",
+      "dimensions": [
+        1200,
+        1499
+      ],
+      "placements": [],
+      "alt": "Before and after comparison supplied by Shea Wellness"
+    },
+    {
+      "id": "owner_zip_s3-02",
+      "title": "Before & after",
+      "src": "/assets/owner-zips-2026/before-after-dry-skin.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea3.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.04.42.jpeg",
+      "sha256": "d71dffcffe607ad20b5035b1daa97b8f3b004781b21ad38ddcc5bddafb4833ae",
+      "dimensions": [
+        640,
+        960
+      ],
+      "placements": [
+        "beforeAfter"
+      ],
+      "alt": "Before and after comparison supplied by Shea Wellness"
+    },
+    {
+      "id": "owner_zip_s3-03",
+      "title": "Before & after",
+      "src": "/assets/owner-zips-2026/before-after-face.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea3.zip",
+      "sourceName": "WhatsApp Image 2026-07-08 at 12.04.42 (1).jpeg",
+      "sha256": "7141c68818a44648bb50620f03126cffde47f1287bc98118f7f25e1da13e4f09",
+      "dimensions": [
+        1200,
+        1500
+      ],
+      "placements": [
+        "beforeAfter"
+      ],
+      "alt": "Before and after comparison supplied by Shea Wellness"
+    },
+    {
+      "id": "owner_zip_s4-01",
+      "title": "Product Price List",
+      "src": "/assets/owner-zips-2026/product-price-list.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Image 2026-07-07 at 11.44.10.jpeg",
+      "sha256": "53706fd22f10dbbc508d202520a4a07be5d4a63435045cb10f84f95972775cf3",
+      "dimensions": [
+        720,
+        1280
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s4-33",
+      "title": "Brand Gold",
+      "src": "/assets/owner-zips-2026/brand-gold.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Image 2026-07-07 at 11.48.21.jpeg",
+      "sha256": "58b3fa73e3ddf9417f97d2607228b2826ff639380fca5c8d4e9ee6dd1ab05403",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s4-34",
+      "title": "Brand Green",
+      "src": "/assets/owner-zips-2026/brand-green.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Image 2026-07-07 at 11.48.21 (1).jpeg",
+      "sha256": "84891d07f1b3974d429a46252b7e865e70aa88340a74a4f5d685a176b5c86d63",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "placements": []
+    },
+    {
+      "id": "owner_zip_s4-35",
+      "title": "Brand Black",
+      "src": "/assets/owner-zips-2026/brand-black.webp",
+      "type": "image",
+      "tag": "Owner ZIP photographs",
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Image 2026-07-07 at 11.48.21 (2).jpeg",
+      "sha256": "b4dfeebbc50fe14ff6460fb85cc205354fb885cdebf645c424b9ca05ffdf284a",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "placements": []
+    }
+  ],
+  "videos": [
+    {
+      "id": "owner_zip_s4-30",
+      "title": "Lemongrass shea butter demonstration",
+      "src": "/assets/owner-zips-2026/s4-30-product-film.mp4",
+      "poster": "/assets/owner-zips-2026/s4-30-product-film-poster.webp",
+      "type": "video",
+      "tag": "Owner ZIP product films",
+      "placements": [],
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Video 2026-07-07 at 11.47.52.mp4",
+      "sha256": "8b241e89bb56613fe2ca41132b4319e275bfdb29afdccc963a06c75baeee31f7"
+    },
+    {
+      "id": "owner_zip_s4-36",
+      "title": "Shea Wellness collection showcase",
+      "src": "/assets/owner-zips-2026/s4-36-product-film.mp4",
+      "poster": "/assets/owner-zips-2026/s4-36-product-film-poster.webp",
+      "type": "video",
+      "tag": "Owner ZIP product films",
+      "placements": [],
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Video 2026-07-07 at 11.48.22.mp4",
+      "sha256": "ad5aee1133e625d1295d28ec182c7b1ddac1955523f732ff3b8dda5778d53b91"
+    },
+    {
+      "id": "owner_zip_s4-39",
+      "title": "Wellness gift collection preview",
+      "src": "/assets/owner-zips-2026/s4-39-product-film.mp4",
+      "poster": "/assets/owner-zips-2026/s4-39-product-film-poster.webp",
+      "type": "video",
+      "tag": "Owner ZIP product films",
+      "placements": [],
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Video 2026-07-07 at 11.48.44.mp4",
+      "sha256": "03962a37e5166a698a6c41be73c6af793dd9c0937b3598cc4c1d193b8793b2e6"
+    },
+    {
+      "id": "owner_zip_s4-42",
+      "title": "Shea Wellness body butter demonstration",
+      "src": "/assets/owner-zips-2026/s4-42-product-film.mp4",
+      "poster": "/assets/owner-zips-2026/s4-42-product-film-poster.webp",
+      "type": "video",
+      "tag": "Owner ZIP product films",
+      "placements": [],
+      "sourceArchive": "shea4.zip",
+      "sourceName": "WhatsApp Video 2026-07-07 at 11.49.02.mp4",
+      "sha256": "574dcc42fa87686b2132b13a151388d0838bcd39451acb09baa346581f6de466"
+    }
+  ],
+  "productUpdates": [
+    {
+      "id": "prod_pure_raw",
+      "imageUrl": "/assets/owner-zips-2026/pure-raw-front.webp",
+      "gallery": [
+        "/assets/owner-zips-2026/pure-raw-front.webp"
+      ]
+    },
+    {
+      "id": "prod_lavender",
+      "imageUrl": "/assets/owner-zips-2026/lavender-front.webp",
+      "gallery": [
+        "/assets/owner-zips-2026/lavender-front.webp",
+        "/assets/owner-zips-2026/lavender-open.webp",
+        "/assets/owner-zips-2026/lavender-back.webp"
+      ]
+    },
+    {
+      "id": "prod_lemongrass",
+      "imageUrl": "/assets/owner-zips-2026/lemongrass-front.webp",
+      "gallery": [
+        "/assets/owner-zips-2026/lemongrass-front.webp",
+        "/assets/owner-zips-2026/lemongrass-open.webp"
+      ],
+      "sizes": [
+        "200ml",
+        "330ml"
+      ],
+      "price": 1100,
+      "sizePrices": {
+        "200ml": 1100,
+        "330ml": 1500
+      }
+    },
+    {
+      "id": "prod_grapefruit",
+      "imageUrl": "/assets/owner-zips-2026/grapefruit-front.webp",
+      "gallery": [
+        "/assets/owner-zips-2026/grapefruit-front.webp",
+        "/assets/owner-zips-2026/grapefruit-open.webp"
+      ]
+    },
+    {
+      "id": "prod_vanilla_mint",
+      "imageUrl": "/assets/owner-zips-2026/vanilla-mint-open.webp",
+      "gallery": [
+        "/assets/owner-zips-2026/vanilla-mint-open.webp"
+      ]
+    }
+  ],
+  "heroSlides": [
+    {
+      "id": "beauty_lavender",
+      "title": "Your daily glow.",
+      "kicker": "Pure Nilotica shea",
+      "body": "Nourishing body butters for beautifully soft skin.",
+      "src": "/assets/owner-zips-2026/lavender-open.webp",
+      "type": "image",
+      "tag": "Lavender shea body butter",
+      "ctaLabel": "Shop body care",
+      "ctaHref": "/skin",
+      "fit": "cover",
+      "objectPosition": "50% 58%"
+    },
+    {
+      "id": "beauty_ritual",
+      "title": "Care for every day.",
+      "kicker": "Natural beauty rituals",
+      "body": "Thoughtful essentials for your skin, hair and wellbeing.",
+      "src": "/assets/owner-zips-2026/s2-13-wellness-photo.webp",
+      "type": "image",
+      "tag": "Shea butter skin care ritual",
+      "ctaLabel": "Explore the shop",
+      "ctaHref": "/shop",
+      "fit": "cover",
+      "objectPosition": "50% 50%"
+    },
+    {
+      "id": "beauty_spa",
+      "title": "A moment of calm.",
+      "kicker": "Wellness at home",
+      "body": "Aromatherapy and spa essentials for your quiet moments.",
+      "src": "/assets/owner-zips-2026/aromatherapy-at-home.webp",
+      "type": "image",
+      "tag": "Aromatherapy at home",
+      "ctaLabel": "Shop spa essentials",
+      "ctaHref": "/spa-essentials",
+      "fit": "cover",
+      "objectPosition": "50% 50%"
+    }
+  ]
+}

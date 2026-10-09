@@ -1,4 +1,6 @@
 "use client";
+import { ProductCard } from "./ProductCard";
+import { suggestedProducts } from "@/lib/product-presentation";
 
 import { StorefrontImage } from "./StorefrontImage";
 import { ArrowRight, CheckCircle2, Heart, Leaf, PackageCheck, RotateCcw, ShieldCheck, ShoppingCart, Sparkles, Star, Truck } from "lucide-react";
@@ -33,6 +35,8 @@ type StoredCartLine = {
 export function SheaProductDetail({ productId, initialProduct }: { productId: string; initialProduct?: Product | null }) {
   const [products, setProducts] = useState<Product[]>(platformSnapshot.products);
   const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
+  const [galleryImage, setGalleryImage] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState(initialProduct?.sizes[0] ?? "100g");
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [reviewName, setReviewName] = useState("");
@@ -45,6 +49,8 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
   const [recentProductIds, setRecentProductIds] = useState<string[]>([]);
 
   useEffect(() => {
+    const requestedOption = new URLSearchParams(location.search).get("option");
+    if (requestedOption && initialProduct?.sizes.includes(requestedOption)) setSize(requestedOption);
     const savedReviews = readStoredArray("sheaWellnessReviews") as ProductReview[];
     const savedCart = readStoredArray("sheaWellnessCart") as StoredCartLine[];
 
@@ -64,7 +70,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
         const nextProduct = nextProducts.find((item) => item.id === productId && (item.status === "active" || item.status === "low_stock")) ?? null;
         setProducts(nextProducts.filter((item) => item.status === "active" || item.status === "low_stock"));
         setProduct(nextProduct);
-        setSize(nextProduct?.sizes[0] ?? "100g");
+        setSize(requestedOption && nextProduct?.sizes.includes(requestedOption) ? requestedOption : nextProduct?.sizes[0] ?? "100g");
       })
       .catch(() => undefined);
   }, [productId]);
@@ -76,7 +82,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     : 0;
   const relatedProducts = useMemo(() => {
     if (!product) return [];
-    return products.filter((item) => item.id !== product.id && item.category === product.category).slice(0, 4);
+    return suggestedProducts(product, products);
   }, [product, products]);
   const recentlyViewed = useMemo(() => recentProductIds.map((id) => products.find((item) => item.id === id)).filter((item): item is Product => Boolean(item)).slice(0, 4), [products, recentProductIds]);
   const botanicalDetail = botanicalDetails.find((item) => item.productId === product?.id);
@@ -84,7 +90,9 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     ? productPairings.filter((pairing) => pairing.products.some((item) => item.toLowerCase().includes(product.title.replace("Cold-Pressed ", "").replace("Cold Pressed ", "").toLowerCase().split(" ").slice(0, 2).join(" ")))).slice(0, 3)
     : [];
   const selectedMedia = product?.sizeMedia?.[size];
-  const selectedImage = selectedMedia?.imageUrl ?? product?.imageUrl ?? "";
+  const selectedImage = galleryImage ?? selectedMedia?.imageUrl ?? product?.imageUrl ?? "";
+  const galleryImages = [...new Set([selectedMedia?.imageUrl ?? product?.imageUrl ?? "", ...(product?.gallery ?? []), ...Object.values(product?.sizeMedia ?? {}).map(item => item.imageUrl || "")].filter(Boolean))];
+  useEffect(() => {setGalleryImage(null);}, [size, productId]);
   const selectedImagePosition = selectedMedia?.imagePosition ?? product?.imagePosition;
   const selectedVideo = selectedMedia?.videoUrl;
   const selectedImageIsSideways = isSidewaysSheaProductAsset(selectedImage);
@@ -99,7 +107,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
   function addToCart() {
     if (!product || product.inventoryQty < 1) return;
-    sharedCart.add(product, size);
+    sharedCart.add(product, size, quantity);
     setNotice(`${product.title} added to cart.`);
   }
 
@@ -137,17 +145,18 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
   return (
     <main className="shea-product-page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, image: product.imageUrl, description: product.description, brand: { "@type": "Brand", name: "Shea Wellness" }, aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount }, offers: { "@type": "Offer", priceCurrency: platformSnapshot.activeStore.currency, price: product.price, availability: product.inventoryQty > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } }) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, image: product.imageUrl, description: product.description, brand: { "@type": "Brand", name: "Shea Wellness" }, ...(product.reviewCount > 0 ? {aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount }} : {}), offers: { "@type": "Offer", priceCurrency: platformSnapshot.activeStore.currency, price: product.price, availability: product.inventoryQty > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } }) }} />
 
       <section className="shea-product-detail-hero">
         <div className="shea-product-gallery">
           <div className={`shea-product-main-image${selectedImageIsSideways ? " is-rotated" : ""}`}>
-            <StorefrontImage className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt={`${product.title}${size ? ` — ${size}` : ""}`} style={{ objectPosition: selectedImagePosition }} />
+            <StorefrontImage className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt={galleryImage ? `Additional view of ${product.title}` : `${product.title}${size ? ` — ${size}` : ""}`} style={{ objectPosition: selectedImagePosition }} />
           </div>
-          <div className="shea-product-thumbs">
-            <StorefrontImage className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt="" style={{ objectPosition: selectedImagePosition }} />
-            {selectedVideo ? <video src={selectedVideo} controls playsInline preload="none" poster={selectedImage} /> : null}
+          <div className="shea-product-thumbs" aria-label="Product gallery">
+            {galleryImages.map((image, index) => <button type="button" key={image} aria-label={`View product photo ${index + 1}`} aria-pressed={selectedImage === image} onClick={() => {const variant = Object.entries(product.sizeMedia ?? {}).find(([, media]) => media.imageUrl === image); if (variant) {setSize(variant[0]);setGalleryImage(null);} else setGalleryImage(image);}}><StorefrontImage src={image} alt="" loading="lazy" /></button>)}
           </div>
+          {selectedVideo && <details className="product-film-toggle"><summary>Watch product video</summary><video className="shea-product-film" src={selectedVideo} controls playsInline preload="none" poster={selectedImage || undefined} aria-label={`${product.title} product film`} /></details>}
+
         </div>
 
         <article className="shea-product-buy-panel">
@@ -169,13 +178,14 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           </div>
 
           <fieldset className="shea-product-size">
-            <legend>Size</legend>
+            <legend>Choose your size or option</legend>
             {product.sizes.map((item) => (
-              <button type="button" key={item} className={size === item ? "active" : ""} aria-pressed={size === item} onClick={() => setSize(item)}>{item}</button>
+              <button type="button" key={item} className={size === item ? "active" : ""} aria-pressed={size === item} onClick={() => {setSize(item);setGalleryImage(null);}}>{item}</button>
             ))}
-            <small>{selectedMedia?.imageUrl || selectedMedia?.videoUrl ? `${size} media selected` : `${size} uses the primary product media`}</small>
+
           </fieldset>
 
+          {product.inventoryQty > 0 && <label className="product-quantity">Quantity<input aria-label="Product quantity" type="number" min="1" max={Math.min(25, product.inventoryQty)} value={quantity} onChange={event => setQuantity(Math.max(1, Math.min(Number(event.target.value) || 1, 25, product.inventoryQty)))} /></label>}
           <div className="shea-product-primary-actions"><button type="button" className="shea-product-add" onClick={addToCart} disabled={product.inventoryQty < 1}>
             <ShoppingCart size={20} />
             {product.inventoryQty < 1 ? "Unavailable online" : "Add to cart"}
@@ -246,27 +256,8 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
         </div>
       </section>
 
-      {relatedProducts.length ? (
-        <section className="shea-product-related">
-          <div className="shea-section-title">
-            <span>Related products</span>
-            <h2>Customers also view these Shea Wellness products.</h2>
-          </div>
-          <div>
-            {relatedProducts.map((item) => (
-              <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}>
-                <StorefrontImage className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} style={{ objectPosition: item.imagePosition }} />
-                <strong>{item.title}</strong>
-                <span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span>
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {relatedProducts.length >= 2 ? <section className="shea-frequently-bought"><div><span>Frequently bought together</span><h2>Build a complete routine.</h2><p>Pair {product.title} with complementary care from the same collection.</p></div><div>{[product, ...relatedProducts.slice(0, 2)].map((item) => <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><StorefrontImage className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
-
-      {recentlyViewed.length ? <section className="shea-product-related recently-viewed"><div className="shea-section-title"><span>Recently viewed</span><h2>Continue where you left off.</h2></div><div>{recentlyViewed.map((item) => <a className={isSidewaysSheaProductAsset(item.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(item.id)}`} key={item.id}><StorefrontImage className={isSidewaysSheaProductAsset(item.imageUrl) ? "shea-rotated-product-image" : undefined} src={item.imageUrl} alt={item.title} loading="lazy" /><strong>{item.title}</strong><span>{formatMoney(item.price, platformSnapshot.activeStore.currency)}</span></a>)}</div></section> : null}
+      {relatedProducts.length > 0 && <section className="shea-product-related refined-recommendations"><div className="shea-section-title"><span>Complete your ritual</span><h2>You may also like.</h2></div><div className="commerce-product-grid">{relatedProducts.map(item => <ProductCard key={item.id} product={item} currency={platformSnapshot.activeStore.currency} />)}</div></section>}
+      {recentlyViewed.length > 0 && <section className="shea-product-related refined-recommendations"><div className="shea-section-title"><span>Recently viewed</span><h2>A second look.</h2></div><div className="commerce-product-grid">{recentlyViewed.map(item => <ProductCard key={item.id} product={item} currency={platformSnapshot.activeStore.currency} />)}</div></section>}
 
       <div className="shea-sticky-cart"><div><strong>{product.title}</strong><span>{formatMoney(productPriceForSize(product, size), platformSnapshot.activeStore.currency)}</span></div><button type="button" onClick={addToCart} disabled={product.inventoryQty < 1}><ShoppingCart size={18} /> {product.inventoryQty < 1 ? "Unavailable online" : "Add to cart"}</button></div>
       {product.inventoryQty < 1 ? <p className="owner-availability"><a href="/contact">Ask about availability</a></p> : null}
