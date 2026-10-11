@@ -9,6 +9,9 @@ import {
   type SheaMediaConfig
 } from "@/lib/shea-content";
 import type { Product } from "@/lib/types";
+import { suppliedProductPhotos, suppliedBrandPhotos } from "@/lib/owner-media";
+import type { PageOverrides } from "@/lib/page-editor";
+export type { PageOverrides } from "@/lib/page-editor";
 
 export type StoreContent = {
   products: Product[];
@@ -18,7 +21,6 @@ export type StoreContent = {
   updatedAt: string | null;
 };
 
-export type PageOverrides = Record<string, { texts?: Record<string, string>; images?: Record<string, string> }>;
 
 const STORE_KEY = "shea-wellness";
 const PAGE_OVERRIDE_SCHEMA_KEY = "__shea_page_overrides_schema";
@@ -55,8 +57,12 @@ function sanitizePageOverrides(
         })
       );
       const safeOverride = {
+        ...(override.branding ? { branding: override.branding } : {}),
         ...(override.texts ? { texts: override.texts } : {}),
-        ...(Object.keys(images).length ? { images } : {})
+        ...(Object.keys(images).length ? { images } : {}),
+        ...(override.links ? { links: override.links } : {}),
+        ...(override.videos ? { videos: override.videos } : {}),
+        ...(override.appearance ? { appearance: override.appearance } : {})
       };
 
       return Object.keys(safeOverride).length ? [[page, safeOverride]] : [];
@@ -105,7 +111,7 @@ function normalizeStoredProducts(products: Product[]): Product[] {
 }
 
 function defaultProducts() {
-  return normalizeStoredProducts(platformSnapshot.products);
+  return normalizeStoredProducts(platformSnapshot.products.map(product => ({ ...product, imageUrl: product.imageUrl || suppliedProductPhotos[product.id] || "" })));
 }
 
 function productsOrDefaults(products: unknown): Product[] {
@@ -145,6 +151,7 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
       await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS page_overrides JSONB NOT NULL DEFAULT '{}'::jsonb`;
       await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS catalogue_initialized BOOLEAN NOT NULL DEFAULT FALSE`;
       await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS owner_image_reset_version INTEGER NOT NULL DEFAULT 0`;
+      await sql`ALTER TABLE storefront_content ADD COLUMN IF NOT EXISTS supplied_image_fill_version INTEGER NOT NULL DEFAULT 0`;
       // Migrate the old media-only record once. Subsequent intentional empty
       // catalogues stay empty; there is no repeating read-time seed fallback.
       await sql`
@@ -190,6 +197,24 @@ async function ensureTable(sql: NonNullable<ReturnType<typeof database>>) {
         owner_image_reset_version = 1,
         updated_at = NOW()
         WHERE store_key = ${STORE_KEY} AND owner_image_reset_version < 1
+      `;
+      // Fill only missing, positively identified photos once. Later removals and
+      // replacements are intentional and must remain under the owner's control.
+      await sql`
+        UPDATE storefront_content
+        SET products = (
+          SELECT COALESCE(jsonb_agg(CASE
+            WHEN COALESCE(product->>'imageUrl', '') = '' AND ${JSON.stringify(suppliedProductPhotos)}::jsonb ? (product->>'id')
+            THEN product || jsonb_build_object('imageUrl', ${JSON.stringify(suppliedProductPhotos)}::jsonb ->> (product->>'id'))
+            ELSE product END ORDER BY ordinal), '[]'::jsonb)
+          FROM jsonb_array_elements(products) WITH ORDINALITY AS entry(product, ordinal)
+        ),
+        media = jsonb_set(media, '{images}', COALESCE(media->'images', '[]'::jsonb) || (
+          SELECT COALESCE(jsonb_agg(logo), '[]'::jsonb)
+          FROM jsonb_array_elements(${JSON.stringify(suppliedBrandPhotos)}::jsonb) AS logo
+          WHERE NOT EXISTS (SELECT 1 FROM jsonb_array_elements(COALESCE(media->'images', '[]'::jsonb)) AS asset WHERE asset->>'src' = logo->>'src')
+        )), supplied_image_fill_version = 2, updated_at = NOW()
+        WHERE store_key = ${STORE_KEY} AND supplied_image_fill_version < 2
       `;
     })().catch((error) => {
       tableReady = null;

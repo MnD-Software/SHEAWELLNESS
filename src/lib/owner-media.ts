@@ -20,6 +20,27 @@ export const ownerProductImages: Record<string, string> = {
   prod_chebe_serum: "hair-oil-poster.webp",
   prod_chebe_butter: "hair-butter-poster.webp"
 };
+// Only files supplied by the owner; matched by catalogue identity.
+export const suppliedProductPhotos: Record<string, string> = {
+  ...Object.fromEntries(Object.entries(ownerProductImages).map(([id, file]) => [id, ownerAsset(file)])),
+  prod_pure_raw: "/assets/owner-zips-2026/pure-raw-front.webp",
+  prod_lavender: "/assets/owner-zips-2026/lavender-front.webp",
+  prod_lemongrass: "/assets/owner-zips-2026/lemongrass-front.webp",
+  prod_grapefruit: "/assets/owner-zips-2026/grapefruit-front.webp",
+  prod_vanilla_mint: "/assets/owner-zips-2026/vanilla-mint-open.webp",
+  prod_spa_essentials: "/assets/owner-zips-2026/spa-collection.webp",
+  prod_yellow_castor_oil: ownerAsset("caster-oil-poster.webp"),
+  prod_jamaican_castor: ownerAsset("caster-oil-poster.webp"),
+  prod_neem_oil: ownerAsset("neem-oil-poster.webp"),
+  // Supplied ritual photographs illustrate products without a packshot.
+  prod_tea_tree_butter: "/assets/owner-zips-2026/s2-13-wellness-photo.webp",
+  prod_avocado_oil: "/assets/owner-zips-2026/face-oil-ritual.webp"
+};
+export const suppliedBrandPhotos = ["green", "gold", "black"].map(variant => ({
+  id: `supplied_brand_${variant}`, title: `Shea Wellness ${variant} logo`,
+  src: `/assets/owner-zips-2026/brand-${variant}.webp`, type: "image" as const,
+  tag: "Brand logos", fit: "contain" as const
+}));
 export const ownerVideos = [
   ["African liquid black soap", "african-liquid-black-soap.mp4"],
   ["Pure & raw shea butter", "pureand-raw-shea-butter.mp4"],

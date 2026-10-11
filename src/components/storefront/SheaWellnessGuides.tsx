@@ -1,7 +1,7 @@
 "use client";
 
 import { StorefrontImage } from "./StorefrontImage";
-import { ownerAsset, ownerProductImages, ownerRoutineImages } from "@/lib/owner-media";
+import { ownerAsset, suppliedProductPhotos, ownerRoutineImages } from "@/lib/owner-media";
 import { CheckCircle2, Droplets, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
 import { productPairings } from "@/lib/shea-website-content";
@@ -15,6 +15,13 @@ type ProductStep = {
   usage: string[];
   caution?: string;
 };
+function guideImage(product: ProductStep) {
+  if (product.productId && suppliedProductPhotos[product.productId]) return suppliedProductPhotos[product.productId];
+  if (product.name === "Rosehip Facial Oil") return "/assets/owner-zips-2026/face-oil-ritual.webp";
+  if (product.name === "Rosemary Essential Oil") return "/assets/owner-zips-2026/aromatherapy-at-home.webp";
+  if (product.name === "Soothing Body Oil") return ownerAsset("massage-oils.webp");
+  return product.image;
+}
 
 type Guide = {
   id: string;
@@ -196,11 +203,11 @@ export function SheaWellnessGuides() {
           <div className="guide-products">
             {guide.products.map((product, productIndex) => (
               <section key={product.name}>
-                {(product.productId && ownerProductImages[product.productId]) || product.name === "Soothing Body Oil" ? <StorefrontImage className="guide-product-image" src={ownerAsset(ownerProductImages[product.productId ?? "prod_soothing_body_oil"])} alt={`Shea Wellness ${product.name}`} /> : <div className="guide-product-image guide-product-image--pending" role="img" aria-label={`Product photo for ${product.name} is not yet available`}><ShieldCheck size={28} /><span>Photo coming soon</span></div>}
+                <StorefrontImage className="guide-product-image" src={guideImage(product)} alt={`Shea Wellness ${product.name}`} />
                 <span>Step {productIndex + 1}</span>
                 <h3>{product.name}</h3>
                 <strong>{product.role}</strong>
-                {product.productId ? <a className="guide-product-link" href={`/products/${encodeURIComponent(product.productId)}`}>View this product</a> : <small className="guide-product-link pending">Product media will be added after verification.</small>}
+                {product.productId ? <a className="guide-product-link" href={`/products/${encodeURIComponent(product.productId)}`}>View this product</a> : <small className="guide-product-link">A thoughtful addition to your daily routine.</small>}
                 <div className="guide-facts">
                   <div><h4><Sparkles size={17} /> Benefits</h4><ul>{product.benefits.map((item) => <li key={item}>{item}</li>)}</ul></div>
                   <div><h4><Droplets size={17} /> How to use</h4><ol>{product.usage.map((item) => <li key={item}>{item}</li>)}</ol></div>

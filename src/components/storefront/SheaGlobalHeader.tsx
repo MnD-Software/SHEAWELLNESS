@@ -3,10 +3,11 @@
 import { ArrowRight, Gift, Heart, Home, Menu, Search, ShoppingBag, ShoppingCart, Sparkles, Store, UserRound, X } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { sheaBrand } from "@/lib/shea-content";
 import type { Product } from "@/lib/types";
 import { useStorefrontCart } from "./StorefrontCart";
 import styles from "./SheaGlobalHeader.module.css";
+import { BrandLogo } from "./BrandLogo";
+import { useBrandIdentity } from "./BrandIdentity";
 
 type SheaGlobalHeaderProps = {
   products?: Product[];
@@ -54,6 +55,7 @@ const sidebarLinks = [
 ];
 
 export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }: SheaGlobalHeaderProps) {
+  const sheaBrand = useBrandIdentity();
   const { count, open, ready } = useStorefrontCart();
   const pathname = usePathname();
   const [localSearch, setLocalSearch] = useState("");
@@ -123,8 +125,8 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
     <aside ref={sidebarRef} className={`shea-desktop-sidebar${mobileOpen ? " open" : ""}`} aria-label="Complete site navigation" aria-hidden={!mobileOpen}>
       <div className="shea-sidebar-topline">
         <a href="/" aria-label={`${sheaBrand.name} home`}>
-          <b className="shea-wordmark" aria-hidden="true">S</b>
-          <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
+          <BrandLogo />
+          <span><strong>{sheaBrand.name}</strong><small>{sheaBrand.tagline}</small></span>
         </a>
         <button type="button" onClick={() => setMobileOpen(false)} aria-label="Close site navigation"><X size={22} /></button>
       </div>
@@ -159,11 +161,11 @@ export function SheaGlobalHeader({ products = [], searchValue, onSearchChange }:
     </aside>
 
     <header ref={headerRef} className={styles.shell} data-testid="global-header" data-cart-ready={ready}>
-      <div className={styles.promo}>100% natural. Ethically sourced Nilotica shea.</div>
+      {sheaBrand.announcement && <div className={styles.promo}>{sheaBrand.announcement}</div>}
       <div className={styles.bar}>
         <a className={styles.brand} href="/" aria-label={sheaBrand.name + " home"}>
-          <b className="shea-wordmark" aria-hidden="true">S</b>
-          <span><strong>Shea Wellness</strong><small>Care inspired by nature</small></span>
+          <BrandLogo />
+          <span><strong>{sheaBrand.name}</strong><small>{sheaBrand.tagline}</small></span>
         </a>
         <nav className={styles.desktop} aria-label="Primary navigation">
           {primaryLinks.map(item => <a href={item.href} key={item.label} aria-current={pathname.startsWith(item.href) ? "page" : undefined}>{item.label}</a>)}

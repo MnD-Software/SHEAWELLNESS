@@ -451,7 +451,7 @@ export function CommerceStorefront({
 
           <section className="commerce-our-story" aria-labelledby="our-story-heading">
             <div className="commerce-story-visual">
-              <StorefrontImage src="" alt="Community story" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+              <StorefrontImage src="/assets/owner-zips-2026/brand-green.webp" alt="Shea Wellness — Pure. Ethical. Holistic." style={{ width: "100%", height: "100%", objectFit: "contain" }} />
               <span>Rooted in African botanical heritage</span>
             </div>
             <div className="commerce-story-copy">

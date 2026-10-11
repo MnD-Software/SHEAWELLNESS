@@ -3,12 +3,13 @@ import { catalogRepository } from "@/server/repositories/catalogRepository";
 import { productCreateSchema } from "@/lib/validation";
 import { requireAdminAccess } from "@/server/adminAuth";
 import { ZodError } from "zod";
+import { platformSnapshot } from "@/lib/platform-data";
 
 export async function GET(request: NextRequest) {
   const denied = requireAdminAccess(request);
   if (denied) return denied;
 
-  const storeId = request.headers.get("x-tenant-id") ?? "store_urban";
+  const storeId = request.headers.get("x-tenant-id") ?? platformSnapshot.activeStore.id;
   try {
     const products = await catalogRepository.listProducts(storeId);
     return NextResponse.json({ data: products });
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
   const denied = requireAdminAccess(request);
   if (denied) return denied;
 
-  const storeId = request.headers.get("x-tenant-id") ?? "store_urban";
+  const storeId = request.headers.get("x-tenant-id") ?? platformSnapshot.activeStore.id;
   try {
     const payload = productCreateSchema.parse(await request.json());
     const product = await catalogRepository.createProduct(storeId, payload);

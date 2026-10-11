@@ -3,6 +3,7 @@ import { ProductCard } from "./ProductCard";
 import { arrangeProducts } from "@/lib/product-presentation";
 
 import { StorefrontImage } from "./StorefrontImage";
+import { useBrandIdentity } from "./BrandIdentity";
 import {
   ArrowRight,
   Award,
@@ -97,12 +98,13 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
 export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
   const [media, setMedia] = useState<SheaMediaConfig>(() => sanitizeSheaMediaConfig(sheaDefaultMediaConfig));
+  const [contentReady, setContentReady] = useState(false);
   const [catalogueProducts, setCatalogueProducts] = useState<Product[]>(() => (
     platformSnapshot.products.filter((product) => product.status === "active" || product.status === "low_stock")
   ));
 
   useEffect(() => {
-
+    setContentReady(false);
     let cancelled = false;
 
     void fetch("/api/storefront/content", { cache: "no-store" })
@@ -115,15 +117,21 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
           setCatalogueProducts(products.filter((product) => product.status === "active" || product.status === "low_stock"));
         }
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => { if (!cancelled) setContentReady(true); });
 
     return () => {
       cancelled = true;
     };
   }, [kind]);
 
+  useEffect(() => {
+    // This runs after React commits the loaded catalogue/media to the preview.
+    if (contentReady) window.dispatchEvent(new Event("shea-content-ready"));
+  }, [contentReady]);
+
   return (
-    <main className={`shea-page shea-page-${kind}`}>
+    <main className={`shea-page shea-page-${kind}`} data-cms-content-ready={contentReady}>
       <section className="shea-page-hero">
         <div>
           <span>{meta.eyebrow}</span>
@@ -135,7 +143,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
           </div>
         </div>
         <figure>
-          <StorefrontImage src={meta.image} alt={kind === "about" ? "Shea Wellness founder seated in front of a fireplace" : `${meta.title} by Shea Wellness`} />
+          <StorefrontImage src={meta.image} alt={kind === "about" ? "Shea Wellness — Pure. Ethical. Holistic." : `${meta.title} by Shea Wellness`} />
           {kind === "about" ? <figcaption className="shea-founder-caption"><span>Shea Wellness Ltd</span><strong>Care Inspired by Nature</strong></figcaption> : <figcaption className="shea-page-hero-caption"><span>Shea Wellness</span><strong>Natural care, clearly guided</strong></figcaption>}
         </figure>
       </section>
@@ -299,7 +307,7 @@ function AboutSections() {
     <section className="shea-complete-story">
       <header><span>Our story</span><h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2></header>
       <div className="shea-story-opening">
-        <StorefrontImage src="/assets/website-edits/community-impact.png" alt="Women celebrating Shea Wellness community impact" />
+        <StorefrontImage src="/assets/owner-zips-2026/brand-gold.webp" alt="Shea Wellness — Pure. Ethical. Holistic." />
         <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
       </div>
 
@@ -580,6 +588,7 @@ function QualitySections() {
 }
 
 function ContactSections() {
+  const sheaBrand = useBrandIdentity();
   return (
     <section className="shea-contact-grid">
       <div className="shea-contact-card">

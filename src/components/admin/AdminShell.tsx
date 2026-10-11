@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowRight,
   BarChart3,
   BookOpen,
   Boxes,
@@ -29,8 +30,12 @@ import type { ChangeEvent, FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import clsx from "clsx";
 import { StorefrontImage } from "@/components/storefront/StorefrontImage";
+import { SitePageEditor } from "./SitePageEditor";
+import { BrandSettings } from "./BrandSettings";
+import { BrandLogo } from "@/components/storefront/BrandLogo";
 import { BulkMediaManager } from "./BulkMediaManager";
-import { uploadMedia } from "@/lib/bulk-media";
+import { uploadAdminMedia } from "@/lib/admin-media";
+import { MediaLibraryPicker } from "./MediaLibraryPicker";
 import { EnquiriesView } from "./EnquiriesView";
 import { readStoredArray } from "@/lib/browser-storage";
 import { formatMoney, productPriceForSize, titleCase } from "@/lib/format";
@@ -279,35 +284,6 @@ function mediaToDraft(asset?: SheaMediaAsset | SheaHeroSlide): MediaFormState {
   };
 }
 
-function mediaFilename(src: string) {
-  const filename = src.split("?")[0].split("/").pop() || src;
-  try {
-    return decodeURIComponent(filename);
-  } catch {
-    return filename;
-  }
-}
-
-async function uploadAdminMedia(file: File) {
-  if (file.size > 3 * 1024 * 1024) return (await uploadMedia(file)).url;
-  const form = new FormData();
-  form.set("file", file);
-  const response = await fetch("/api/admin/upload", { method: "POST", headers: adminRequestHeaders(), body: form });
-  const responseText = await response.text();
-  let payload: { data?: { url?: unknown }; error?: unknown } = {};
-
-  try {
-    payload = responseText ? JSON.parse(responseText) as { data?: { url?: unknown }; error?: unknown } : {};
-  } catch {
-    // The HTTP status remains useful if a proxy returns a non-JSON error page.
-  }
-
-  const errorMessage = typeof payload.error === "string" ? payload.error : "Unable to upload media.";
-  const url = typeof payload.data?.url === "string" ? payload.data.url : null;
-  if (!response.ok || !url) throw new Error(errorMessage);
-  return url;
-}
-
 export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [view, setView] = useState<View>("overview");
   const [createProductRequest, setCreateProductRequest] = useState(0);
@@ -323,7 +299,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   const [pageOverrides, setPageOverrides] = useState<PageOverrides>({});
   const [contentLoaded, setContentLoaded] = useState(false);
   const [saveState, setSaveState] = useState<"loading" | "saved" | "saving" | "error" | "setup">("loading");
-  const [saveMessage, setSaveMessage] = useState("Connecting to content database…");
+  const [saveMessage, setSaveMessage] = useState("Loading your store…");
   const activeStore = snapshot.activeStore;
 
   const filteredProducts = useMemo(() => {
@@ -371,7 +347,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         setMediaConfig(sanitizeSheaMediaConfig(payload.data.media as SheaMediaConfig));
         setPageOverrides((payload.data.pageOverrides as PageOverrides | undefined) ?? {});
         setSaveState(payload.data.persisted ? "saved" : "setup");
-        setSaveMessage(payload.data.persisted ? "All changes are synced to Neon" : "Add DATABASE_URL to enable saving");
+        setSaveMessage(payload.data.persisted ? "Your store is up to date" : "Add DATABASE_URL to enable saving");
         setContentLoaded(true);
       })
       .catch((error: Error) => {
@@ -398,7 +374,9 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error ?? "Unable to save changes.");
       setSaveState("saved");
-      setSaveMessage("Saved to Neon");
+      setSaveMessage("Changes saved");
+      try { localStorage.setItem("sheaContentRevision", `${Date.now()}-${Math.random()}`); } catch { /* Focus refresh also updates other tabs. */ }
+      window.dispatchEvent(new Event("shea-content-saved"));
       return { success: true, data: payload.data as { media?: SheaMediaConfig } };
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unable to save changes.";
@@ -426,6 +404,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   async function savePageOverridesConfig(nextPageOverrides: PageOverrides) {
     const result = await persistContent({ type: "pageOverrides", pageOverrides: nextPageOverrides });
     if (result.success) setPageOverrides(nextPageOverrides);
+    return result;
   }
 
   async function updateOrderStatus(orderId: string, update: Pick<RuntimeOrder, "paymentStatus" | "fulfillmentStatus">) {
@@ -446,6 +425,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
   }
 
   function openNewProduct() {
+    if (document.querySelector('[data-studio-dirty="true"]') && !window.confirm("Leave the editor and discard unsaved page changes?")) return;
     setView("products");
     setCreateProductRequest((request) => request + 1);
   }
@@ -456,7 +436,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
     <div className={clsx("shea-admin", sidebarCollapsed && "sidebar-collapsed")} data-admin-ready={contentLoaded}>
       <aside className="shea-admin-sidebar">
         <div className="shea-admin-brand">
-          <div>S</div>
+          <BrandLogo />
           <span>Shea Wellness LTD</span>
           <small>Store administration</small>
         </div>
@@ -470,7 +450,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
           {adminNav.map((item) => {
             const Icon = item.icon;
             return (
-              <button type="button" key={item.id} aria-label={item.label} className={clsx(view === item.id && "active")} onClick={() => setView(item.id)}>
+              <button type="button" key={item.id} aria-label={item.label} className={clsx(view === item.id && "active")} onClick={() => { if (item.id === view) return; if (!document.querySelector('[data-studio-dirty="true"]') || window.confirm("Leave the editor and discard unsaved page changes?")) setView(item.id); }}>
                 <Icon size={18} />
                 <span>{item.label}</span>
               </button>
@@ -499,7 +479,7 @@ export function AdminShell({ snapshot }: { snapshot: PlatformSnapshot }) {
         {view === "products" ? <ProductsView products={filteredProducts} allProducts={managedProducts} storeId={activeStore.id} filter={filter} setFilter={setFilter} saveProducts={saveManagedProducts} createRequest={createProductRequest} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "pages" ? <SitePagesView pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "media" ? contentLoaded ? <MediaView mediaConfig={mediaConfig} saveMediaConfig={saveMediaConfig} /> : <p role="status">Loading your media library…</p> : null}
-        {view === "settings" ? <SettingsView snapshot={snapshot} /> : null}
+        {view === "settings" ? <SettingsView snapshot={snapshot} pageOverrides={pageOverrides} savePageOverrides={savePageOverridesConfig} mediaConfig={mediaConfig} mediaReady={contentLoaded} saveMediaConfig={saveMediaConfig} /> : null}
         {view === "enquiries" ? <EnquiriesView /> : null}
       </main>
     </div>
@@ -530,152 +510,18 @@ const adminSitePages = [
   { title: "Customer account", route: "/account", group: "Customer", manage: "settings" as View }
 ];
 
-function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaReady, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => void; mediaConfig: SheaMediaConfig; mediaReady: boolean; saveMediaConfig: (config: SheaMediaConfig) => Promise<ContentSaveResult> }) {
-  const [pageQuery, setPageQuery] = useState("");
-  const [editingPage, setEditingPage] = useState<(typeof adminSitePages)[number] | null>(null);
-  const [elements, setElements] = useState<Array<{ kind: "text" | "image"; index: number; label: string; value: string }>>([]);
-  const [selectedElement, setSelectedElement] = useState<{ kind: "text" | "image"; index: number; label: string; value: string } | null>(null);
-  const [imagePickerElement, setImagePickerElement] = useState<{ kind: "image"; index: number; label: string; value: string } | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const visiblePages = adminSitePages.filter((page) => `${page.title} ${page.group} ${page.route}`.toLowerCase().includes(pageQuery.trim().toLowerCase()));
-
-  function inspectPage() {
-    const documentRoot = iframeRef.current?.contentDocument;
-    if (!documentRoot || !editingPage) return;
-    const textNodes = Array.from(documentRoot.querySelectorAll<HTMLElement>("main h1, main h2, main h3, main h4, main p, main li, main blockquote, main figcaption"));
-    const imageNodes = Array.from(documentRoot.querySelectorAll<HTMLImageElement>("main img"));
-    const texts = textNodes.map((node, index) => ({ kind: "text" as const, index, label: `${node.tagName} ${index + 1}`, value: pageOverrides[editingPage.route]?.texts?.[String(index)] ?? node.textContent?.trim() ?? "" }));
-    const images = imageNodes.map((node, index) => ({ kind: "image" as const, index, label: `Image ${index + 1}: ${node.dataset.imageLabel || node.alt || "Untitled"}`, value: pageOverrides[editingPage.route]?.images?.[String(index)] ?? node.getAttribute("src") ?? "" }));
-    texts.forEach((element) => { textNodes[element.index].textContent = element.value; });
-    images.forEach((element) => { if (element.value) imageNodes[element.index].src = element.value; else imageNodes[element.index].removeAttribute("src"); });
-    setElements([...texts, ...images]);
-    setSelectedElement(null);
-
-    [...textNodes, ...imageNodes].forEach((node, combinedIndex) => {
-      const isImage = combinedIndex >= textNodes.length;
-      const index = isImage ? combinedIndex - textNodes.length : combinedIndex;
-      const element = (isImage ? images : texts)[index];
-      if (node.dataset.cmsEditable === "true") return;
-      node.dataset.cmsEditable = "true";
-      node.style.cursor = "pointer";
-      node.style.outlineOffset = "4px";
-      node.title = `Click to edit ${element.label}`;
-      node.addEventListener("mouseenter", () => { node.style.outline = "2px solid #008060"; });
-      node.addEventListener("mouseleave", () => { node.style.outline = ""; });
-      node.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (isImage) {
-          const imageElement = element as { kind: "image"; index: number; label: string; value: string };
-          setSelectedElement(imageElement);
-          setImagePickerElement(imageElement);
-          return;
-        }
-        const nextValue = window.prompt(`Edit ${element.label}`, element.value);
-        if (nextValue === null) return;
-        const nextElement = { ...element, value: nextValue };
-        setSelectedElement(nextElement);
-        setElements((items) => items.map((item) => item.kind === nextElement.kind && item.index === nextElement.index ? nextElement : item));
-        node.textContent = nextValue;
-      }, { capture: true });
-    });
-  }
-
-  function handlePreviewLoad() {
-    const previewWindow = iframeRef.current?.contentWindow;
-    const previewDocument = iframeRef.current?.contentDocument;
-    if (!previewWindow || !previewDocument) return;
-    if (previewDocument.documentElement.dataset.cmsHydrated === "true") {
-      inspectPage();
-      return;
-    }
-    previewWindow.addEventListener("shea-cms-hydrated", inspectPage, { once: true });
-  }
-
-  function updateSelectedElement(value: string) {
-    if (!editingPage || !selectedElement) return;
-    const nextElement = { ...selectedElement, value };
-    setSelectedElement(nextElement);
-    setElements((items) => items.map((item) => item.kind === nextElement.kind && item.index === nextElement.index ? nextElement : item));
-    const documentRoot = iframeRef.current?.contentDocument;
-    if (!documentRoot) return;
-    if (nextElement.kind === "text") {
-      const node = documentRoot.querySelectorAll<HTMLElement>("main h1, main h2, main h3, main h4, main p, main li, main blockquote, main figcaption")[nextElement.index];
-      if (node) node.textContent = value;
-    } else {
-      const node = documentRoot.querySelectorAll<HTMLImageElement>("main img")[nextElement.index];
-      if (node) { if (value) node.src = value; else node.removeAttribute("src"); }
-    }
-  }
-
-  function savePage() {
-    if (!editingPage) return;
-    const texts: Record<string, string> = {};
-    const images: Record<string, string> = {};
-    elements.forEach((element) => {
-      (element.kind === "text" ? texts : images)[String(element.index)] = element.value;
-    });
-    savePageOverrides({ ...pageOverrides, [editingPage.route]: { texts, images } });
-  }
-
-  function replaceImage(element: { kind: "image"; index: number; label: string; value: string }, src: string) {
-    const nextElement = { ...element, value: src };
-    setSelectedElement(nextElement);
-    setElements((items) => items.map((item) => item.kind === "image" && item.index === element.index ? nextElement : item));
-    const node = iframeRef.current?.contentDocument?.querySelectorAll<HTMLImageElement>("main img")[element.index];
-    if (node) { if (src) node.src = src; else node.removeAttribute("src"); }
-    setImagePickerElement(null);
-  }
-
-  if (editingPage) {
-    return <section className="shea-admin-stack shea-visual-editor">
-      <AdminHeading eyebrow="Visual editor" title={editingPage.title} action={<button type="button" className="shea-admin-secondary-action" onClick={() => setEditingPage(null)}>Back to pages</button>} />
-      <div className="shea-visual-editor-toolbar"><span>{editingPage.route}</span><button type="button" onClick={savePage}>Save page changes</button></div>
-      <div className="shea-visual-editor-layout">
-        <div className="shea-visual-editor-preview"><iframe ref={iframeRef} src={`${editingPage.route}?cmsPreview=1`} title={`${editingPage.title} live preview`} onLoad={handlePreviewLoad} /></div>
-        <aside className="shea-visual-editor-controls">
-          <header><strong>Page elements</strong><span>{elements.length} editable items</span></header>
-          <div className="shea-visual-editor-elements">{elements.map((element) => <button type="button" key={`${element.kind}-${element.index}`} className={clsx(selectedElement?.kind === element.kind && selectedElement.index === element.index && "active")} onClick={() => setSelectedElement(element)}><span>{element.label}</span><small>{element.value}</small></button>)}</div>
-          {selectedElement ? <label>{selectedElement.kind === "image" ? "Image URL" : "Text content"}<textarea value={selectedElement.value} onChange={(event) => updateSelectedElement(event.target.value)} /></label> : <p>Select a text or image item to edit it. Changes appear in the preview immediately.</p>}
-        </aside>
-      </div>
-      {imagePickerElement ? <MediaLibraryPicker
-        assets={[...mediaConfig.heroSlides, ...mediaConfig.images]}
-        isLoading={!mediaReady}
-        selectedSrc={imagePickerElement.value}
-        onClose={() => setImagePickerElement(null)}
-        onSelect={(src) => replaceImage(imagePickerElement, src)}
-        onUploadFile={async (file) => {
-          const src = await uploadAdminMedia(file);
-          if (!mediaConfig.images.some((asset) => asset.src === src)) {
-            const result = await saveMediaConfig({ ...mediaConfig, images: [...mediaConfig.images, { id: `page_image_${Date.now()}`, title: file.name.replace(/\.[^.]+$/, ""), src, type: "image", tag: "Page image" }] });
-            if (!result.success) throw new Error(result.message);
-          }
-          return src;
-        }}
-      /> : null}
-    </section>;
-  }
-
-  return (
-    <section className="shea-admin-stack">
-      <AdminHeading eyebrow="Website" title="Site pages" />
-      <div className="shea-admin-page-search"><Search size={17} /><input value={pageQuery} onChange={(event) => setPageQuery(event.target.value)} placeholder="Search pages and sections" /></div>
-      <div className="shea-admin-page-grid">
-        {visiblePages.map((page) => (
-          <article key={page.route}>
-            <span>{page.group}</span>
-            <h2>{page.title}</h2>
-            <code>{page.route}</code>
-            <div>
-              <a href={page.route} target="_blank" rel="noreferrer">View page</a>
-              <button type="button" onClick={() => setEditingPage(page)}>Edit page</button>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
+function SitePagesView({ pageOverrides, savePageOverrides, mediaConfig, mediaReady, saveMediaConfig }: { pageOverrides: PageOverrides; savePageOverrides: (overrides: PageOverrides) => Promise<ContentSaveResult>; mediaConfig: SheaMediaConfig; mediaReady: boolean; saveMediaConfig: (config: SheaMediaConfig) => Promise<ContentSaveResult> }) {
+  const [query, setQuery] = useState("");
+  const [editingPage, setEditingPage] = useState<{ title: string; route: string } | null>(null);
+  const pages = adminSitePages.filter(page => (page.title + page.group + page.route).toLowerCase().includes(query.toLowerCase()));
+  if (editingPage) return <SitePageEditor key={editingPage.route} page={editingPage} overrides={pageOverrides} saveOverrides={savePageOverrides} media={mediaConfig} mediaReady={mediaReady} saveMedia={saveMediaConfig} onClose={() => setEditingPage(null)} />;
+  return <section className="shea-admin-stack studio-pages">
+    <AdminHeading eyebrow="Website studio" title="Every detail, in your hands." />
+    <div className="studio-welcome"><div><span>YOUR BRAND, BEAUTIFULLY PRESENTED</span><h2>A considered space for your ideas.</h2><p>Shape your pages, refine every image and make your brand feel unmistakably yours. Click any page to open the visual studio.</p></div><button type="button" onClick={() => setEditingPage({ title: "Header, footer & branding", route: "__global" })}>Edit shared branding <ArrowRight size={16} /></button></div>
+    <div className="shea-admin-page-search"><Search size={17} /><input aria-label="Search pages" value={query} onChange={event => setQuery(event.target.value)} placeholder="Find a page or collection…" /><span>{pages.length} pages</span></div>
+    <div className="shea-admin-page-grid">{pages.map((page, index) => <article key={page.route}><div className="studio-page-art"><span>{String(index + 1).padStart(2, "0")}</span><FileText size={32} /><small>{page.group}</small></div><div className="studio-page-copy"><span>{page.group}</span><h2>{page.title}</h2><code>{page.route}</code><div><a href={page.route} target="_blank" rel="noreferrer">View page</a><button type="button" disabled={!mediaReady} onClick={() => setEditingPage(page)}>Edit page <ArrowRight size={14} /></button></div></div></article>)}</div>
+    {!pages.length && <p>No pages match your search.</p>}
+  </section>;
 }
 
 function OverviewView({
@@ -1104,84 +950,6 @@ function ProductDetailsModal({ product, onClose, onEdit, onDelete }: { product: 
   );
 }
 
-function MediaLibraryPicker({
-  assets,
-  selectedSrc,
-  onSelect,
-  onClose,
-  onUploadFile,
-  isLoading = false
-}: {
-  assets: Array<SheaMediaAsset | SheaHeroSlide>;
-  selectedSrc: string;
-  onSelect: (src: string) => void;
-  onClose: () => void;
-  onUploadFile?: (file: File) => Promise<string>;
-  isLoading?: boolean;
-}) {
-  const [search, setSearch] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
-  const [page, setPage] = useState(0);
-  const [preview, setPreview] = useState<SheaMediaAsset | SheaHeroSlide | null>(null);
-  const uniqueAssets = Array.from(new Map(assets.filter((asset) => asset.type === "image" && asset.src).map((asset) => [asset.src, asset])).values());
-  const visibleAssets = uniqueAssets.filter((asset) => `${asset.title} ${asset.tag}`.toLowerCase().includes(search.trim().toLowerCase()));
-  const pageSize = 24;
-  const pageCount = Math.max(1, Math.ceil(visibleAssets.length / pageSize));
-  const currentPage = Math.min(page, pageCount - 1);
-  const pageAssets = visibleAssets.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
-
-  useEffect(() => setPage(0), [search]);
-
-  useEffect(() => {
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") { if (preview) setPreview(null); else onClose(); }
-    }
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, [onClose, preview]);
-
-  return (
-    <div className="shea-media-picker-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section className="shea-media-picker" role="dialog" aria-modal="true" aria-labelledby="media-library-title">
-        <header>
-          <div><span>Media</span><h2 id="media-library-title">Choose an image</h2></div>
-          <button type="button" onClick={onClose} aria-label="Close media library">×</button>
-        </header>
-        <div className="shea-media-picker-tools">
-          <label><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search media library" autoFocus /></label>
-          {onUploadFile ? <label className="shea-media-picker-upload">{uploading ? "Uploading…" : "Upload from computer"}<input type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" disabled={uploading} onChange={async (event) => { const file = event.target.files?.[0]; if (!file) return; setUploading(true); setUploadError(""); try { onSelect(await onUploadFile(file)); } catch (error) { setUploadError(error instanceof Error ? error.message : "Unable to upload image."); } finally { setUploading(false); event.target.value = ""; } }} /></label> : null}
-          <strong>{visibleAssets.length} images</strong>
-        </div>
-        {uploadError ? <p className="shea-media-picker-error" role="alert">{uploadError}</p> : null}
-        <div className="shea-media-picker-grid">
-          {isLoading ? <p className="shea-media-picker-loading">Loading your saved media library…</p> : pageAssets.map((asset) => (
-            <article key={asset.src} className={clsx("media-picker-card", asset.src === selectedSrc && "selected")}>
-              <button className="media-picker-image" type="button" onClick={() => onSelect(asset.src)} aria-label={`Choose ${asset.title}`} title={asset.title}>
-                <StorefrontImage src={asset.src} alt={asset.alt || asset.title} loading="lazy" decoding="async" />
-              </button>
-              <span>{asset.title}</span>
-              <small>{mediaFilename(asset.src)}</small>
-              <button className="media-picker-preview-button" type="button" onClick={() => setPreview(asset)} aria-label={`Preview ${asset.title}`}>Preview full image</button>
-            </article>
-          ))}
-        </div>
-        {!isLoading && visibleAssets.length > pageSize ? <footer className="shea-media-picker-pagination">
-          <button type="button" onClick={() => setPage((value) => Math.max(0, value - 1))} disabled={currentPage === 0}>Previous</button>
-          <span>Showing {currentPage * pageSize + 1}–{Math.min((currentPage + 1) * pageSize, visibleAssets.length)} of {visibleAssets.length}</span>
-          <button type="button" onClick={() => setPage((value) => Math.min(pageCount - 1, value + 1))} disabled={currentPage >= pageCount - 1}>Next</button>
-        </footer> : null}
-        {!isLoading && !visibleAssets.length ? <div className="shea-admin-empty"><Image size={28} /><strong>No images found</strong><p>Upload an image or try a different search.</p></div> : null}
-        {preview && <div className="media-picker-full-preview" role="region" aria-label="Full image preview">
-          <header><h3>{preview.title}</h3><button type="button" onClick={() => setPreview(null)} aria-label="Close full image preview" autoFocus>×</button></header>
-          <div><StorefrontImage src={preview.src} alt={preview.alt || preview.title} /></div>
-          <footer><button type="button" onClick={() => onSelect(preview.src)}>Use this image</button><a href={preview.src} target="_blank" rel="noreferrer">Open original</a></footer>
-        </div>}
-      </section>
-    </div>
-  );
-}
-
 function ReviewsView({ products, reviews }: { products: PlatformSnapshot["products"]; reviews: RuntimeReview[] }) {
   return (
     <section className="shea-admin-stack">
@@ -1238,14 +1006,14 @@ function OrdersView({
       {state === "loading" ? <div className="shea-admin-empty"><ShoppingCart size={28} /><strong>Loading orders</strong><p>Checking the secure order queue…</p></div> : null}
       {state === "error" ? <div className="shea-admin-empty"><ShoppingCart size={28} /><strong>Orders are unavailable</strong><p>{message || "Connect DATABASE_URL to load the order queue."}</p></div> : null}
       {state === "ready" && !orders.length ? <div className="shea-admin-empty"><ShoppingCart size={28} /><strong>No orders yet</strong><p>Submitted storefront orders will appear here for fulfillment.</p></div> : null}
-      <section className="shea-admin-grid three">
+      <section className="shea-admin-grid three shea-orders-board">
         {["unfulfilled", "partial", "on_hold", "fulfilled"].map((status) => (
           <Panel key={status} title={titleCase(status)} description="Operational work queue.">
             <div className="shea-admin-list">
               {orders
                 .filter((order) => order.fulfillmentStatus === status)
                 .map((order) => (
-                  <article key={`${order.orderNumber}-${order.createdAt}`}>
+                  <article className="shea-order-card" key={`${order.orderNumber}-${order.createdAt}`}>
                     <div>
                       <strong>{order.orderNumber}</strong>
                       <span>{order.customerName}</span>
@@ -1644,7 +1412,7 @@ function MediaView({
   );
 }
 
-function SettingsView({ snapshot }: { snapshot: PlatformSnapshot }) {
+function SettingsView({ snapshot, pageOverrides, savePageOverrides, mediaConfig, mediaReady, saveMediaConfig }: { snapshot: PlatformSnapshot; pageOverrides: PageOverrides; savePageOverrides: (value: PageOverrides) => Promise<ContentSaveResult>; mediaConfig: SheaMediaConfig; mediaReady: boolean; saveMediaConfig: (value: SheaMediaConfig) => Promise<ContentSaveResult> }) {
   const [wellnessGuidesEnabled, setWellnessGuidesEnabled] = useState(false);
   const [settingsBusy, setSettingsBusy] = useState(true);
   const [settingsMessage, setSettingsMessage] = useState("");
@@ -1671,17 +1439,18 @@ function SettingsView({ snapshot }: { snapshot: PlatformSnapshot }) {
   return (
     <section className="shea-admin-stack">
       <AdminHeading eyebrow="Configuration" title="Shea Wellness store settings" />
+      {mediaReady && <BrandSettings overrides={pageOverrides} saveOverrides={savePageOverrides} media={mediaConfig} saveMedia={saveMediaConfig} ready={mediaReady} />}
       <section className="shea-admin-grid two">
         <Panel title="Store identity" description="This dashboard is scoped to Shea Wellness only.">
-          <Detail label="Store" value={snapshot.activeStore.name} />
+          <Detail label="Store" value={pageOverrides.__brand?.branding?.name ?? snapshot.activeStore.name} />
           <Detail label="Platform domain" value={snapshot.activeStore.platformDomain} />
           <Detail label="Plan" value={titleCase(snapshot.activeStore.plan)} />
           <Detail label="Currency" value={snapshot.activeStore.currency} />
         </Panel>
         <Panel title="Contact details" description="Business enquiries welcome.">
-          <Detail label="Email" value={sheaBrand.email} />
-          <Detail label="Phone" value={sheaBrand.phone} />
-          <Detail label="Address" value={sheaBrand.address} />
+          <Detail label="Email" value={pageOverrides.__brand?.branding?.email ?? sheaBrand.email} />
+          <Detail label="Phone" value={pageOverrides.__brand?.branding?.phone ?? sheaBrand.phone} />
+          <Detail label="Address" value={pageOverrides.__brand?.branding?.address ?? sheaBrand.address} />
           <Detail label="Products indexed" value={String(sheaProductCategories.reduce((total, category) => total + category.products.length, 0))} />
         </Panel>
         <Panel title="Homepage sections" description="Only administrators can control optional storefront content.">

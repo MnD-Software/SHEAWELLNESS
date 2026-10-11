@@ -18,7 +18,9 @@
     "test:database": "node scripts/db-sanity.mjs",
     "test:refinements": "node scripts/refinement-sanity.mjs",
     "test:chunks": "node scripts/chunk-media-sanity.mjs",
-    "test:media-picker": "node scripts/media-picker-sanity.mjs"
+    "test:media-picker": "node scripts/media-picker-sanity.mjs",
+    "test:studio": "node scripts/studio-sanity.mjs",
+    "test:branding": "node scripts/branding-regression.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
