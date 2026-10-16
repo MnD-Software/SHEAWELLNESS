@@ -22,7 +22,6 @@ function FilmCard({ film, paused }: { film: SheaMediaAsset; paused: boolean }) {
   }, [visible, paused]);
   return <article ref={card} className="product-film-card" aria-label={film.title}>
     <video ref={player} src={visible ? film.src : undefined} poster={film.poster || (film.src.startsWith("/assets/owner-oct-2026/") ? film.src.replace(".mp4", "-poster.webp") : undefined)} autoPlay={visible && !paused} muted loop playsInline controls preload="none" aria-label={film.title} />
-    <strong>{film.title}</strong>
   </article>;
 }
 

@@ -29,7 +29,6 @@ export function ProductFilmSlideshow({ films }: { films: SheaMediaAsset[] }) {
         onPlay={() => setPaused(false)}
         onPause={event => { if (event.currentTarget === video.current && !event.currentTarget.ended && event.currentTarget.readyState >= 2) setPaused(true); }}
         onEnded={() => { if (!paused) { if (ordered.length > 1) move(1); else { const player = video.current; if (player) { player.currentTime = 0; void player.play().catch(() => undefined); } } } }} aria-label={film.title} />
-      <strong>{film.title}</strong>
     </div>
     <div className="product-film-controls">
       <button type="button" onClick={() => move(-1)} aria-label="Previous product film"><ChevronLeft size={20} /></button>

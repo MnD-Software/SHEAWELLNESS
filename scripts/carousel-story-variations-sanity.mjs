@@ -16,9 +16,9 @@ try {
   await carousel.scrollIntoViewIfNeeded();
   const geometry=await rail.evaluate(rail=>{const b=rail.getBoundingClientRect(),cards=[...rail.children].map(card=>card.getBoundingClientRect());return {total:cards.length,visible:cards.filter(card=>card.right>b.left+1&&card.left<b.right-1).length,full:cards.filter(card=>card.left>=b.left-1&&card.right<=b.right+1).length,overflow:document.documentElement.scrollWidth>innerWidth+1};});
   assert.ok(geometry.total>4);assert.equal(geometry.overflow,false);assert.ok(geometry.visible>=2);
-  if(width===1440)assert.equal(geometry.full,4);
+  if(width===1440)assert.ok(geometry.full>=4);
   await page.waitForFunction(()=>[...document.querySelectorAll('.product-film-rail video')].some(v=>!v.paused&&v.currentTime>0),null,{timeout:90000});
-  const playing=await rail.locator('video').evaluateAll(videos=>videos.filter(v=>!v.paused).map(v=>({muted:v.muted,loop:v.loop,inline:v.playsInline})));assert.ok(playing.length<=4);assert.ok(playing.every(v=>v.muted&&v.loop&&v.inline));
+  const playing=await rail.locator('video').evaluateAll(videos=>videos.filter(v=>!v.paused).map(v=>({muted:v.muted,loop:v.loop,inline:v.playsInline})));assert.ok(playing.length<=geometry.visible);assert.ok(playing.every(v=>v.muted&&v.loop&&v.inline));
   if(width===1440){await page.mouse.move(0,0);await page.waitForFunction(()=>document.querySelector('.product-film-rail').scrollLeft>30,null,{timeout:15000});await rail.evaluate(node=>node.scrollTo({left:0,behavior:'instant'}));console.log('PASS automatic carousel sliding');}
   await carousel.getByRole('button',{name:'Pause video carousel',exact:true}).click();
   await page.waitForFunction(()=>[...document.querySelectorAll('.product-film-rail video')].every(v=>v.paused));
