@@ -14,15 +14,21 @@ export function ProductFilmSlideshow({ films }: { films: SheaMediaAsset[] }) {
   const film = ordered[current];
   const move = (delta: number) => setIndex(value => (value + delta + ordered.length) % Math.max(ordered.length, 1));
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setPaused(true);
+  }, []);
+  useEffect(() => {
     const player = video.current;
     if (!player) return;
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) player.pause();
+    if (paused) player.pause();
     else void player.play().catch(() => undefined);
   }, [paused, film?.src]);
   if (!film) return null;
   return <div className="product-film-slideshow" role="region" aria-roledescription="carousel" aria-label="Shea Wellness product video slideshow" data-live-content>
     <div className="product-film-stage" role="group" aria-roledescription="slide" aria-label={`${current + 1} of ${ordered.length}: ${film.title}`}>
-      <video ref={video} key={film.src} src={film.src} poster={film.poster || (film.src.startsWith("/assets/owner-oct-2026/") ? film.src.replace(".mp4", "-poster.webp") : undefined)} muted playsInline controls preload="metadata" onEnded={() => { if (!paused) move(1); }} aria-label={film.title} />
+      <video ref={video} key={film.src} src={film.src} poster={film.poster || (film.src.startsWith("/assets/owner-oct-2026/") ? film.src.replace(".mp4", "-poster.webp") : undefined)} autoPlay={!paused} muted playsInline controls preload="metadata"
+        onPlay={() => setPaused(false)}
+        onPause={event => { if (event.currentTarget === video.current && !event.currentTarget.ended && event.currentTarget.readyState >= 2) setPaused(true); }}
+        onEnded={() => { if (!paused) { if (ordered.length > 1) move(1); else { const player = video.current; if (player) { player.currentTime = 0; void player.play().catch(() => undefined); } } } }} aria-label={film.title} />
       <strong>{film.title}</strong>
     </div>
     <div className="product-film-controls">

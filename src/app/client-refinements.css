@@ -39,7 +39,8 @@ main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .ow
 .commerce-concern-grid > a > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; object-fit: cover !important; z-index: -2; background: var(--shea-client-grey); }
 .commerce-concern-grid > a > i { display: none; background: none; }
 .commerce-concern-grid > a > strong { margin-top: 0; font-size: 23px; font-weight: 800; font-style: italic; }
-.commerce-concern-grid > a > span { font-size: 16px; line-height: 1.5; font-weight: 700; font-style: italic; color: #173d2b; }
+.commerce-concern-grid > a > span { font-size: 16px; line-height: 1.5; font-weight: 700; font-style: italic; }
+.commerce-concern-grid > a > :is(strong,span) { color: #fff; text-shadow: 0 1px 3px #102a20, 0 0 5px #102a20; }
 .commerce-concern-grid > a > b { margin-top: 16px; font-size: 12px; background: #eeeeecb3; }
 .product-film-slideshow, .owner-films > .product-film-slideshow { display: block; width: 100%; max-width: 1050px; margin-inline: auto; overflow: hidden; border: 1px solid #cbd1cb; border-radius: 16px; background: var(--shea-client-grey); }
 .product-film-stage { display: grid; text-align: center; }
@@ -86,11 +87,35 @@ main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .ow
   .commerce-concerns-section .commerce-concern-grid > a { min-height: 280px; gap: 8px; padding: 12px 6px; border-radius: 12px; }
   .commerce-concerns-section .commerce-concern-grid > a > strong { font-size: clamp(11px,3vw,16px); line-height: 1.25; }
   .commerce-concerns-section .commerce-concern-grid > a > span { display: block; font-size: clamp(10px,2.6vw,12px); line-height: 1.35; -webkit-line-clamp: unset; }
-  .commerce-concerns-section .commerce-concern-grid > a > :is(strong,span) { text-shadow: 0 1px 2px #fff, 0 0 5px rgba(255,255,255,.8); }
   .commerce-concerns-section .commerce-concern-grid > a[href$="#hair-scalp"] > img { object-position: 25% center; }
   .commerce-concerns-section .commerce-concern-grid > a > b { min-height: 44px; margin-top: 8px; padding: 8px 3px; font-size: clamp(9px,2.3vw,11px); line-height: 1.25; }
   .client-collection-gallery { grid-template-columns: minmax(0,1fr); }
   .shea-footer-contacts { flex-direction: column; font-size: 16px; }
+}
+/* Keep every footer row aligned and prevent the logo from sizing its column. */
+.shea-commerce-footer .shea-commerce-footer-grid { grid-template-columns: minmax(220px,1.4fr) repeat(3,minmax(0,1fr)); gap: 32px; align-items: start; padding-block: 40px 24px; }
+.shea-commerce-footer .shea-commerce-footer-brand { min-width: 0; gap: 12px; }
+.shea-commerce-footer .shea-footer-logo { width: 88px !important; height: 132px !important; padding: 0; border-radius: 4px !important; box-shadow: none; }
+.shea-commerce-footer .shea-footer-logo .shea-brand-logo { display: block; width: 88px !important; height: 132px !important; max-width: 100%; object-fit: contain !important; }
+.shea-commerce-footer .shea-commerce-footer-brand p { max-width: 30ch; margin: 0; }
+.shea-commerce-footer nav { min-width: 0; gap: 12px; }
+.shea-commerce-footer nav a { width: fit-content; line-height: 1.5; }
+.shea-commerce-footer .shea-footer-contacts { display: grid; grid-template-columns: 1fr .75fr 1.25fr; align-items: start; width: min(1320px,calc(100% - 48px)); margin: 0 auto; padding: 24px 0; gap: 24px; font-size: 14px; }
+.shea-commerce-footer .shea-footer-payments { margin-top: 4px; }
+@media(max-width:900px) {
+ .shea-commerce-footer .shea-commerce-footer-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 28px 20px; }
+ .shea-commerce-footer .shea-commerce-footer-brand { grid-column: 1 / -1; }
+ .shea-commerce-footer .shea-footer-contacts { grid-template-columns: repeat(2,minmax(0,1fr)); }
+ .shea-commerce-footer .shea-footer-contacts > span { grid-column: 1 / -1; }
+}
+@media(max-width:600px) {
+ .shea-commerce-footer .shea-commerce-footer-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 28px 20px; padding-top: 32px; }
+ .shea-commerce-footer .shea-commerce-footer-brand { justify-items: start; text-align: left; }
+ .shea-commerce-footer .shea-commerce-footer-brand > span { justify-content: start; }
+ .shea-commerce-footer .shea-commerce-footer-grid nav:last-of-type { grid-column: 1 / -1; }
+ .shea-commerce-footer .shea-footer-contacts { width: calc(100% - 32px); grid-template-columns: minmax(0,1fr); gap: 12px; }
+ .shea-commerce-footer .shea-footer-contacts > span { grid-column: auto; }
+ .shea-commerce-footer .shea-footer-payments > div { flex-wrap: wrap; }
 }
 @media(max-width:900px) {
   .shea-page-about .shea-story-opening, .shea-page-about .shea-living-section { grid-template-columns: minmax(0,1fr); }
