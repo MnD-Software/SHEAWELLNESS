@@ -447,11 +447,9 @@ export function CommerceStorefront({
             </div>
             <div className="commerce-story-copy">
               <span>Our story</span>
-              <h2 id="our-story-heading">Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2>
+              <h2 id="our-story-heading">Wellness rooted in nature.</h2>
               <p>
-                At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our
-                journey began with a simple yet powerful vision: to create natural, effective, and sustainable
-                personal care products that nourish people while creating lasting value for communities and the environment.
+                Made in Kenya with African shea butter and botanical oils, our natural care nourishes skin and hair while supporting communities and responsible sourcing.
               </p>
               <p>
                 Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea
