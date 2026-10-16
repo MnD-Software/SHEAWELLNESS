@@ -30,12 +30,13 @@ main :is(.commerce-product-card,.shea-product-detail-card,.shea-blog-grid articl
 }
 .shea-page-about .shea-complete-story article h3 { font-size: clamp(28px, 3vw, 42px); }
 .shea-story-promise, .shea-story-promise :is(p,h3,strong,blockquote), .shea-story-promise > span { color: #173d2b !important; }
-.shea-story-opening img, .shea-page-hero figure img, .shea-living-section img,
-.commerce-story-visual img, .guide-product-image, .wellness-guide > header img,
-.shea-department-page img, .shea-product-main-image img { object-fit: contain !important; }
+/* Photographic frames fill consistently; marks and document covers stay intact. */
+main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .owner-resources img, .shea-partners-section img, .commerce-partners img) { object-fit: cover !important; padding: 0; }
+.shea-page-hero figure, .shea-living-section figure, .commerce-story-visual,
+.department-carousel-stage > a, .shea-category-hero figure, .shea-product-main-image { padding: 0; overflow: hidden; }
 .shea-page-hero figure img { object-position: center; }
 .commerce-concern-grid > a { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; min-height: 390px; isolation: isolate; padding: 24px 20px; overflow: hidden; text-align: center; }
-.commerce-concern-grid > a > img { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; padding: 0; object-fit: contain !important; z-index: -2; background: var(--shea-client-grey); }
+.commerce-concern-grid > a > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; object-fit: cover !important; z-index: -2; background: var(--shea-client-grey); }
 .commerce-concern-grid > a > i { display: none; background: none; }
 .commerce-concern-grid > a > strong { margin-top: 0; font-size: 23px; font-weight: 800; font-style: italic; }
 .commerce-concern-grid > a > span { font-size: 16px; line-height: 1.5; font-weight: 700; font-style: italic; color: #173d2b; }
@@ -49,13 +50,51 @@ main :is(.commerce-product-card,.shea-product-detail-card,.shea-blog-grid articl
 .shea-footer-contacts { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 28px 0; margin-top: 28px; border-top: 1px solid #78897a55; font-size: 17px; font-style: normal; line-height: 1.6; }
 .shea-footer-contacts > * { overflow-wrap: anywhere; }
 .client-collection-gallery { width: min(1200px, calc(100% - 32px)); margin: 48px auto; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
-.client-collection-gallery figure { margin: 0; padding: 20px; background: var(--shea-client-grey); border: 1px solid #ced3ce; border-radius: 16px; }
-.client-collection-gallery img { width: 100%; height: 390px; object-fit: contain; }
-.client-collection-gallery figcaption { margin-top: 18px; text-align: center; font: 400 20px/1.4 Georgia,serif; color: #173d2b; }
+.client-collection-gallery figure { align-self: start; margin: 0; padding: 0; overflow: hidden; background: var(--shea-client-grey); border: 1px solid #ced3ce; border-radius: 16px; }
+.client-collection-gallery img { display: block; width: 100%; height: auto; object-fit: cover; }
+.client-collection-gallery figcaption { margin: 0; padding: 18px 20px; text-align: center; font: 400 20px/1.4 Georgia,serif; color: #173d2b; }
+.commerce-concerns-section .commerce-concern-grid { grid-template-columns: repeat(3,minmax(0,1fr)) !important; }
+/* Our Story follows the existing palette, with native-proportion photo cards. */
+.shea-page-about img[data-image-slot] { display: block; position: static; width: 100% !important; height: auto !important; min-height: 0; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; object-position: center !important; margin: 0; padding: 0; transform: none !important; }
+.shea-page-about .shea-page-hero { width: min(1200px,calc(100% - 32px)); gap: 32px; padding-block: 32px; }
+.shea-page-about .shea-page-hero h1 { font-size: clamp(34px,4.2vw,58px); line-height: 1.08; }
+.shea-page-about .shea-page-hero:has(h1:empty) { grid-template-columns: minmax(0,1fr); gap: 20px; }
+.shea-page-about .shea-page-hero > div:has(h1:empty) { order: 2; text-align: center; }
+.shea-page-about .shea-page-hero > div:has(h1:empty) .shea-hero-actions { justify-content: center; }
+.shea-page-about :is(.shea-page-hero,.shea-living-section) figure { height: auto; min-height: 0; align-self: start; border: 1px solid #d6dcd3; border-radius: 18px; background: #eeeeec; box-shadow: none; }
+.shea-page-about :is(.shea-page-hero,.shea-living-section) figure::before { display: none; }
+.shea-page-about :is(.shea-page-hero figure img,.shea-story-opening img,.shea-living-section figure > img) { display: block; width: 100%; height: auto !important; min-height: 0; max-height: none; aspect-ratio: auto; margin: 0; border-radius: 0; box-shadow: none; }
+.shea-page-about :is(.shea-page-hero,.shea-living-section) figcaption { position: static; width: 100%; min-width: 0; padding: 14px 18px; border: 0; border-radius: 0; color: #173d2b; background: transparent; box-shadow: none; backdrop-filter: none; }
+.shea-page-about :is(.shea-page-hero,.shea-living-section) figcaption span { color: #6c7954; padding: 0; }
+.shea-page-about :is(.shea-page-hero,.shea-living-section) figcaption strong { display: block; padding: 4px 0 0; color: #173d2b; }
+.shea-page-about .shea-complete-story { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; width: min(1200px,calc(100% - 32px)); margin: 48px auto 64px; background: transparent !important; }
+.shea-page-about .shea-complete-story > header { grid-column: 1 / -1; margin: 0 auto 8px; }
+.shea-page-about .shea-complete-story > header h2 { max-width: 26ch; font-size: clamp(32px,4.4vw,54px); line-height: 1.12; }
+.shea-page-about .shea-story-opening { grid-column: 1 / -1; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 24px; align-items: start; margin: 0 0 16px; padding: 0; border-radius: 0; background: transparent !important; }
+.shea-story-opening-visual { overflow: hidden; border: 1px solid #d6dcd3; border-radius: 18px; }
+.shea-page-about .shea-story-opening > div:last-child { padding: clamp(20px,3vw,36px); border: 1px solid #d6dcd3; border-radius: 18px; background: #eeeeec; }
+.shea-page-about .shea-story-opening p:first-child { margin-top: 0; }
+.shea-page-about .shea-story-opening p:last-child { margin-bottom: 0; }
+.shea-page-about .shea-complete-story > article { width: 100%; max-width: none; margin: 0; padding: clamp(24px,3vw,38px); border-radius: 18px; }
+.shea-page-about .shea-complete-story > article :is(p,ul,blockquote) { max-width: 70ch; margin-inline: auto; }
+.shea-page-about .shea-complete-story article h3 { font-size: clamp(27px,2.8vw,36px); line-height: 1.15; }
+.shea-page-about .shea-complete-story > :is(.shea-story-partner,.shea-story-promise) { grid-column: 1 / -1; }
+.shea-page-about .shea-living-section { width: min(1200px,calc(100% - 32px)); grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); align-items: center; gap: 32px; padding: 28px; border: 1px solid #d6dcd3; border-radius: 18px; background: #eeeeec; }
 @media(max-width:700px) {
   .botanical-product-guide > div { grid-template-columns: minmax(0,1fr); }
-  .commerce-concern-grid > a { min-height: 380px; }
+  .commerce-concerns-section .commerce-concern-grid { gap: 8px; }
+  .commerce-concerns-section .commerce-concern-grid > a { min-height: 280px; gap: 8px; padding: 12px 6px; border-radius: 12px; }
+  .commerce-concerns-section .commerce-concern-grid > a > strong { font-size: clamp(11px,3vw,16px); line-height: 1.25; }
+  .commerce-concerns-section .commerce-concern-grid > a > span { display: block; font-size: clamp(10px,2.6vw,12px); line-height: 1.35; -webkit-line-clamp: unset; }
+  .commerce-concerns-section .commerce-concern-grid > a > :is(strong,span) { text-shadow: 0 1px 2px #fff, 0 0 5px rgba(255,255,255,.8); }
+  .commerce-concerns-section .commerce-concern-grid > a[href$="#hair-scalp"] > img { object-position: 25% center; }
+  .commerce-concerns-section .commerce-concern-grid > a > b { min-height: 44px; margin-top: 8px; padding: 8px 3px; font-size: clamp(9px,2.3vw,11px); line-height: 1.25; }
   .client-collection-gallery { grid-template-columns: minmax(0,1fr); }
-  .client-collection-gallery img { height: 320px; }
   .shea-footer-contacts { flex-direction: column; font-size: 16px; }
+}
+@media(max-width:900px) {
+  .shea-page-about .shea-story-opening, .shea-page-about .shea-living-section { grid-template-columns: minmax(0,1fr); }
+  .shea-page-about .shea-complete-story { grid-template-columns: minmax(0,1fr); gap: 18px; }
+  .shea-page-about .shea-complete-story > :is(header,.shea-story-opening,.shea-story-partner,.shea-story-promise) { grid-column: auto; }
+  .shea-page-about .shea-living-section { gap: 24px; padding: 18px; }
 }

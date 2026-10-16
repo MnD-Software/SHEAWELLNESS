@@ -286,7 +286,7 @@ function AboutSections() {
     <section className="shea-complete-story">
       <header><span>Our story</span><h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2></header>
       <div className="shea-story-opening">
-        <StorefrontImage src="/assets/client-oct-2026/owner.png" alt="Shea Wellness founder presenting the collection" />
+        <div className="shea-story-opening-visual"><StorefrontImage src="/assets/client-oct-2026/owner.png" alt="Shea Wellness founder presenting the collection" /></div>
         <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
       </div>
 
