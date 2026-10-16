@@ -31,13 +31,13 @@ try {
   for(const route of ['/shop','/skin','/about','/wellness-guides','/wellness-gifts','/products/prod_rosehip_facial_oil','/catalogue']){
    await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:120000});await page.locator('main').waitFor({state:'visible'});
    const state=await page.evaluate(()=>({
-    photos:[...document.querySelectorAll('main img[data-image-slot][src]:not(.owner-partner-grid img, .owner-resources img, .shea-partners-section img, .commerce-partners img)')].map(img=>({src:img.getAttribute('src'),fit:getComputedStyle(img).objectFit})),
+    photos:[...document.querySelectorAll('main img[data-image-slot][src]:not(.owner-partner-grid img, .owner-resources img, .shea-partners-section img, .commerce-partners img)')].map(img=>({src:img.getAttribute('src'),fit:getComputedStyle(img).objectFit,fullPhoto:!!img.closest('.shea-page-about,.shea-product-main-image,.shea-product-thumbs,.shea-product-size,.shop-card-options')})),
     overflow:document.documentElement.scrollWidth>innerWidth+1,
     logoFits:[...document.querySelectorAll('img[data-brand-logo]')].map(img=>getComputedStyle(img).objectFit),
     previews:[...document.querySelectorAll('.owner-partner-grid img,.owner-resources img')].map(img=>getComputedStyle(img).objectFit)
    }));
    assert.equal(state.overflow,false,`${width} ${route}: overflow`);
-   assert.ok(state.photos.every(img=>img.fit===(route==='/about'?'contain':'cover')),`${width} ${route}: photographs use the intended fit`);
+   assert.ok(state.photos.every(img=>img.fit===(img.fullPhoto?'contain':'cover')),`${width} ${route}: photographs use the intended fit`);
    assert.ok(state.previews.every(fit=>fit==='contain'),`${route}: full partner marks and document previews`);
    if(route==='/about'){
     const storyPhotos=page.locator('.shea-page-about img[data-image-slot]');

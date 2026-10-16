@@ -99,7 +99,8 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
 
 export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
-  const { media, products } = useStorefrontContent();
+  const { media, products, pageOverrides } = useStorefrontContent();
+  const introOnly = kind === "about" && pageOverrides["/about"]?.texts?.["0"]?.trim() === "";
   const contentReady = true;
   const catalogueProducts = products.filter(product => product.status === "active" || product.status === "low_stock");
 
@@ -110,7 +111,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
 
   return (
     <main className={`shea-page shea-page-${kind}`} data-cms-content-ready={contentReady}>
-      <section className="shea-page-hero">
+      <section className={`shea-page-hero${introOnly ? " is-intro-only" : ""}`}>
         <div>
           <span>{meta.eyebrow}</span>
           <h1>{meta.title}</h1>

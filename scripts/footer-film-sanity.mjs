@@ -17,6 +17,7 @@ try {
   await footer.screenshot({path:`artifacts/footer-films/footer-${width}.png`,style:'header[data-testid="global-header"],.commerce-mobile-tabs,.shea-whatsapp-chat,.commerce-drawer { visibility: hidden !important; }'});
   console.log('PASS footer sizing and alignment',width);
  }
+ await page.goto(base+'/catalogue',{waitUntil:'domcontentloaded',timeout:120000});
  const carousel=page.locator('.product-film-slideshow').first(),video=carousel.locator('video');
  await carousel.scrollIntoViewIfNeeded();
  await page.waitForFunction(()=>{const v=document.querySelector('.product-film-slideshow video');return v&&!v.paused&&v.currentTime>0;},null,{timeout:90000});

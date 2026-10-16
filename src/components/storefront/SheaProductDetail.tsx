@@ -81,8 +81,8 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     ? productPairings.filter((pairing) => pairing.products.some((item) => item.toLowerCase().includes(product.title.replace("Cold-Pressed ", "").replace("Cold Pressed ", "").toLowerCase().split(" ").slice(0, 2).join(" ")))).slice(0, 3)
     : [];
   const selectedMedia = product?.sizeMedia?.[size];
-  const selectedImage = galleryImage ?? selectedMedia?.imageUrl ?? product?.imageUrl ?? "";
-  const galleryImages = [...new Set([selectedMedia?.imageUrl ?? product?.imageUrl ?? "", ...(product?.gallery ?? []), ...Object.values(product?.sizeMedia ?? {}).map(item => item.imageUrl || "")].filter(Boolean))];
+  const selectedImage = galleryImage ?? (selectedMedia?.imageUrl || product?.imageUrl || "");
+  const galleryImages = [...new Set([product?.imageUrl ?? "", selectedMedia?.imageUrl ?? "", ...(product?.gallery ?? []), ...Object.values(product?.sizeMedia ?? {}).map(item => item.imageUrl || "")].filter(Boolean))];
   useEffect(() => {setGalleryImage(null);}, [size, productId]);
   const selectedImagePosition = selectedMedia?.imagePosition ?? product?.imagePosition;
   const selectedVideo = selectedMedia?.videoUrl;
@@ -139,7 +139,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({ "@context": "https://schema.org", "@type": "Product", name: product.title, image: product.imageUrl, description: product.description, brand: { "@type": "Brand", name: "Shea Wellness" }, ...(product.reviewCount > 0 ? {aggregateRating: { "@type": "AggregateRating", ratingValue: product.rating, reviewCount: product.reviewCount }} : {}), offers: { "@type": "Offer", priceCurrency: platformSnapshot.activeStore.currency, price: product.price, availability: product.inventoryQty > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock" } }) }} />
 
       <section className="shea-product-detail-hero">
-        <div className="shea-product-gallery">
+        <div className="shea-product-gallery" data-live-content>
           <div className={`shea-product-main-image${selectedImageIsSideways ? " is-rotated" : ""}`}>
             <StorefrontImage className={selectedImageIsSideways ? "shea-rotated-product-image" : undefined} src={selectedImage} alt={galleryImage ? `Additional view of ${product.title}` : `${product.title}${size ? ` — ${size}` : ""}`} style={{ objectPosition: selectedImagePosition }} />
           </div>
@@ -171,7 +171,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
           <fieldset className="shea-product-size">
             <legend>Choose your size or option</legend>
             {product.sizes.map((item) => (
-              <button type="button" key={item} className={size === item ? "active" : ""} aria-pressed={size === item} onClick={() => {setSize(item);setGalleryImage(null);}}>{item}</button>
+              <button type="button" key={item} className={size === item ? "active" : ""} aria-pressed={size === item} onClick={() => {setSize(item);setGalleryImage(null);}}>{product.sizeMedia?.[item]?.imageUrl && <StorefrontImage src={product.sizeMedia[item].imageUrl} alt="" loading="lazy" data-cms-exclude />}{item}</button>
             ))}
 
           </fieldset>

@@ -31,7 +31,7 @@ main :is(.commerce-product-card,.shea-product-detail-card,.shea-blog-grid articl
 .shea-page-about .shea-complete-story article h3 { font-size: clamp(28px, 3vw, 42px); }
 .shea-story-promise, .shea-story-promise :is(p,h3,strong,blockquote), .shea-story-promise > span { color: #173d2b !important; }
 /* Photographic frames fill consistently; marks and document covers stay intact. */
-main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .owner-resources img, .shea-partners-section img, .commerce-partners img) { object-fit: cover !important; padding: 0; }
+main img[data-image-slot]:not(.shea-page-about img, .shea-product-main-image img, .shea-product-thumbs img, .shea-product-size img, .shop-card-options img, .owner-partner-grid img, .owner-resources img, .shea-partners-section img, .commerce-partners img) { object-fit: cover !important; padding: 0; }
 .shea-page-hero figure, .shea-living-section figure, .commerce-story-visual,
 .department-carousel-stage > a, .shea-category-hero figure, .shea-product-main-image { padding: 0; overflow: hidden; }
 .shea-page-hero figure img { object-position: center; }
@@ -48,6 +48,26 @@ main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .ow
 .product-film-stage strong { padding: 20px; color: #173d2b; font-size: 21px; font-weight: 700; font-style: italic; }
 .product-film-controls { display: flex; justify-content: center; align-items: center; gap: 20px; border-top: 1px solid #cbd1cb; padding: 8px; color: #173d2b; }
 .product-film-controls button { display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 1px solid #cbd1cb; border-radius: 50%; background: transparent; color: #173d2b; cursor: pointer; }
+.product-film-carousel { width: 100%; min-width: 0; margin-top: 28px; }
+.product-film-rail { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 48px) / 4); gap: 16px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: #b8c591 transparent; padding: 0 0 12px; }
+.product-film-rail:focus-visible { outline: 2px solid #cdbd70; outline-offset: 4px; }
+.product-film-card { min-width: 0; overflow: hidden; scroll-snap-align: start; border: 1px solid #ffffff30; border-radius: 16px; background: #102a20; }
+.commerce-video-section .product-film-card video { display: block; width: 100%; height: auto; aspect-ratio: 9 / 16; object-fit: contain; border-radius: 0; background: #102a20; }
+.product-film-card > strong { display: block; padding: 16px; color: #fff; font-size: 16px; line-height: 1.4; }
+.product-film-carousel-controls { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-top: 12px; color: #fff; font-size: 13px; }
+.product-film-carousel-controls > div { display: flex; gap: 8px; }
+.product-film-carousel-controls button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffffff50; border-radius: 50%; background: transparent; color: #fff; cursor: pointer; }
+.product-film-carousel-controls button:hover { background: #ffffff20; }
+.shop-card-options button:has(img), .shea-product-size button:has(img) { display: inline-flex; align-items: center; gap: 8px; }
+.shop-card-options button img, .shea-product-size button img { display: block; flex: 0 0 36px; width: 36px; height: 44px; object-fit: contain !important; border-radius: 4px; background: #f7f7f3; }
+.shop-card-options .shop-card-variation-images { display: flex; flex-wrap: nowrap; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
+.shop-card-options .shop-card-variation-images button { flex: 0 0 68px; display: grid; justify-items: center; padding: 6px; gap: 4px; min-width: 0; white-space: normal; }
+.shop-card-variation-images button span { font-size: 9px; line-height: 1.3; }
+.shea-product-page :is(.shea-product-main-image,.shea-product-thumbs) img { object-fit: contain !important; }
+.shea-product-page .shea-product-main-image:not(.is-rotated) { height: auto; min-height: 0; aspect-ratio: auto; }
+.shea-product-page .shea-product-main-image:not(.is-rotated) > img { display: block; width: 100%; height: auto; max-height: none; aspect-ratio: auto; }
+@media(max-width:1000px) { .product-film-rail { grid-auto-columns: calc((100% - 32px) / 3); } }
+@media(max-width:600px) { .product-film-rail { grid-auto-columns: 78%; } }
 .shea-footer-contacts { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 28px 0; margin-top: 28px; border-top: 1px solid #78897a55; font-size: 17px; font-style: normal; line-height: 1.6; }
 .shea-footer-contacts > * { overflow-wrap: anywhere; }
 .client-collection-gallery { width: min(1200px, calc(100% - 32px)); margin: 48px auto; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; }
@@ -59,9 +79,11 @@ main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .ow
 .shea-page-about img[data-image-slot] { display: block; position: static; width: 100% !important; height: auto !important; min-height: 0; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; object-position: center !important; margin: 0; padding: 0; transform: none !important; }
 .shea-page-about .shea-page-hero { width: min(1200px,calc(100% - 32px)); gap: 32px; padding-block: 32px; }
 .shea-page-about .shea-page-hero h1 { font-size: clamp(34px,4.2vw,58px); line-height: 1.08; }
-.shea-page-about .shea-page-hero:has(h1:empty) { grid-template-columns: minmax(0,1fr); gap: 20px; }
-.shea-page-about .shea-page-hero > div:has(h1:empty) { order: 2; text-align: center; }
-.shea-page-about .shea-page-hero > div:has(h1:empty) .shea-hero-actions { justify-content: center; }
+.shea-page-about .shea-page-hero.is-intro-only { grid-template-columns: minmax(0,.75fr) minmax(0,1.25fr); gap: 32px; align-items: center; }
+.shea-page-about .shea-page-hero.is-intro-only > div { text-align: left; }
+.shea-page-about .shea-page-hero.is-intro-only > div > h1, .shea-page-about .shea-page-hero.is-intro-only > div > p:empty { display: none; }
+.shea-page-about .shea-page-hero.is-intro-only > div > span { display: block; text-align: left; font-size: clamp(28px,3vw,42px); line-height: 1.15; letter-spacing: .03em; }
+.shea-page-about .shea-page-hero.is-intro-only .shea-hero-actions { justify-content: flex-start; margin-top: 24px; }
 .shea-page-about :is(.shea-page-hero,.shea-living-section) figure { height: auto; min-height: 0; align-self: start; border: 1px solid #d6dcd3; border-radius: 18px; background: #eeeeec; box-shadow: none; }
 .shea-page-about :is(.shea-page-hero,.shea-living-section) figure::before { display: none; }
 .shea-page-about :is(.shea-page-hero figure img,.shea-story-opening img,.shea-living-section figure > img) { display: block; width: 100%; height: auto !important; min-height: 0; max-height: none; aspect-ratio: auto; margin: 0; border-radius: 0; box-shadow: none; }
@@ -71,13 +93,22 @@ main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .ow
 .shea-page-about .shea-complete-story { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 24px; width: min(1200px,calc(100% - 32px)); margin: 48px auto 64px; background: transparent !important; }
 .shea-page-about .shea-complete-story > header { grid-column: 1 / -1; margin: 0 auto 8px; }
 .shea-page-about .shea-complete-story > header h2 { max-width: 26ch; font-size: clamp(32px,4.4vw,54px); line-height: 1.12; }
-.shea-page-about .shea-story-opening { grid-column: 1 / -1; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 24px; align-items: start; margin: 0 0 16px; padding: 0; border-radius: 0; background: transparent !important; }
+.shea-page-about .shea-story-opening { grid-column: 1 / -1; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 32px; align-items: center; margin: 0 0 16px; padding: 0; border-radius: 0; background: transparent !important; }
 .shea-story-opening-visual { overflow: hidden; border: 1px solid #d6dcd3; border-radius: 18px; }
 .shea-page-about .shea-story-opening > div:last-child { padding: clamp(20px,3vw,36px); border: 1px solid #d6dcd3; border-radius: 18px; background: #eeeeec; }
 .shea-page-about .shea-story-opening p:first-child { margin-top: 0; }
 .shea-page-about .shea-story-opening p:last-child { margin-bottom: 0; }
 .shea-page-about .shea-complete-story > article { width: 100%; max-width: none; margin: 0; padding: clamp(24px,3vw,38px); border-radius: 18px; }
 .shea-page-about .shea-complete-story > article :is(p,ul,blockquote) { max-width: 70ch; margin-inline: auto; }
+.shea-page-about .shea-complete-story :is(article,.shea-story-opening > div:last-child) { text-align: left; }
+.shea-page-about .shea-complete-story article > span { display: block; margin-bottom: 12px; }
+.shea-page-about .shea-complete-story article h3 { margin-bottom: 24px; }
+.shea-page-about .shea-complete-story article p { color: #42554a; font-size: 18px; line-height: 1.7; }
+.shea-page-about .shea-story-opening p { font-size: 18px; line-height: 1.7; }
+.shea-page-about .shea-story-opening p:first-child { font-size: 23px; line-height: 1.5; }
+.shea-page-about .shea-story-sustainability ul { grid-template-columns: minmax(0,1fr); }
+.shea-page-about .shea-story-partner ul { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 28px; }
+.shea-page-about .shea-story-promise { text-align: center !important; }
 .shea-page-about .shea-complete-story article h3 { font-size: clamp(27px,2.8vw,36px); line-height: 1.15; }
 .shea-page-about .shea-complete-story > :is(.shea-story-partner,.shea-story-promise) { grid-column: 1 / -1; }
 .shea-page-about .shea-living-section { width: min(1200px,calc(100% - 32px)); grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); align-items: center; gap: 32px; padding: 28px; border: 1px solid #d6dcd3; border-radius: 18px; background: #eeeeec; }
@@ -103,6 +134,8 @@ main img[data-image-slot]:not(.shea-page-about img, .owner-partner-grid img, .ow
 .shea-commerce-footer .shea-footer-contacts { display: grid; grid-template-columns: 1fr .75fr 1.25fr; align-items: start; width: min(1320px,calc(100% - 48px)); margin: 0 auto; padding: 24px 0; gap: 24px; font-size: 14px; }
 .shea-commerce-footer .shea-footer-payments { margin-top: 4px; }
 @media(max-width:900px) {
+  .shea-page-about .shea-page-hero.is-intro-only { grid-template-columns: minmax(0,1fr); gap: 24px; }
+  .shea-page-about .shea-complete-story .shea-story-partner ul { grid-template-columns: minmax(0,1fr); }
  .shea-commerce-footer .shea-commerce-footer-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 28px 20px; }
  .shea-commerce-footer .shea-commerce-footer-brand { grid-column: 1 / -1; }
  .shea-commerce-footer .shea-footer-contacts { grid-template-columns: repeat(2,minmax(0,1fr)); }

@@ -38,7 +38,7 @@ import type { Product, Store } from "@/lib/types";
 import { quickFaqs } from "@/lib/shea-website-content";
 import { ownerAsset, ownerRoutineImages } from "@/lib/owner-media";
 import { OwnerPartners, OwnerRoutineProgress } from "./OwnerSuppliedMedia";
-import { ProductFilmSlideshow } from "./ProductFilmSlideshow";
+import { ProductFilmCarousel } from "./ProductFilmCarousel";
 import { useStorefrontContent } from "./StorefrontContent";
 
 type CartLine = {
@@ -501,7 +501,7 @@ export function CommerceStorefront({
               </div>
               <a href="/catalogue">View media catalogue <ArrowRight size={17} /></a>
             </div>
-            <ProductFilmSlideshow films={mediaVideos} />
+            <ProductFilmCarousel films={mediaVideos} />
           </section>
         </>
       ) : null}
