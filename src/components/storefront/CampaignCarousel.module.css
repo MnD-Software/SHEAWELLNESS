@@ -1,18 +1,18 @@
-.section { padding: 24px clamp(12px, 3vw, 48px) 32px; background: #eeeeec; }
-.carousel { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 1320px; margin: auto; background: #eeeeec; color: #173d2b; overflow: hidden; touch-action: pan-y; border: 1px solid #d5d7d2; border-radius: 12px; }
-.media { grid-area: 1 / 1; position: relative; min-width: 0; width: 100%; height: 300px; background: #eeeeec; }
+.section { padding: 24px clamp(12px, 3vw, 48px) 32px; background: #faf9f5; }
+.carousel { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 1320px; margin: auto; background: #eeeee6; color: #173d2b; overflow: hidden; touch-action: pan-y; border: 1px solid #e3e3d7; border-radius: 12px; }
+.media { grid-area: 1 / 1; position: relative; min-width: 0; width: 100%; height: 300px; background: #efeee6; }
 .media img, .media video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
-.copy { grid-area: 1 / 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 22px clamp(24px, 4vw, 56px); text-align: center; min-width: 0; background: #eeeeec; }
-.empty .media { min-height: 350px; aspect-ratio: auto; background: #eeeeec; }
+.copy { grid-area: 1 / 2; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 22px clamp(24px, 4vw, 56px); text-align: left; min-width: 0; background: #eeeee6; }
+.empty .media { min-height: 350px; aspect-ratio: auto; background: linear-gradient(115deg, #f0efe6, #faf9f2 60%, #e9eddf); }
 .empty .copy { grid-area: 1 / 1 / 2 / -1; align-self: center; z-index: 1; background: transparent; padding: 36px 70px; align-items: center; text-align: center; }
 .copy > span { color: #7f6c3e; font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; }
-.copy h1 { margin: 12px 0 !important; font: italic 700 clamp(28px, 3.2vw, 42px)/1.12 Georgia, serif !important; letter-spacing: -.025em !important; overflow-wrap: break-word; color: #173d2b !important; max-width: 20ch !important; }
-.copy p { margin: 0 0 18px; max-width: 38ch; font-size: 18px; font-weight: 700; font-style: italic; line-height: 1.6; color: #58685b; }
+.copy h1 { margin: 12px 0 !important; font: 400 clamp(28px, 3.2vw, 42px)/1.12 Georgia, serif !important; letter-spacing: -.025em !important; overflow-wrap: break-word; color: #173d2b !important; max-width: 20ch !important; }
+.copy p { margin: 0 0 18px; max-width: 38ch; font-size: 14px; line-height: 1.6; color: #58685b; }
 .copy a { display: inline-flex; align-items: center; gap: 18px; min-height: 46px; padding: 12px 24px; color: #fff; background: #173d2b; text-decoration: none; font-size: 12px; letter-spacing: .03em; font-weight: 600; }
 .arrow { grid-area: 1 / 1; z-index: 2; align-self: center; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #173d2b30; border-radius: 50%; background: #faf9f5ed; color: #173d2b; cursor: pointer; }
 .previous { justify-self: start; margin-left: 20px; }
 .next { justify-self: end; margin-right: 20px; }
-.controls { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 20px; border-top: 1px solid #d5d7d2; background: #eeeeec; }
+.controls { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 20px; border-top: 1px solid #dedfd3; background: #eeeee6; }
 .controls > button { display: grid; place-items: center; flex-shrink: 0; width: 44px; height: 44px; border: 0; background: transparent; color: #173d2b; cursor: pointer; }
 .controls > span { font-size: 11px; color: #58685b; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .dots { display: flex; min-width: 0; overflow-x: auto; gap: 2px; }
