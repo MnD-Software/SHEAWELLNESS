@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {chromium} from 'playwright';
-const base=process.env.SMOKE_URL||'http://localhost:3152';
+const base=process.env.SMOKE_URL||process.argv.find(value=>/^https?:/.test(value))||'http://localhost:3152';
 const folder='artifacts/image-frames';
 await fs.mkdir(folder,{recursive:true});
 const browser=await chromium.launch({headless:true,channel:'msedge'});
@@ -19,14 +19,15 @@ try {
    cards:[...grid.querySelectorAll(':scope > a')].map(card=>{const image=card.querySelector('img'),bounds=card.getBoundingClientRect(),photo=image.getBoundingClientRect();return {x:bounds.x,y:bounds.y,fit:getComputedStyle(image).objectFit,margin:getComputedStyle(image).margin,gaps:[photo.left-bounds.left,photo.top-bounds.top,bounds.right-photo.right,bounds.bottom-photo.bottom],fade:getComputedStyle(card.querySelector('i')).display,overflow:card.scrollWidth>card.clientWidth+1};}),
    overflow:document.documentElement.scrollWidth>innerWidth+1
   }));
-  assert.equal(state.columns,3,`${width}: three columns`);assert.equal(state.cards.length,6);
-  assert.equal(new Set(state.cards.map(card=>Math.round(card.y))).size,2,`${width}: two rows`);
+  const columns=width<=700?2:3,rows=width<=700?3:2;
+  assert.equal(state.columns,columns,`${width}: ${columns} columns`);assert.equal(state.cards.length,6);
+  assert.equal(new Set(state.cards.map(card=>Math.round(card.y))).size,rows,`${width}: ${rows} rows`);
   assert.equal(state.overflow,false,`${width}: no horizontal overflow`);
   for(const card of state.cards){assert.equal(card.fit,'cover');assert.equal(card.margin,'0px');assert.equal(card.fade,'none');assert.equal(card.overflow,false);assert.ok(card.gaps.every(gap=>Math.abs(gap)<=2),`${width}: photo fills frame ${card.gaps}`);}
   await grid.screenshot({path:`${folder}/routines-${width}.png`});
-  results.push({width,route:'/',...state});console.log('PASS routine grid',width,'three columns, two rows, full photos, no fade');
+  results.push({width,route:'/',...state});console.log('PASS routine grid',width,`${columns} columns, ${rows} rows, full photos, no fade`);
  }
- for(const width of [390,1440]){
+ for(const width of (process.argv.includes('--routines')?[]:[390,1440])){
   await page.setViewportSize({width,height:1000});
   for(const route of ['/shop','/skin','/about','/wellness-guides','/wellness-gifts','/products/prod_rosehip_facial_oil','/catalogue']){
    await page.goto(base+route,{waitUntil:'domcontentloaded',timeout:120000});await page.locator('main').waitFor({state:'visible'});
@@ -53,4 +54,5 @@ try {
   }
  }
  assert.deepEqual(errors,[]);await fs.writeFile(folder+'/results.json',JSON.stringify({results,errors},null,2));
-}finally{await browser.close();}
+}finally{await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,3000))]);}
+process.exit(0);
