@@ -20,9 +20,9 @@ export function editorNodes(root: ParentNode, kind: EditorKind, global = false):
   let nodes: HTMLElement[] = [];
   const selector = kind === "text" ? "h1,h2,h3,h4,p,li,blockquote,figcaption,span,strong,small,label,summary" : kind === "image" ? "img" : kind === "link" ? "a[href]" : kind === "video" ? "video" : "section";
   for (const container of containers) nodes.push(...Array.from(container.querySelectorAll<HTMLElement>(selector)));
-  nodes = [...new Set(nodes)];
+  nodes = [...new Set(nodes)].filter(node => !node.closest("[data-cms-exclude]"));
   if (kind === "text" && !global) {
-    const legacy = Array.from(root.querySelectorAll<HTMLElement>(legacyTextSelector));
+    const legacy = Array.from(root.querySelectorAll<HTMLElement>(legacyTextSelector)).filter(node => !node.closest("[data-cms-exclude]"));
     nodes = [...legacy, ...nodes.filter(node => !legacy.includes(node) && !node.children.length)];
   } else if (kind === "text") nodes = nodes.filter(node => !node.children.length);
   return nodes;

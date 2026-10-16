@@ -41,6 +41,8 @@ import { sanitizeSheaMediaConfig, sheaDefaultMediaConfig, type SheaMediaConfig }
 import { OwnerDownloads, OwnerPartners, OwnerProductFilms } from "./OwnerSuppliedMedia";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { useEffect, useMemo, useState } from "react";
+import { useStorefrontContent } from "./StorefrontContent";
+import { ClientCollectionGallery } from "./ClientCollectionGallery";
 
 type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blog" | "quality" | "contact" | "catalogue";
 
@@ -49,7 +51,7 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
     eyebrow: "Our brand story",
     title: "Nurturing wellness. Empowering communities. Sustaining nature.",
     body: "At Shea Wellness Ltd, we believe that wellness is more than skincare—it's a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.",
-    image: "/assets/website-edits/community-impact.png"
+    image: "/assets/client-oct-2026/shea-community.png"
   },
   products: {
     eyebrow: "Product catalogue",
@@ -97,33 +99,9 @@ const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: str
 
 export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
-  const [media, setMedia] = useState<SheaMediaConfig>(() => sanitizeSheaMediaConfig(sheaDefaultMediaConfig));
-  const [contentReady, setContentReady] = useState(false);
-  const [catalogueProducts, setCatalogueProducts] = useState<Product[]>(() => (
-    platformSnapshot.products.filter((product) => product.status === "active" || product.status === "low_stock")
-  ));
-
-  useEffect(() => {
-    setContentReady(false);
-    let cancelled = false;
-
-    void fetch("/api/storefront/content", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) return;
-        const payload = await response.json() as { data?: { products?: Product[]; media?: SheaMediaConfig } };
-        const products = payload.data?.products;
-        if (!cancelled && payload.data?.media) setMedia(sanitizeSheaMediaConfig(payload.data.media));
-        if (!cancelled && Array.isArray(products)) {
-          setCatalogueProducts(products.filter((product) => product.status === "active" || product.status === "low_stock"));
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => { if (!cancelled) setContentReady(true); });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [kind]);
+  const { media, products } = useStorefrontContent();
+  const contentReady = true;
+  const catalogueProducts = products.filter(product => product.status === "active" || product.status === "low_stock");
 
   useEffect(() => {
     // This runs after React commits the loaded catalogue/media to the preview.
@@ -158,6 +136,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
       {kind === "catalogue" ? <CatalogueSections media={media} /> : null}
 
       <LivingPageSection kind={kind} />
+      {kind === "about" ? <ClientCollectionGallery kind="about" /> : null}
       <SheaFooter />
     </main>
   );
@@ -250,7 +229,7 @@ const pageLifeCopy: Record<SheaPageKind, { title: string; body: string; image: s
   about: {
     title: "A brand built from African wellness heritage.",
     body: "Every page connects back to the same promise: clean ingredients, ethical sourcing, and products customers can understand before they buy.",
-    image: "/assets/website-edits/community-impact.png"
+    image: "/assets/client-oct-2026/founder-portrait.jpeg"
   },
   products: {
     title: "See the texture, understand the routine, then choose the product.",
@@ -307,7 +286,7 @@ function AboutSections() {
     <section className="shea-complete-story">
       <header><span>Our story</span><h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2></header>
       <div className="shea-story-opening">
-        <StorefrontImage src="/assets/owner-zips-2026/brand-gold.webp" alt="Shea Wellness — Pure. Ethical. Holistic." />
+        <StorefrontImage src="/assets/client-oct-2026/owner.png" alt="Shea Wellness founder presenting the collection" />
         <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
       </div>
 

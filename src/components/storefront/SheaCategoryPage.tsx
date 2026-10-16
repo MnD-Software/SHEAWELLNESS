@@ -9,21 +9,15 @@ import { platformSnapshot } from "@/lib/platform-data";
 import { readStoredArray } from "@/lib/browser-storage";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import type { Product } from "@/lib/types";
+import { useStorefrontContent } from "./StorefrontContent";
 
 export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySlug: string; initialCategory?: string | null }) {
-  const [products, setProducts] = useState<Product[]>(platformSnapshot.products);
+  const { products } = useStorefrontContent();
   const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     const savedCart = readStoredArray("sheaWellnessCart") as Array<{ quantity: number }>;
     setCartCount(savedCart.reduce((total, line) => total + line.quantity, 0));
-    void fetch("/api/storefront/content", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) return;
-        const payload = await response.json();
-        if (Array.isArray(payload.data?.products)) setProducts(payload.data.products as Product[]);
-      })
-      .catch(() => undefined);
   }, []);
 
   const categories = useMemo(() => Array.from(new Set(products.map((product) => product.category))), [products]);

@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import type { SheaMediaAsset, SheaMediaConfig } from "@/lib/shea-content";
 import { StorefrontImage } from "./StorefrontImage";
 import { AutoScrollRail } from "./AutoScrollRail";
+import { ProductFilmSlideshow } from "./ProductFilmSlideshow";
 
 function imageStyle(asset: SheaMediaAsset): CSSProperties {
   return { objectPosition: asset.objectPosition ?? "center", transform: asset.rotation ? `rotate(${asset.rotation}deg)` : undefined };
@@ -20,7 +21,7 @@ export function OwnerDownloads({ media }: { media: SheaMediaConfig }) {
 export function OwnerProductFilms({ media }: { media: SheaMediaConfig }) {
   const films = media.videos.filter(item => item.placements?.includes("films"));
   if (!films.length) return null;
-  return <section className="owner-films" aria-label="Shea Wellness product films"><header><span>Closer to the collection</span><h2>See our products in motion.</h2></header><div>{films.map(item => <article key={item.id}><video src={item.src} poster={item.poster || (item.src.startsWith("/assets/owner-oct-2026/") ? item.src.replace('.mp4','-poster.webp') : undefined)} controls playsInline preload="none" aria-label={item.title} /><h3>{item.title}</h3></article>)}</div></section>;
+  return <section className="owner-films" aria-label="Shea Wellness product films"><header><span>Closer to the collection</span><h2>See our products in motion.</h2></header><ProductFilmSlideshow films={films} /></section>;
 }
 export function OwnerRoutineProgress({ media }: { media: SheaMediaConfig }) {
   const photos = media.images.filter(item => item.placements?.includes("beforeAfter"));

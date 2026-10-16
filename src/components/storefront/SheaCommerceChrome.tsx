@@ -40,6 +40,7 @@ export function SheaCommerceFooter() {
         <nav aria-label="Social media links"><strong>Follow us</strong><a href={brand.instagramUrl} target="_blank" rel="noreferrer">Instagram</a><a href={`https://wa.me/${brand.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a><a href={`mailto:${brand.email}`}>Email</a><a href="/catalogue">Brochures &amp; product films</a></nav>
         <div className="shea-footer-payments"><strong>Payment methods</strong><div><span>M-Pesa</span><span>Visa</span><span>Mastercard</span><span>PayPal</span></div><small><LockKeyhole size={14} /> Secure checkout</small></div>
       </div>
+      <address className="shea-footer-contacts" aria-label="Shea Wellness contact details"><a href={`mailto:${brand.email}`}>{brand.email}</a><a href={`tel:${brand.phone.replace(/[^+\d]/g, "")}`}>{brand.phone}</a><span>{brand.address}</span></address>
       <div className="shea-commerce-footer-bottom"><span>© {new Date().getFullYear()} {brand.name}.</span><span><CheckCircle2 size={15} /> Natural care. Intentional wellness.</span></div>
     </footer>
   );

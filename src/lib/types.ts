@@ -19,6 +19,7 @@ export type Product = {
   storeId: string;
   title: string;
   description: string;
+  details?: Array<{ title: string; paragraphs: string[] }>;
   category: string;
   badge: string;
   imageUrl: string;

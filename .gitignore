@@ -3,6 +3,7 @@ node_modules
 .next-smoke/
 .next-verify/
 .next-studio*/
+.next-client*/
 playwright-report/
 test-results/
 .codex/

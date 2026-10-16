@@ -13,6 +13,7 @@ import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { botanicalDetails, productPairings } from "@/lib/shea-website-content";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
+import { useStorefrontContent } from "./StorefrontContent";
 
 type ProductReview = {
   source?: string;
@@ -33,8 +34,9 @@ type StoredCartLine = {
 };
 
 export function SheaProductDetail({ productId, initialProduct }: { productId: string; initialProduct?: Product | null }) {
-  const [products, setProducts] = useState<Product[]>(platformSnapshot.products);
-  const [product, setProduct] = useState<Product | null>(initialProduct ?? null);
+  const savedContent = useStorefrontContent();
+  const products = savedContent.products.filter(item => item.status === "active" || item.status === "low_stock");
+  const product = products.find(item => item.id === productId) ?? initialProduct ?? null;
   const [galleryImage, setGalleryImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState(initialProduct?.sizes[0] ?? "100g");
@@ -62,17 +64,6 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
     const nextRecent = [productId, ...savedRecent.filter((id) => id !== productId)].slice(0, 8);
     window.localStorage.setItem("sheaWellnessRecentlyViewed", JSON.stringify(nextRecent));
     setRecentProductIds(nextRecent.filter((id) => id !== productId));
-    void fetch("/api/storefront/content", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) return;
-        const payload = await response.json();
-        const nextProducts = Array.isArray(payload.data?.products) ? payload.data.products as Product[] : [];
-        const nextProduct = nextProducts.find((item) => item.id === productId && (item.status === "active" || item.status === "low_stock")) ?? null;
-        setProducts(nextProducts.filter((item) => item.status === "active" || item.status === "low_stock"));
-        setProduct(nextProduct);
-        setSize(requestedOption && nextProduct?.sizes.includes(requestedOption) ? requestedOption : nextProduct?.sizes[0] ?? "100g");
-      })
-      .catch(() => undefined);
   }, [productId]);
 
   const productReviews = product ? reviews.filter((review) => review.productId === product.id) : [];
@@ -225,6 +216,7 @@ export function SheaProductDetail({ productId, initialProduct }: { productId: st
 
       {matchingPairings.length ? <section className="shea-product-pairing-block"><div><span>Perfect pairings</span><h2>Choose the right solution.</h2><p>Complete your routine with concern-led combinations from Shea Wellness.</p></div><div>{matchingPairings.map((pairing) => <article key={pairing.concern}><span>For</span><h3>{pairing.concern}</h3><p>{pairing.products.join(" + ")}</p><ul>{pairing.benefits.map((item) => <li key={item}>{item}</li>)}</ul></article>)}</div></section> : null}
 
+      {product.details?.length ? <section className="botanical-product-guide" aria-label="Detailed product guide" data-live-content data-cms-exclude><header><span>Know your botanicals</span><h2>Ingredients, benefits &amp; daily rituals.</h2></header><div>{product.details.map(section => <details key={section.title}><summary>{section.title}</summary>{section.paragraphs.map((paragraph,index) => <p key={index}>{paragraph}</p>)}</details>)}</div></section> : null}
       <section className="shea-product-faq" id="faq"><div><span>Product FAQ</span><h2>Good to know before you order.</h2></div><div><details><summary>Is this suitable for sensitive skin?</summary><p>Patch-test first and introduce one product at a time. Stop use if irritation occurs.</p></details><details><summary>How should I store it?</summary><p>Keep it sealed in a cool, dry place away from direct sunlight and excess heat.</p></details><details><summary>Can I order for a spa or retail store?</summary><p>Yes. Contact our wholesale team for bulk sizes, pricing, and fulfilment guidance.</p></details></div></section>
 
       <section className="shea-product-reviews" id="reviews">

@@ -16,6 +16,7 @@ type ProductStep = {
   caution?: string;
 };
 function guideImage(product: ProductStep) {
+  if (product.name === "Aroma Diffusers") return "/assets/client-oct-2026/aroma-diffuser.jpeg";
   if (product.productId && suppliedProductPhotos[product.productId]) return suppliedProductPhotos[product.productId];
   if (product.name === "Rosehip Facial Oil") return "/assets/owner-zips-2026/face-oil-ritual.webp";
   if (product.name === "Rosemary Essential Oil") return "/assets/owner-zips-2026/aromatherapy-at-home.webp";

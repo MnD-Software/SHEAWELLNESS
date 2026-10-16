@@ -9,6 +9,8 @@ import { StorefrontChrome } from "@/components/storefront/StorefrontChrome";
 import { getStoreContent } from "@/server/repositories/storeContentRepository";
 import { platformSnapshot } from "@/lib/platform-data";
 import { BrandIdentityProvider } from "@/components/storefront/BrandIdentity";
+import { StorefrontContentProvider } from "@/components/storefront/StorefrontContent";
+import "@/app/client-refinements.css";
 // Shared cart and search must use the current Neon catalogue on every route.
 export const dynamic = "force-dynamic";
 
@@ -25,8 +27,10 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   const content = await getStoreContent();
   return (
-    <html lang="en">
+    <html lang="en" data-cms-pending={Object.keys(content.pageOverrides).some(key => key === "__global" || key.startsWith("/")) ? "true" : undefined} suppressHydrationWarning>
       <body>
+        <noscript><style>{'html[data-cms-pending="true"] main { visibility: visible; }'}</style></noscript>
+        <StorefrontContentProvider initialContent={content}>
         <BrandIdentityProvider branding={content.pageOverrides.__brand?.branding}>
         <StorefrontCartProvider products={content.products}>
         <StorefrontChrome store={platformSnapshot.activeStore} products={content.products} />
@@ -35,6 +39,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         {children}
         </StorefrontCartProvider>
         </BrandIdentityProvider>
+        </StorefrontContentProvider>
       </body>
     </html>
   );

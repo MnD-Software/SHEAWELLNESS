@@ -33,7 +33,7 @@ export const suppliedProductPhotos: Record<string, string> = {
   prod_jamaican_castor: ownerAsset("caster-oil-poster.webp"),
   prod_neem_oil: ownerAsset("neem-oil-poster.webp"),
   // Supplied ritual photographs illustrate products without a packshot.
-  prod_tea_tree_butter: "/assets/owner-zips-2026/s2-13-wellness-photo.webp",
+  prod_tea_tree_butter: "/assets/client-oct-2026/tea-tree.png",
   prod_avocado_oil: "/assets/owner-zips-2026/face-oil-ritual.webp"
 };
 export const suppliedBrandPhotos = ["green", "gold", "black"].map(variant => ({

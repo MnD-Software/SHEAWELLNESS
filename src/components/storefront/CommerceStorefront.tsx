@@ -38,6 +38,8 @@ import type { Product, Store } from "@/lib/types";
 import { quickFaqs } from "@/lib/shea-website-content";
 import { ownerAsset, ownerRoutineImages } from "@/lib/owner-media";
 import { OwnerPartners, OwnerRoutineProgress } from "./OwnerSuppliedMedia";
+import { ProductFilmSlideshow } from "./ProductFilmSlideshow";
+import { useStorefrontContent } from "./StorefrontContent";
 
 type CartLine = {
   product: Product;
@@ -176,7 +178,8 @@ export function CommerceStorefront({
   initialWellnessGuidesEnabled?: boolean;
   cartOnly?: boolean;
 }) {
-  const [catalogProducts, setCatalogProducts] = useState(products);
+  const savedContent = useStorefrontContent();
+  const catalogProducts = savedContent.products;
   const liveProducts = catalogProducts.filter((product) => product.status === "active" || product.status === "low_stock");
   const categories = ["All", ...Array.from(new Set(liveProducts.map((product) => product.category)))];
   const [activeCategory, setActiveCategory] = useState("All");
@@ -193,24 +196,12 @@ export function CommerceStorefront({
   const checkoutRequestId = useRef<string | null>(null);
   const [reviews, setReviews] = useState<ProductReview[]>([]);
   const [wishlist, setWishlist] = useState<string[]>([]);
-  const [mediaConfig, setMediaConfig] = useState<SheaMediaConfig>(initialMedia ?? defaultStorefrontMedia);
+  const mediaConfig = savedContent.media;
   const wellnessGuidesEnabled = initialWellnessGuidesEnabled;
 
   const heroSlides = mediaConfig.heroSlides;
   const mediaVideos = [...mediaConfig.videos].sort((left, right) => Number(right.id.startsWith("owner_oct_")) - Number(left.id.startsWith("owner_oct_")));
 
-
-  useEffect(() => {
-    if (cartOnly) return;
-    void fetch("/api/storefront/content", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) return;
-        const payload = await response.json();
-        setMediaConfig(sanitizeSheaMediaConfig(payload.data.media as SheaMediaConfig));
-        setCatalogProducts((payload.data.products as Product[]).map((product) => ({ ...product, imageUrl: replaceRetiredSyntheticImage(product.imageUrl) })));
-      })
-      .catch(() => undefined);
-  }, []);
 
   useEffect(() => {
     setWishlist(readStoredArray("sheaWellnessWishlist") as string[]);
@@ -451,7 +442,7 @@ export function CommerceStorefront({
 
           <section className="commerce-our-story" aria-labelledby="our-story-heading">
             <div className="commerce-story-visual">
-              <StorefrontImage src="/assets/owner-zips-2026/brand-green.webp" alt="Shea Wellness — Pure. Ethical. Holistic." style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+              <StorefrontImage src="/assets/client-oct-2026/product-shea-butter.png" alt="Shea Wellness lavender, grapefruit, lemongrass and vanilla mint butters" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
               <span>Rooted in African botanical heritage</span>
             </div>
             <div className="commerce-story-copy">
@@ -510,14 +501,7 @@ export function CommerceStorefront({
               </div>
               <a href="/catalogue">View media catalogue <ArrowRight size={17} /></a>
             </div>
-            <div className="commerce-video-slider" aria-label="Shea Wellness product video slider">
-              {mediaVideos.slice(0, 4).map((video) => (
-                <article key={video.src}>
-                  <video src={video.src} poster={video.src.startsWith("/assets/owner-oct-2026/") ? video.src.replace(".mp4", "-poster.webp") : undefined} controls playsInline preload="none" />
-                  <strong>{video.title}</strong>
-                </article>
-              ))}
-            </div>
+            <ProductFilmSlideshow films={mediaVideos} />
           </section>
         </>
       ) : null}
@@ -586,7 +570,7 @@ export function CommerceStorefront({
         <div className="commerce-concern-grid">
           {concernCards.map((concern) => (
             <a href={concern.href} key={concern.title}>
-              <StorefrontImage src={ownerAsset(ownerRoutineImages[concern.href.split("#")[1]].front)} alt={concern.title} loading="lazy" />
+              <StorefrontImage src={concern.href.endsWith("#hair-scalp") ? "/assets/client-oct-2026/hair-scalp.png" : ownerAsset(ownerRoutineImages[concern.href.split("#")[1]].front)} alt={concern.title} loading="lazy" />
               <i />
               <strong>{concern.title}</strong>
               <span>{concern.body}</span>

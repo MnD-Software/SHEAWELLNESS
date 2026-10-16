@@ -12,6 +12,8 @@ import { formatMoney, productPriceForSize } from "@/lib/format";
 import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import type { Product } from "@/lib/types";
 import { SheaCommerceFooter, SheaTrustGrid, SheaWhatsApp } from "@/components/storefront/SheaCommerceChrome";
+import { useStorefrontContent } from "./StorefrontContent";
+import { ClientCollectionGallery } from "./ClientCollectionGallery";
 
 export type DepartmentKind = "face" | "skin" | "hair" | "gifts" | "spa";
 
@@ -63,7 +65,7 @@ const departmentContent: Record<DepartmentKind, {
 
 export function SheaDepartmentPage({ kind, initialProducts }: { kind: DepartmentKind; initialProducts: Product[] }) {
   const content = departmentContent[kind];
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const { products } = useStorefrontContent();
   const [cartCount, setCartCount] = useState(0);
   const sharedCart = useStorefrontCart();
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -73,13 +75,6 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
     const savedCart = readStoredArray("sheaWellnessCart") as Array<{ quantity: number }>;
     setCartCount(savedCart.reduce((total, item) => total + item.quantity, 0));
     setWishlist(readStoredArray("sheaWellnessWishlist") as string[]);
-    void fetch("/api/storefront/content", { cache: "no-store" })
-      .then(async (response) => {
-        if (!response.ok) return;
-        const payload = await response.json();
-        if (Array.isArray(payload.data?.products)) setProducts(payload.data.products as Product[]);
-      })
-      .catch(() => undefined);
   }, []);
 
   const departmentProducts = useMemo(() => products.filter((product) => content.categories.includes(product.category) && (product.status === "active" || product.status === "low_stock")), [content.categories, products]);
@@ -150,6 +145,7 @@ export function SheaDepartmentPage({ kind, initialProducts }: { kind: Department
         <div><span>How to use the collection</span><h2>Build a routine, not a crowded shelf.</h2></div>
         {content.routines.map((routine, index) => <article key={routine.title}><b>0{index + 1}</b><Sparkles size={20} /><strong>{routine.title}</strong><p>{routine.copy}</p></article>)}
       </section>
+      {kind === "gifts" || kind === "skin" ? <ClientCollectionGallery kind={kind} /> : null}
       <SheaTrustGrid /><SheaCommerceFooter /><SheaWhatsApp />
     </main>
   );
