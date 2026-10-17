@@ -101,6 +101,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
   const meta = pageMeta[kind];
   const { media, products, pageOverrides } = useStorefrontContent();
   const introOnly = kind === "about" && pageOverrides["/about"]?.texts?.["0"]?.trim() === "";
+  const HeroHeading = kind === "about" ? "h2" : "h1";
   const contentReady = true;
   const catalogueProducts = products.filter(product => product.status === "active" || product.status === "low_stock");
 
@@ -111,10 +112,12 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
 
   return (
     <main className={`shea-page shea-page-${kind}`} data-cms-content-ready={contentReady}>
-      <section className={`shea-page-hero${introOnly ? " is-intro-only" : ""}`}>
+      {kind === "about" ? <LivingPageSection kind={kind} /> : null}
+      {kind === "about" ? <nav className="shea-story-navigation" aria-label="Explore our story" data-cms-exclude><a href="#our-story">Our roots</a><a href="#our-purpose">Our purpose</a><a href="#our-collections">Our collections</a><a href="#our-promise">Our promise</a></nav> : null}
+      <section className={`shea-page-hero${introOnly ? " is-intro-only" : ""}`} data-cms-order={kind === "about" ? 0 : undefined}>
         <div>
           <span>{meta.eyebrow}</span>
-          <h1>{meta.title}</h1>
+          <HeroHeading>{meta.title}</HeroHeading>
           <p>{meta.body}</p>
           <div className="shea-hero-actions">
             <a href="/products">Shop Products</a>
@@ -136,7 +139,7 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
       {kind === "contact" ? <ContactSections /> : null}
       {kind === "catalogue" ? <CatalogueSections media={media} /> : null}
 
-      <LivingPageSection kind={kind} />
+      {kind !== "about" ? <LivingPageSection kind={kind} /> : null}
       <SheaFooter />
     </main>
   );
@@ -283,16 +286,16 @@ function PromiseGrid() {
 
 function AboutSections() {
   return (
-    <section className="shea-complete-story">
+    <section className="shea-complete-story" id="our-story" data-cms-order={1}>
       <header><span>Our story</span><h2>Nurturing Wellness. Empowering Communities. Sustaining Nature.</h2></header>
       <div className="shea-story-opening">
         <div className="shea-story-opening-visual"><StorefrontImage src="/assets/client-oct-2026/owner.png" alt="Shea Wellness founder presenting the collection" /></div>
         <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
       </div>
 
-      <article className="shea-story-purpose"><div><span>Purpose beyond beauty</span><h3>More Than a Skincare Brand</h3></div><div><p>Shea Wellness was founded with a purpose beyond beauty.</p><p>We exist to build a business that creates shared value by connecting sustainable sourcing, local manufacturing, innovation, and community empowerment. Through ethical partnerships with farmers, processors, and local suppliers, we contribute to stronger livelihoods while promoting responsible production and consumption.</p><p>By manufacturing in Kenya and sourcing high-quality natural ingredients, we are helping demonstrate that African businesses can produce world-class wellness products that compete confidently in local and international markets.</p></div></article>
+      <article id="our-purpose" className="shea-story-purpose"><div><span>Purpose beyond beauty</span><h3>More Than a Skincare Brand</h3></div><div><p>Shea Wellness was founded with a purpose beyond beauty.</p><p>We exist to build a business that creates shared value by connecting sustainable sourcing, local manufacturing, innovation, and community empowerment. Through ethical partnerships with farmers, processors, and local suppliers, we contribute to stronger livelihoods while promoting responsible production and consumption.</p><p>By manufacturing in Kenya and sourcing high-quality natural ingredients, we are helping demonstrate that African businesses can produce world-class wellness products that compete confidently in local and international markets.</p></div></article>
 
-      <article className="shea-story-collections"><span>Our collections</span><h3>Wellness Inspired by Nature</h3><p>Our carefully curated collections include:</p><ul>{["Natural Skin Care", "Face Care", "Hair & Scalp Care", "Essential Oils", "Massage & Skin Oils", "Aromatherapy Products", "SPA Essentials", "Wellness Gift Collections"].map((item) => <li key={item}><Leaf size={18} />{item}</li>)}</ul><p>Each product is thoughtfully formulated to support healthy skin, healthy hair, relaxation, and everyday self-care while embracing the power of nature.</p></article>
+      <article id="our-collections" className="shea-story-collections"><span>Our collections</span><h3>Wellness Inspired by Nature</h3><p>Our carefully curated collections include:</p><ul>{["Natural Skin Care", "Face Care", "Hair & Scalp Care", "Essential Oils", "Massage & Skin Oils", "Aromatherapy Products", "SPA Essentials", "Wellness Gift Collections"].map((item) => <li key={item}><Leaf size={18} />{item}</li>)}</ul><p>Each product is thoughtfully formulated to support healthy skin, healthy hair, relaxation, and everyday self-care while embracing the power of nature.</p></article>
 
       <article className="shea-story-sustainability"><span>Responsibility</span><h3>Sustainability at Our Core</h3><p>Sustainability is not an initiative—it is part of who we are.</p><p>We are committed to:</p><ul>{["Responsibly sourced natural ingredients.", "Supporting ethical and transparent supply chains.", "Reducing environmental impact through conscious production.", "Minimising waste through thoughtful packaging choices.", "Promoting wellness that benefits both people and the planet."].map((item) => <li key={item}><CheckCircle2 size={18} />{item}</li>)}</ul><p>As we continue to grow, we remain committed to aligning our work with global sustainability goals while creating products that future generations can be proud of.</p></article>
 
@@ -302,7 +305,7 @@ function AboutSections() {
 
       <article className="shea-story-partner"><span>Collaboration</span><h3>Partner With Us</h3><p>We believe the future of wellness is built through collaboration.</p><p>Whether you are:</p><ul>{["A retailer or distributor seeking premium natural products,", "A hotel, spa, salon, or wellness centre looking for trusted wellness solutions,", "A corporate organisation interested in wellness gifting,", "An investor seeking a purpose-driven manufacturing business,", "Or a development partner passionate about sustainable enterprise and community impact,"].map((item) => <li key={item}>{item}</li>)}</ul><p>we invite you to join us as we continue building a brand that delivers value for people, communities, and the planet.</p><p>Together, we can redefine wellness through innovation, sustainability, and African excellence.</p><a href="/contact">Partner with Shea Wellness <ArrowRight size={17} /></a></article>
 
-      <article className="shea-story-promise"><span>Our Promise</span><h3>Care Inspired by Nature.</h3><p>Every Shea Wellness product represents our unwavering commitment to quality, integrity, sustainability, and care.</p><p>Because we believe that true wellness begins with nature, grows through community, and flourishes when business becomes a force for good.</p><strong>Shea Wellness Ltd</strong><blockquote>Care Inspired by Nature. Wellness for Every Skin. Wellness for Every Home. Wellness for Every Generation.</blockquote></article>
+      <article id="our-promise" className="shea-story-promise"><span>Our Promise</span><h3>Care Inspired by Nature.</h3><p>Every Shea Wellness product represents our unwavering commitment to quality, integrity, sustainability, and care.</p><p>Because we believe that true wellness begins with nature, grows through community, and flourishes when business becomes a force for good.</p><strong>Shea Wellness Ltd</strong><blockquote>Care Inspired by Nature. Wellness for Every Skin. Wellness for Every Home. Wellness for Every Generation.</blockquote></article>
     </section>
   );
 }
@@ -522,16 +525,17 @@ function BlogSections() {
 
 function LivingPageSection({ kind }: { kind: SheaPageKind }) {
   const copy = pageLifeCopy[kind];
+  const Heading = kind === "about" ? "h1" : "h2";
 
   return (
-    <section className="shea-living-section">
+    <section className="shea-living-section" data-cms-order={kind === "about" ? 2 : undefined}>
       <figure>
-        <StorefrontImage src={copy.image} alt="" loading="lazy" />
+        <StorefrontImage src={copy.image} alt={kind === "about" ? "Owner of Shea Wellness" : ""} loading={kind === "about" ? "eager" : "lazy"} />
         <figcaption><span>Shea Wellness</span><strong>Care inspired by nature</strong></figcaption>
       </figure>
       <div>
-        <span>Shea Wellness experience</span>
-        <h2>{copy.title}</h2>
+        <span>{kind === "about" ? "Meet the owner" : "Shea Wellness experience"}</span>
+        <Heading>{copy.title}</Heading>
         <p>{copy.body}</p>
         <div>
           <article><CheckCircle2 size={18} /><strong>{kind === "about" ? "Thoughtful care" : "Product media"}</strong><small>{kind === "about" ? "Carefully selected ingredients for everyday wellbeing." : "Real jars, textures, and product films."}</small></article>

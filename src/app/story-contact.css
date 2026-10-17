@@ -4,7 +4,7 @@
 .shea-page-about .shea-page-hero { width: min(1200px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); align-items: center; gap: 56px; min-height: 0; margin: 0 auto; padding-block: 56px !important; background: transparent; }
 .shea-page-about .shea-page-hero > div { min-width: 0; text-align: left; }
 .shea-page-about .shea-page-hero > div > span { font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: #64754c; }
-.shea-page-about .shea-page-hero h1 { margin: 18px 0; font: 400 clamp(36px,4vw,56px)/1.08 Georgia,serif; letter-spacing: -.035em; color: #173d35; text-wrap: balance; }
+.shea-page-about .shea-page-hero :is(h1,h2) { margin: 18px 0; font: 400 clamp(32px,3.4vw,46px)/1.12 Georgia,serif; letter-spacing: -.035em; color: #173d35; text-wrap: balance; }
 .shea-page-about .shea-page-hero p { max-width: 48ch; margin: 0; color: #56665b; font-size: 16px; line-height: 1.75; }
 .shea-page-about .shea-hero-actions { justify-content: flex-start; gap: 10px; margin-top: 28px; }
 .shea-page-about .shea-hero-actions a { min-height: 46px; padding: 12px 20px; font-size: 13px; border-radius: 999px; }
@@ -48,15 +48,20 @@
 .shea-page-about .shea-story-promise p { max-width: 64ch; margin-inline: auto; }
 .shea-page-about .shea-story-promise strong { display: block; margin-top: 24px; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
 .shea-page-about .shea-story-promise blockquote { max-width: 34ch; margin: 22px auto 0; padding: 0; border: 0; font: 400 clamp(23px,2.8vw,32px)/1.45 Georgia,serif; }
-.shea-page-about .shea-living-section { width: min(1120px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,.65fr) minmax(0,1fr); gap: 56px; align-items: center; margin: 56px auto 72px; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.shea-page-about .shea-living-section { width: min(1120px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,.65fr) minmax(0,1fr); gap: 48px; align-items: center; margin: 40px auto 20px; padding: 28px; border: 1px solid #d8dfd1; border-radius: 20px; background: #fff; }
 .shea-page-about .shea-living-section figure { max-width: 360px; }
-.shea-page-about .shea-living-section h2 { margin: 14px 0 20px; font: 400 clamp(28px,3vw,40px)/1.18 Georgia,serif; letter-spacing: -.025em; }
+.shea-page-about .shea-living-section :is(h1,h2) { max-width: 20ch; margin: 16px 0 20px; font: 400 clamp(32px,3.7vw,50px)/1.12 Georgia,serif; letter-spacing: -.025em; color: #173d35; text-wrap: balance; }
+.shea-page-about .shea-living-section > div > span { color: #8a6c2f; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
 .shea-page-about .shea-living-section p { font-size: 16px; line-height: 1.8; color: #526459; }
 .shea-page-about .shea-living-section > div > div { display: grid; grid-template-columns: minmax(0,1fr); gap: 0; margin-top: 22px; }
 .shea-page-about .shea-living-section article { display: grid; grid-template-columns: 22px 1fr; gap: 6px 12px; padding: 16px 0; border: 0; border-top: 1px solid #d5ddce; border-radius: 0; background: transparent; box-shadow: none; }
 .shea-page-about .shea-living-section article svg { grid-row: span 2; color: #64754c; }
 .shea-page-about .shea-living-section article strong { font-size: 14px; }
 .shea-page-about .shea-living-section article small { font-size: 13px; line-height: 1.6; color: #526459; }
+.shea-story-navigation { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: min(1120px,calc(100% - 48px)); margin: 0 auto 4px; }
+.shea-story-navigation a { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 18px; border: 1px solid #d3ddc9; border-radius: 999px; background: #edf1e6; color: #365541; font-size: 12px; font-weight: 600; text-decoration: none; }
+.shea-story-navigation a:hover { background: #173d35; border-color: #173d35; color: #fff; }
+.shea-page-about [id^="our-"] { scroll-margin-top: 160px; }
 /* Contact details, directions and enquiry form form one responsive section. */
 .shea-page-contact .shea-contact-grid { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 24px; width: min(1120px,calc(100% - 48px)); margin: 32px auto 64px; }
 .shea-page-contact .shea-contact-card { grid-column: span 2; min-width: 0; padding: 24px; border-radius: 14px; box-shadow: none; background: #f4f6ef; gap: 12px; }
@@ -87,7 +92,7 @@
 }
 @media(max-width:650px) {
   .shea-page-about :is(.shea-page-hero,.shea-complete-story,.shea-living-section), .shea-page-contact .shea-contact-grid { width: calc(100% - 32px); }
-  .shea-page-about .shea-page-hero h1 { font-size: clamp(34px,8vw,46px); }
+  .shea-page-about .shea-page-hero :is(h1,h2) { font-size: clamp(30px,7.6vw,38px); }
   .shea-page-about .shea-hero-actions { display: flex; flex-wrap: wrap; }
   .shea-page-about .shea-complete-story { grid-template-columns: minmax(0,1fr); gap: 20px; }
   .shea-page-about .shea-complete-story > header { padding: 24px 0 10px; }
@@ -99,8 +104,10 @@
   .shea-page-about .shea-story-partner ul { grid-template-columns: minmax(0,1fr); }
   .shea-page-about .shea-story-collections ul { gap: 0 12px; }
   .shea-page-about .shea-complete-story .client-collection-gallery { grid-template-columns: minmax(0,1fr); }
-  .shea-page-about .shea-living-section { grid-template-columns: minmax(0,1fr); margin-block: 36px 48px; }
-  .shea-page-about .shea-living-section figure { width: min(100%,360px); margin-inline: auto; }
+  .shea-page-about .shea-living-section { grid-template-columns: minmax(0,1fr); margin-block: 20px 16px; padding: 20px; gap: 24px; }
+  .shea-page-about .shea-living-section figure { width: min(100%,260px); margin-inline: auto; }
+  .shea-page-about .shea-living-section :is(h1,h2) { font-size: clamp(30px,7.6vw,36px); }
+  .shea-story-navigation { width: calc(100% - 32px); display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
   .shea-page-contact .shea-contact-grid { grid-template-columns: minmax(0,1fr); margin-top: 24px; }
   .shea-page-contact .shea-contact-grid > * { grid-column: 1; }
   .shea-page-contact .shea-contact-card { grid-template-columns: 24px 1fr; gap: 8px 14px; align-content: center; min-height: 106px; padding: 20px; }

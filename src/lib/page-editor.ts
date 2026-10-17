@@ -15,14 +15,20 @@ export type PageOverrides = Record<string, PageContentOverride>;
 export type EditorKind = "text" | "image" | "link" | "video" | "section";
 export const legacyTextSelector = "main h1, main h2, main h3, main h4, main p, main li, main blockquote, main figcaption";
 const protectedContent = "[data-live-content], .department-product-carousel, .shop-product-card, .commerce-product-card, .commerce-checkout, .commerce-cart, [role=dialog]";
+// Sections can move on the page while keeping the owner's saved editor slots.
+function inEditorOrder(nodes: HTMLElement[]) {
+  const order = (node: HTMLElement) => Number(node.closest<HTMLElement>("[data-cms-order]")?.dataset.cmsOrder ?? 3);
+  return nodes.sort((a, b) => order(a) - order(b));
+}
 export function editorNodes(root: ParentNode, kind: EditorKind, global = false): HTMLElement[] {
   const containers = Array.from(root.querySelectorAll<HTMLElement>(global ? "header[data-testid=global-header], footer.shea-commerce-footer, .shea-desktop-sidebar" : "main"));
   let nodes: HTMLElement[] = [];
   const selector = kind === "text" ? "h1,h2,h3,h4,p,li,blockquote,figcaption,span,strong,small,label,summary" : kind === "image" ? "img" : kind === "link" ? "a[href]" : kind === "video" ? "video" : "section";
   for (const container of containers) nodes.push(...Array.from(container.querySelectorAll<HTMLElement>(selector)));
   nodes = [...new Set(nodes)].filter(node => !node.closest("[data-cms-exclude]"));
+  if (!global) nodes = inEditorOrder(nodes);
   if (kind === "text" && !global) {
-    const legacy = Array.from(root.querySelectorAll<HTMLElement>(legacyTextSelector)).filter(node => !node.closest("[data-cms-exclude]"));
+    const legacy = inEditorOrder(Array.from(root.querySelectorAll<HTMLElement>(legacyTextSelector)).filter(node => !node.closest("[data-cms-exclude]")));
     nodes = [...legacy, ...nodes.filter(node => !legacy.includes(node) && !node.children.length)];
   } else if (kind === "text") nodes = nodes.filter(node => !node.children.length);
   return nodes;
