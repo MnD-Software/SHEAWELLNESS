@@ -40,6 +40,9 @@ import { ownerAsset, ownerRoutineImages } from "@/lib/owner-media";
 import { OwnerPartners, OwnerRoutineProgress } from "./OwnerSuppliedMedia";
 import { ProductFilmCarousel } from "./ProductFilmCarousel";
 import { useStorefrontContent } from "./StorefrontContent";
+import { TillPaymentInstructions } from "./TillPaymentInstructions";
+import { mpesaTillNumber } from "@/lib/payment-details";
+import { RoutineFinderLink } from "./RoutineFinderLink";
 
 type CartLine = {
   product: Product;
@@ -65,7 +68,7 @@ type ProductReview = {
   createdAt: string;
 };
 
-type CheckoutStep = "information" | "delivery" | "payment" | "review" | "success";
+type CheckoutStep = "information" | "delivery" | "review" | "success";
 
 type CheckoutForm = {
   email: string;
@@ -88,7 +91,7 @@ const defaultForm: CheckoutForm = {
   country: "Kenya",
   city: "",
   deliveryMethod: "kenya",
-  paymentMethod: "card"
+  paymentMethod: "mpesa"
 };
 
 const concernCards = [
@@ -325,6 +328,7 @@ export function CommerceStorefront({
 
       const savedOrder = payload.data;
       const savedOrders = readStoredArray("sheaWellnessOrders");
+      try {
       window.localStorage.setItem("sheaWellnessOrders", JSON.stringify([
         {
           source: "shea_storefront_checkout",
@@ -347,6 +351,7 @@ export function CommerceStorefront({
         },
         ...savedOrders
       ]));
+      } catch { /* The server saved the order; unavailable browser storage must not turn it into a failed checkout. */ }
       setOrderNumber(savedOrder.orderNumber);
       setCheckoutStep("success");
       setCart([]);
@@ -555,7 +560,7 @@ export function CommerceStorefront({
 
       {isHomePage ? (
       <>
-      <section className="beauty-routine-banner"><div><span>Your everyday ritual</span><h2>Cleanse. Nourish. Glow.</h2><p>Build a simple routine with care for your skin, hair and moments of calm.</p></div><a href="/wellness-guides">Find your routine <ArrowRight size={18} /></a></section>
+      <section className="beauty-routine-banner"><div><span>Your everyday ritual</span><h2>Cleanse. Nourish. Glow.</h2><p>Build a simple routine with care for your skin, hair and moments of calm.</p></div><RoutineFinderLink /></section>
 
       <section className="commerce-concerns-section" id="skin-concerns">
         <div className="commerce-section-title split">
@@ -878,30 +883,54 @@ function CheckoutFlow({
   onClose: () => void;
   onPlaceOrder: () => Promise<void>;
 }) {
-  const steps: CheckoutStep[] = ["information", "delivery", "payment", "review"];
-  const canProceed = step !== "information" || Boolean(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) && form.fullName.trim().length >= 2 && form.phone.trim().length >= 6 && form.address.trim().length >= 4 && form.country.trim().length >= 2 && form.city.trim().length >= 2);
+  const steps: CheckoutStep[] = ["information", "delivery", "review"];
+  const checkoutDialog = useRef<HTMLElement>(null);
+  const [summaryOpen,setSummaryOpen] = useState(() => typeof window !== "undefined" && window.innerWidth > 760);
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    checkoutDialog.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape" && !placingOrder) onClose();
+      if (event.key !== "Tab") return;
+      const nodes = [...(checkoutDialog.current?.querySelectorAll<HTMLElement>("button:not(:disabled),a[href],input,summary") ?? [])].filter(node => node.getClientRects().length);
+      const first = nodes[0],last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+    document.addEventListener("keydown",handleKey);
+    return () => { document.body.style.overflow = overflow; document.removeEventListener("keydown",handleKey); previous?.focus(); };
+  }, [placingOrder]);
+  useEffect(() => {
+    checkoutDialog.current?.scrollTo({top:0});
+    checkoutDialog.current?.querySelector<HTMLElement>(".commerce-checkout-panel h2,.commerce-success h2")?.focus();
+  }, [step]);
+  const informationValid = Boolean(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim()) && form.fullName.trim().length >= 2 && form.phone.trim().length >= 6 && form.address.trim().length >= 4 && form.country.trim().length >= 2 && form.city.trim().length >= 2);
+  const canProceed = step !== "information" || informationValid;
 
   return (
     <div className="commerce-checkout-backdrop">
-      <section className="commerce-checkout">
-        <button type="button" className="commerce-close" onClick={onClose} aria-label="Close checkout">
+      <section ref={checkoutDialog} className={clsx("commerce-checkout", step === "success" && "is-complete")} role="dialog" aria-modal="true" aria-label="Checkout" onKeyDown={event => { if (event.key === "Enter" && (event.target as HTMLElement).tagName === "INPUT" && step === "information" && informationValid) { event.preventDefault(); setStep("delivery"); } }}>
+        <button type="button" className="commerce-close" onClick={onClose} disabled={placingOrder} aria-label="Close checkout">
           <X size={20} />
         </button>
         <div className="commerce-checkout-main">
           {step === "success" ? (
             <div className="commerce-success">
               <CheckCircle2 size={44} />
-              <span>Order request received</span>
-              <h2>{orderNumber}</h2>
-              <p>Shea Wellness will confirm delivery and payment details before fulfilment. No online payment has been collected by this storefront yet.</p>
+              <span>Order received · payment pending</span>
+              <h2 tabIndex={-1}>{orderNumber}</h2>
+              <p>Your order is saved. Our team will confirm availability, delivery and the final amount. Then pay using the Till below and share your transaction code.</p>
+              <TillPaymentInstructions orderNumber={orderNumber} />
               <button type="button" onClick={onClose}>Return to store</button>
             </div>
           ) : (
             <>
               <div className="commerce-checkout-steps">
                 {steps.map((item) => (
-                  <button type="button" key={item} className={clsx(step === item && "active")} onClick={() => setStep(item)}>
-                    {item}
+                  <button type="button" key={item} className={clsx(step === item && "active")} disabled={placingOrder || (item !== "information" && !informationValid)} aria-current={step === item ? "step" : undefined} onClick={() => setStep(item)}>
+                    <b>{steps.indexOf(item) < steps.indexOf(step) ? <CheckCircle2 size={16} /> : steps.indexOf(item) + 1}</b>{item === "information" ? "Your details" : item === "delivery" ? "Delivery" : "Review order"}
                   </button>
                 ))}
               </div>
@@ -911,32 +940,31 @@ function CheckoutFlow({
               {step === "delivery" ? (
                 <CheckoutDelivery form={form} setForm={setForm} />
               ) : null}
-              {step === "payment" ? (
-                <CheckoutPayment form={form} setForm={setForm} />
-              ) : null}
               {step === "review" ? (
-                <CheckoutReview form={form} cart={cart} currency={currency} total={total} />
+                <CheckoutReview form={form} cart={cart} currency={currency} total={total} onEdit={setStep} />
               ) : null}
               {error ? <p className="commerce-checkout-error" role="alert">{error}</p> : null}
               <div className="commerce-checkout-actions">
                 <button type="button" className="secondary" disabled={placingOrder} onClick={() => {
                   const index = steps.indexOf(step);
-                  setStep(index <= 0 ? "information" : steps[index - 1]);
-                }}>Back</button>
+                  if (index <= 0) onClose(); else setStep(steps[index - 1]);
+                }}>{step === "information" ? "Back to bag" : "Back"}</button>
                 {step === "review" ? (
-                  <button type="button" disabled={placingOrder} onClick={onPlaceOrder}>{placingOrder ? "Saving order…" : "Place order request"}</button>
+                  <button type="button" disabled={placingOrder || !informationValid} onClick={onPlaceOrder}>{placingOrder ? "Saving order…" : "Place order"}</button>
                 ) : (
-                  <button type="button" disabled={!canProceed} onClick={() => setStep(steps[steps.indexOf(step) + 1])}>Continue</button>
+                  <button type="button" disabled={!canProceed} onClick={() => setStep(steps[steps.indexOf(step) + 1])}>{step === "information" ? "Choose delivery" : "Review order"}<ArrowRight size={16} /></button>
                 )}
               </div>
             </>
           )}
         </div>
-        <aside className="commerce-checkout-summary">
-          <h3>Order summary</h3>
+        {step !== "success" && <aside className="commerce-checkout-summary">
+          <details open={summaryOpen} onToggle={event => setSummaryOpen(event.currentTarget.open)}>
+          <summary><span>Order summary ({cart.reduce((count,line) => count + line.quantity,0)})</span><strong>{formatMoney(subtotal,currency)}</strong><ChevronDown size={18} /></summary>
+          <div className="checkout-summary-content">
           {cart.map((line) => (
             <div className="commerce-summary-line" key={`${line.product.id}-${line.size}`}>
-              <span>{line.quantity}x {line.product.title}</span>
+              <span>{line.quantity} × {line.product.title}<small>{line.size}</small></span>
               <strong>{formatMoney(productPriceForSize(line.product, line.size) * line.quantity, currency)}</strong>
             </div>
           ))}
@@ -944,7 +972,9 @@ function CheckoutFlow({
           <div><span>Delivery</span><strong>Address review</strong></div>
           <div><span>Taxes</span><strong>Confirmed before payment</strong></div>
           <div className="total"><span>Products subtotal</span><strong>{formatMoney(total, currency)}</strong></div>
-        </aside>
+          <p className="checkout-summary-note">We’ll confirm your final total, including delivery, before you pay.</p>
+          </div></details>
+        </aside>}
       </section>
     </div>
   );
@@ -954,14 +984,15 @@ function CheckoutInformation({ form, setForm }: { form: CheckoutForm; setForm: (
   return (
     <div className="commerce-checkout-panel">
       <span>Guest checkout</span>
-      <h2>Contact and delivery address</h2>
-      <label>Email<input value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" /></label>
-      <label>Full name<input value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} placeholder="Customer name" /></label>
-      <label>Phone number<input type="tel" value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="+254 7xx xxx xxx" /></label>
-      <label>Address<input value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} placeholder="Street address" /></label>
+      <h2 tabIndex={-1}>Where should your order go?</h2>
+      <p>No account needed. Add your contact and delivery details.</p>
+      <label>Email<input type="email" autoComplete="email" required value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" /></label>
+      <label>Full name<input autoComplete="name" required value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} placeholder="Customer name" /></label>
+      <label>Phone number<input type="tel" autoComplete="tel" required value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} placeholder="+254 7xx xxx xxx" /></label>
+      <label>Address<input autoComplete="street-address" required value={form.address} onChange={(event) => setForm({ ...form, address: event.target.value })} placeholder="Street address" /></label>
       <div className="commerce-form-row">
-        <label>Country<input value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value })} placeholder="Kenya" /></label>
-        <label>City / county / province<input value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} placeholder="Nairobi, Mombasa, Kisumu..." /></label>
+        <label>Country<input autoComplete="country-name" required value={form.country} onChange={(event) => setForm({ ...form, country: event.target.value })} placeholder="Kenya" /></label>
+        <label>City / county / province<input autoComplete="address-level2" required value={form.city} onChange={(event) => setForm({ ...form, city: event.target.value })} placeholder="Nairobi, Mombasa, Kisumu..." /></label>
       </div>
     </div>
   );
@@ -971,7 +1002,8 @@ function CheckoutDelivery({ form, setForm }: { form: CheckoutForm; setForm: (for
   return (
     <div className="commerce-checkout-panel">
       <span>Delivery</span>
-      <h2>Choose where we deliver</h2>
+      <h2 tabIndex={-1}>Choose your delivery.</h2>
+      <p>We’ll confirm the delivery fee from your address before you pay.</p>
       {[
         { id: "kenya", title: "Kenya delivery", detail: "Nairobi and other Kenyan destinations. The delivery route, fee, and any free-delivery eligibility are confirmed from your address." },
         { id: "international", title: "Outside Kenya", detail: "International delivery is available by quotation after your address and order are reviewed." }
@@ -980,38 +1012,13 @@ function CheckoutDelivery({ form, setForm }: { form: CheckoutForm; setForm: (for
           type="button"
           className={clsx("commerce-option", form.deliveryMethod === method.id && "active")}
           key={method.id}
+          aria-pressed={form.deliveryMethod === method.id}
           onClick={() => setForm({ ...form, deliveryMethod: method.id as CheckoutForm["deliveryMethod"] })}
         >
           <span><strong>{method.title}</strong><small>{method.detail}</small></span>
-          <b>Address review</b>
+          <b>{form.deliveryMethod === method.id ? <CheckCircle2 size={20} /> : "Select"}</b>
         </button>
       ))}
-    </div>
-  );
-}
-
-function CheckoutPayment({ form, setForm }: { form: CheckoutForm; setForm: (form: CheckoutForm) => void }) {
-  return (
-    <div className="commerce-checkout-panel">
-      <span>Payment preference</span>
-      <h2>How should Shea Wellness contact you to arrange payment?</h2>
-      {[
-        { id: "card", title: "Credit or debit card", detail: "A secure payment link is sent after stock and delivery are confirmed.", icon: CreditCard },
-        { id: "paypal", title: "PayPal", detail: "PayPal instructions are sent after the order is reviewed.", icon: ShieldCheck },
-        { id: "mpesa", title: "M-Pesa", detail: "A payment prompt or verified PayBill instructions are provided after order review.", icon: ShoppingCart }
-      ].map((method) => {
-        const Icon = method.icon;
-        return (
-          <button
-            type="button"
-            className={clsx("commerce-option", form.paymentMethod === method.id && "active")}
-            key={method.id}
-            onClick={() => setForm({ ...form, paymentMethod: method.id as CheckoutForm["paymentMethod"] })}
-          >
-            <span><Icon size={18} /><strong>{method.title}</strong><small>{method.detail}</small></span>
-          </button>
-        );
-      })}
     </div>
   );
 }
@@ -1020,28 +1027,34 @@ function CheckoutReview({
   form,
   cart,
   currency,
-  total
+  total,
+  onEdit
 }: {
   form: CheckoutForm;
   cart: CartLine[];
   currency: string;
   total: number;
+  onEdit: (step: CheckoutStep) => void;
 }) {
   return (
     <div className="commerce-checkout-panel">
       <span>Review</span>
-      <h2>Confirm your order request</h2>
+      <h2 tabIndex={-1}>Everything look right?</h2>
+      <p>Review your details, then place your order. You’ll pay after we confirm the final amount.</p>
       <div className="commerce-review-box">
+        <header><strong>Contact &amp; delivery</strong><button type="button" onClick={() => onEdit("information")}>Edit details</button></header>
         <strong>{form.fullName}</strong>
         <p>{form.email}</p>
         <p>{form.phone}</p>
         <p>{form.address}, {form.city}, {form.country}</p>
-        <p>{form.deliveryMethod === "international" ? "International delivery quote" : "Kenya delivery"} / {form.paymentMethod === "card" ? "Card" : form.paymentMethod === "paypal" ? "PayPal" : "M-Pesa"}</p>
+        <p>{form.deliveryMethod === "international" ? "International delivery quote" : "Kenya delivery"} · M-Pesa Buy Goods · Till {mpesaTillNumber}</p>
+        <button className="checkout-edit-link" type="button" onClick={() => onEdit("delivery")}>Change delivery</button>
       </div>
       <div className="commerce-review-box">
-        <strong>{cart.length} line items</strong>
-        <p>Products subtotal: {formatMoney(total, currency)}. Delivery, tax, and payment confirmation follow address review. No payment is collected in this step.</p>
+        <strong>{cart.reduce((count,line) => count + line.quantity,0)} {cart.reduce((count,line) => count + line.quantity,0) === 1 ? "item" : "items"} · {formatMoney(total, currency)}</strong>
+        <p>Delivery and any applicable taxes are confirmed before payment.</p>
       </div>
+      <div className="checkout-payment-preview"><CheckCircle2 size={22} /><div><strong>M-Pesa Buy Goods</strong><p>Till {mpesaTillNumber} · Instructions follow after you place your order.</p></div></div>
     </div>
   );
 }

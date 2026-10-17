@@ -57,8 +57,9 @@ await page.getByLabel('Full name', { exact: true }).fill('QA Mobile');
 await page.getByLabel('Phone number', { exact: true }).fill('0700000000');
 await page.getByLabel('Address', { exact: true }).fill('Test address');
 await page.getByLabel('City / county / province', { exact: true }).fill('Nairobi');
-for (let index = 0; index < 3; index++) await page.getByRole('button', { name: 'Continue', exact: true }).click();
-await page.getByRole('button', { name: 'Place order request', exact: true }).waitFor({ state: 'visible' });
+await page.getByRole('button', { name: 'Choose delivery', exact: true }).click();
+await page.getByRole('button', { name: 'Review order', exact: true }).click();
+await page.getByRole('button', { name: 'Place order', exact: true }).waitFor({ state: 'visible' });
 assert.ok((await page.evaluate(() => document.documentElement.scrollWidth)) <= 390);
 await page.screenshot({ path: 'artifacts/smoke/checkout-mobile.png' });
 // Exercise review UI without submitting an extra order; persistence is covered by db-sanity.

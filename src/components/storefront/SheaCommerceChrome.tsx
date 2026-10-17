@@ -38,7 +38,7 @@ export function SheaCommerceFooter() {
         <nav aria-label="Company links"><strong>Company</strong><a href="/about">About</a><a href="/contact">Contact</a><a href="/sustainability">Sustainability</a><a href="/wholesale">Wholesale</a></nav>
         <nav aria-label="Customer care links"><strong>Customer care</strong><a href="/policies">Policies</a><a href="/refund-policy">Refund policy</a><a href="/shipping-policy">Shipping</a><a href="/faq">FAQ</a></nav>
         <nav aria-label="Social media links"><strong>Follow us</strong><a href={brand.instagramUrl} target="_blank" rel="noreferrer">Instagram</a><a href={`https://wa.me/${brand.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a><a href={`mailto:${brand.email}`}>Email</a><a href="/catalogue">Brochures &amp; product films</a></nav>
-        <div className="shea-footer-payments"><strong>Payment methods</strong><div><span>M-Pesa</span><span>Visa</span><span>Mastercard</span><span>PayPal</span></div><small><LockKeyhole size={14} /> Secure checkout</small></div>
+        <div className="shea-footer-payments"><strong>Payment</strong><div><span>M-Pesa Buy Goods</span></div><small><LockKeyhole size={14} /> Order securely · pay after confirmation</small></div>
       </div>
       <address className="shea-footer-contacts" aria-label="Shea Wellness contact details"><a href={`mailto:${brand.email}`}>{brand.email}</a><a href={`tel:${brand.phone.replace(/[^+\d]/g, "")}`}>{brand.phone}</a><span>{brand.address}</span></address>
       <div className="shea-commerce-footer-bottom"><span>© {new Date().getFullYear()} {brand.name}.</span><span><CheckCircle2 size={15} /> Natural care. Intentional wellness.</span></div>

@@ -45,7 +45,11 @@ export function AutoScrollRail({ label, children, kind }: { label: string; child
   return <div className={`auto-rail auto-rail-${kind}`} role="region" aria-label={label} aria-roledescription="carousel"
     onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)}
     onFocusCapture={() => setInteracting(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setInteracting(false); }}>
-    <div ref={track} className="auto-rail-track" tabIndex={0} onTouchStart={() => setInteracting(true)} onTouchEnd={() => setInteracting(false)} onTouchCancel={() => setInteracting(false)}
+    <div ref={track} className="auto-rail-track" tabIndex={0}
+      onPointerDown={() => { setPaused(true); setInteracting(true); }}
+      onPointerUp={() => setInteracting(false)} onPointerCancel={() => setInteracting(false)}
+      onTouchStart={() => { setPaused(true); setInteracting(true); }} onTouchEnd={() => setInteracting(false)} onTouchCancel={() => setInteracting(false)}
+      onWheel={() => setPaused(true)}
       onKeyDown={event => { if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); } }}>
       <div className="auto-rail-group" data-carousel-original>{children}</div>
       <div className="auto-rail-group" aria-hidden="true" inert data-carousel-copy>{children}</div>

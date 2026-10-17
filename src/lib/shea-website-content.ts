@@ -108,7 +108,7 @@ export const faqGroups = [
     ["Do you deliver across Kenya?", "Yes. Nairobi delivery typically takes 1–3 business days and other Kenyan destinations 2–5 business days."],
     ["Do you ship internationally?", "Yes, to many destinations. Cost and timing depend on the country, order and shipping method."],
     ["How can I track my order?", "Tracking details are provided after dispatch where the selected courier supports tracking."],
-    ["What payment methods do you accept?", "M-PESA, bank transfers, cards where available, and the approved options shown at checkout."],
+    ["What payment methods do you accept?", "Pay using M-Pesa Buy Goods Till 5287597. Place your order first; our team will confirm delivery and the final amount before you pay."],
     ["Can I return a product?", "Opened personal-care products cannot normally be returned for hygiene reasons unless damaged, defective or incorrect. Contact us within 48 hours of delivery."],
     ["How do I choose the right products?", "Contact our team with your skin or hair concerns for personalised routine guidance."],
     ["Can I buy in bulk or become a stockist?", "Yes. Retailers, distributors, spas, salons, hotels and wellness centres can use our wholesale enquiry route."]
