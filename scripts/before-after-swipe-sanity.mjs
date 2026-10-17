@@ -20,5 +20,8 @@ try {
  await new Promise(resolve=>setTimeout(resolve,700));const settled=await rail.evaluate(node=>node.scrollLeft);assert.ok(settled>=after-2);
  await swipe(70,320);await page.waitForFunction(position=>document.querySelector('.owner-progress .auto-rail-track').scrollLeft<position-50,settled);
  await rail.focus();const beforeKey=await rail.evaluate(node=>node.scrollLeft);await page.keyboard.press('ArrowRight');await page.waitForFunction(position=>document.querySelector('.owner-progress .auto-rail-track').scrollLeft>position+30,beforeKey);
- console.log('PASS native touch swipe both directions, manual pause, momentum and keyboard navigation');
+ await page.getByRole('button',{name:'Play before and after',exact:true}).click();
+ await new Promise(resolve=>setTimeout(resolve,500));const resumed=await rail.evaluate(node=>node.scrollLeft);
+ await page.waitForFunction(position=>document.querySelector('.owner-progress .auto-rail-track').scrollLeft>position+5,resumed,{timeout:5000});
+ console.log('PASS native touch swipe both directions, manual pause, momentum, keyboard navigation and explicit play resume');
 }catch(error){console.error(error);process.exitCode=1;}finally{await Promise.race([browser.close(),new Promise(resolve=>setTimeout(resolve,3000))]);}process.exit(process.exitCode??0);

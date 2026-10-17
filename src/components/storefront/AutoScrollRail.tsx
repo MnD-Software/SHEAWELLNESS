@@ -55,7 +55,7 @@ export function AutoScrollRail({ label, children, kind }: { label: string; child
       <div className="auto-rail-group" aria-hidden="true" inert data-carousel-copy>{children}</div>
     </div>
     <div className="auto-rail-controls"><button type="button" onClick={() => move(-1)} aria-label={`Previous ${label}`}><ArrowLeft size={17} /></button>
-      <button type="button" onClick={() => setPaused(value => !value)} disabled={reduced} aria-label={`${paused ? "Play" : "Pause"} ${label}`}>{paused || reduced ? <Play size={16} /> : <Pause size={16} />}</button>
+      <button type="button" onClick={() => { setPaused(value => !value); setInteracting(false); }} disabled={reduced} aria-label={`${paused ? "Play" : "Pause"} ${label}`}>{paused || reduced ? <Play size={16} /> : <Pause size={16} />}</button>
       <button type="button" onClick={() => move(1)} aria-label={`Next ${label}`}><ArrowRight size={17} /></button></div>
   </div>;
 }
