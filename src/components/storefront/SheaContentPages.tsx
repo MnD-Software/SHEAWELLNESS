@@ -49,8 +49,8 @@ type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blo
 const pageMeta: Record<SheaPageKind, { eyebrow: string; title: string; body: string; image: string }> = {
   about: {
     eyebrow: "Our brand story",
-    title: "Nurturing wellness. Empowering communities. Sustaining nature.",
-    body: "At Shea Wellness Ltd, we believe that wellness is more than skincare—it's a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.",
+    title: "Rooted in nature. Made for everyday wellness.",
+    body: "Natural care, African botanical heritage, and a belief that wellbeing should reach beyond the product—to the people and communities behind it.",
     image: "/assets/client-oct-2026/shea-community.png"
   },
   products: {
@@ -137,7 +137,6 @@ export function SheaContentPage({ kind }: { kind: SheaPageKind }) {
       {kind === "catalogue" ? <CatalogueSections media={media} /> : null}
 
       <LivingPageSection kind={kind} />
-      {kind === "about" ? <ClientCollectionGallery kind="about" /> : null}
       <SheaFooter />
     </main>
   );
@@ -229,7 +228,7 @@ const sheaRoutineSolutions = [
 const pageLifeCopy: Record<SheaPageKind, { title: string; body: string; image: string }> = {
   about: {
     title: "A brand built from African wellness heritage.",
-    body: "Every page connects back to the same promise: clean ingredients, ethical sourcing, and products customers can understand before they buy.",
+    body: "From carefully selected botanicals to products made in Kenya, our purpose is simple: thoughtful care for people, communities, and the world we share.",
     image: "/assets/client-oct-2026/founder-portrait.jpeg"
   },
   products: {
@@ -291,13 +290,15 @@ function AboutSections() {
         <div><p>At Shea Wellness Ltd, we believe that wellness is more than skincare—it&apos;s a way of living. Our journey began with a simple yet powerful vision: to create natural, effective, and sustainable personal care products that nourish people while creating lasting value for communities and the environment.</p><p>Inspired by Africa&apos;s rich botanical heritage, we harness the remarkable benefits of premium shea butter, cold-pressed plant oils, and carefully selected essential oils to craft products that care for the skin, hair, and overall wellbeing of the whole family.</p><p>Every product we make reflects our commitment to purity, quality, and intentional craftsmanship. We believe that what you put on your body matters just as much as what you put into it.</p></div>
       </div>
 
-      <article><span>Purpose beyond beauty</span><h3>More Than a Skincare Brand</h3><p>Shea Wellness was founded with a purpose beyond beauty.</p><p>We exist to build a business that creates shared value by connecting sustainable sourcing, local manufacturing, innovation, and community empowerment. Through ethical partnerships with farmers, processors, and local suppliers, we contribute to stronger livelihoods while promoting responsible production and consumption.</p><p>By manufacturing in Kenya and sourcing high-quality natural ingredients, we are helping demonstrate that African businesses can produce world-class wellness products that compete confidently in local and international markets.</p></article>
+      <article className="shea-story-purpose"><div><span>Purpose beyond beauty</span><h3>More Than a Skincare Brand</h3></div><div><p>Shea Wellness was founded with a purpose beyond beauty.</p><p>We exist to build a business that creates shared value by connecting sustainable sourcing, local manufacturing, innovation, and community empowerment. Through ethical partnerships with farmers, processors, and local suppliers, we contribute to stronger livelihoods while promoting responsible production and consumption.</p><p>By manufacturing in Kenya and sourcing high-quality natural ingredients, we are helping demonstrate that African businesses can produce world-class wellness products that compete confidently in local and international markets.</p></div></article>
 
       <article className="shea-story-collections"><span>Our collections</span><h3>Wellness Inspired by Nature</h3><p>Our carefully curated collections include:</p><ul>{["Natural Skin Care", "Face Care", "Hair & Scalp Care", "Essential Oils", "Massage & Skin Oils", "Aromatherapy Products", "SPA Essentials", "Wellness Gift Collections"].map((item) => <li key={item}><Leaf size={18} />{item}</li>)}</ul><p>Each product is thoughtfully formulated to support healthy skin, healthy hair, relaxation, and everyday self-care while embracing the power of nature.</p></article>
 
       <article className="shea-story-sustainability"><span>Responsibility</span><h3>Sustainability at Our Core</h3><p>Sustainability is not an initiative—it is part of who we are.</p><p>We are committed to:</p><ul>{["Responsibly sourced natural ingredients.", "Supporting ethical and transparent supply chains.", "Reducing environmental impact through conscious production.", "Minimising waste through thoughtful packaging choices.", "Promoting wellness that benefits both people and the planet."].map((item) => <li key={item}><CheckCircle2 size={18} />{item}</li>)}</ul><p>As we continue to grow, we remain committed to aligning our work with global sustainability goals while creating products that future generations can be proud of.</p></article>
 
-      <article><span>Our ambition</span><h3>Our Vision for the Future</h3><p>Our ambition is to become one of Africa&apos;s leading holistic wellness brands, recognised for innovation, quality, sustainability, and social impact.</p><p>We envision Shea Wellness products in homes, hotels, spas, wellness centres, retail stores, and international markets—bringing African excellence to customers around the world.</p><p>Growth for us means more than increased sales. It means creating jobs, strengthening local manufacturing, empowering entrepreneurs, supporting women and youth across our value chain, and contributing to healthier communities.</p></article>
+      <ClientCollectionGallery kind="about" />
+
+      <article className="shea-story-vision"><div><span>Our ambition</span><h3>Our Vision for the Future</h3></div><div><p>Our ambition is to become one of Africa&apos;s leading holistic wellness brands, recognised for innovation, quality, sustainability, and social impact.</p><p>We envision Shea Wellness products in homes, hotels, spas, wellness centres, retail stores, and international markets—bringing African excellence to customers around the world.</p><p>Growth for us means more than increased sales. It means creating jobs, strengthening local manufacturing, empowering entrepreneurs, supporting women and youth across our value chain, and contributing to healthier communities.</p></div></article>
 
       <article className="shea-story-partner"><span>Collaboration</span><h3>Partner With Us</h3><p>We believe the future of wellness is built through collaboration.</p><p>Whether you are:</p><ul>{["A retailer or distributor seeking premium natural products,", "A hotel, spa, salon, or wellness centre looking for trusted wellness solutions,", "A corporate organisation interested in wellness gifting,", "An investor seeking a purpose-driven manufacturing business,", "Or a development partner passionate about sustainable enterprise and community impact,"].map((item) => <li key={item}>{item}</li>)}</ul><p>we invite you to join us as we continue building a brand that delivers value for people, communities, and the planet.</p><p>Together, we can redefine wellness through innovation, sustainability, and African excellence.</p><a href="/contact">Partner with Shea Wellness <ArrowRight size={17} /></a></article>
 
@@ -533,9 +534,9 @@ function LivingPageSection({ kind }: { kind: SheaPageKind }) {
         <h2>{copy.title}</h2>
         <p>{copy.body}</p>
         <div>
-          <article><CheckCircle2 size={18} /><strong>Product media</strong><small>Real jars, textures, and product films.</small></article>
-          <article><BookOpen size={18} /><strong>Education</strong><small>Usage lessons that make routines clear.</small></article>
-          <article><Sparkles size={18} /><strong>Premium trust</strong><small>Clean claims, sourcing proof, and buyer confidence.</small></article>
+          <article><CheckCircle2 size={18} /><strong>{kind === "about" ? "Thoughtful care" : "Product media"}</strong><small>{kind === "about" ? "Carefully selected ingredients for everyday wellbeing." : "Real jars, textures, and product films."}</small></article>
+          <article><BookOpen size={18} /><strong>{kind === "about" ? "Shared knowledge" : "Education"}</strong><small>{kind === "about" ? "African botanical heritage at the heart of our work." : "Usage lessons that make routines clear."}</small></article>
+          <article><Sparkles size={18} /><strong>{kind === "about" ? "Made in Kenya" : "Premium trust"}</strong><small>{kind === "about" ? "Local manufacturing, with a vision that reaches further." : "Clean claims, sourcing proof, and buyer confidence."}</small></article>
         </div>
       </div>
     </section>
@@ -569,23 +570,41 @@ function QualitySections() {
 
 function ContactSections() {
   const sheaBrand = useBrandIdentity();
+  const isUngaHouse = /unga house/i.test(sheaBrand.address) && /nairobi/i.test(sheaBrand.address);
+  const location = isUngaHouse
+    ? "Unga House, Muthithi Road, Westlands, Nairobi, Kenya"
+    : sheaBrand.address;
+  // Pin the building itself so similarly named nearby businesses are not selected.
+  // Building footprint: openstreetmap.org/way/553232056.
+  const mapQuery = encodeURIComponent(isUngaHouse ? "-1.26333,36.80443" : location);
   return (
     <section className="shea-contact-grid">
       <div className="shea-contact-card">
         <Mail size={22} />
         <span>Email</span>
-        <strong>{sheaBrand.email}</strong>
+        <strong><a href={`mailto:${sheaBrand.email}`}>{sheaBrand.email}</a></strong>
       </div>
       <div className="shea-contact-card">
         <Phone size={22} />
         <span>Phone</span>
-        <strong>{sheaBrand.phone}</strong>
+        <strong><a href={`tel:${sheaBrand.phone.replace(/\s/g, "")}`}>{sheaBrand.phone}</a></strong>
       </div>
       <div className="shea-contact-card">
         <MapPin size={22} />
         <span>Business address</span>
         <strong>{sheaBrand.address}</strong>
       </div>
+      <section className="shea-contact-map" aria-label="Visit Shea Wellness" data-cms-exclude>
+        <header><span>Visit us</span><h2>Find us in Westlands.</h2><p>{sheaBrand.address}</p></header>
+        <iframe
+          title={`Map showing Shea Wellness at ${sheaBrand.address}`}
+          src={`https://www.google.com/maps?q=${mapQuery}&z=17&output=embed`}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+        <a href={`https://www.google.com/maps/dir/?api=1&destination=${mapQuery}`} target="_blank" rel="noopener noreferrer">Open directions <ArrowRight size={18} /></a>
+      </section>
       <ContactForm />
     </section>
   );

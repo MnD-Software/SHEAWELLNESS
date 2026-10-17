@@ -12,6 +12,7 @@ import { BrandIdentityProvider } from "@/components/storefront/BrandIdentity";
 import { StorefrontContentProvider } from "@/components/storefront/StorefrontContent";
 import "@/app/client-refinements.css";
 import "@/app/storefront-polish.css";
+import "@/app/story-contact.css";
 // Shared cart and search must use the current Neon catalogue on every route.
 export const dynamic = "force-dynamic";
 
