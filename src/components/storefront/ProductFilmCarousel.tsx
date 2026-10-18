@@ -64,6 +64,29 @@ export function ProductFilmCarousel({ films, children }: { films: SheaMediaAsset
     const timer = window.setInterval(() => move(1), 8000);
     return () => window.clearInterval(timer);
   }, [paused, interacting, inView, reducedMotion, ordered.length]);
+  // Editorial cards keep their CMS-managed sources while sharing playback controls.
+  useEffect(() => {
+    const node = rail.current;
+    if (!children || !node) return;
+    const players = Array.from(node.querySelectorAll("video"));
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        const player = entry.target as HTMLVideoElement;
+        const playing = entry.isIntersecting && entry.intersectionRatio >= 0.35 && !paused;
+        player.autoplay = playing;
+        if (playing) void player.play().catch(() => undefined);
+        else player.pause();
+      }
+    }, { threshold: [0, 0.35] });
+    for (const player of players) {
+      player.pause();
+      observer.observe(player);
+    }
+    return () => {
+      observer.disconnect();
+      players.forEach(player => player.pause());
+    };
+  }, [children, paused]);
   if (!ordered.length) return null;
   return <div className="product-film-carousel" role="region" aria-roledescription="carousel" aria-label="Shea Wellness product video carousel" data-live-content={children ? undefined : true}
     onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)} onFocusCapture={() => setInteracting(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setInteracting(false); }}>

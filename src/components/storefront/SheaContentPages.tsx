@@ -643,7 +643,7 @@ function VideoShowcase({ title, body }: { title: string; body: string }) {
       <ProductFilmCarousel films={ownerVideos.slice(0, 3).map(([title, file]) => ({ id: file, title, src: ownerAsset(file), type: "video" as const, tag: "Product motion" }))}>
         {ownerVideos.slice(0, 3).map(([title, file]) => (
           <article key={file} className="product-film-card">
-            <video src={ownerAsset(file)} poster={ownerAsset(file.replace(".mp4", "-poster.webp"))} controls playsInline preload="none" />
+            <video src={ownerAsset(file)} poster={ownerAsset(file.replace(".mp4", "-poster.webp"))} autoPlay muted loop controls playsInline preload="none" />
             <strong>{title}</strong>
           </article>
         ))}
