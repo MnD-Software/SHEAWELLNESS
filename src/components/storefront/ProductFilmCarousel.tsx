@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { prioritizeOwnerFilms } from "@/lib/client-media";
 import type { SheaMediaAsset } from "@/lib/shea-content";
@@ -25,7 +25,7 @@ function FilmCard({ film, paused }: { film: SheaMediaAsset; paused: boolean }) {
   </article>;
 }
 
-export function ProductFilmCarousel({ films }: { films: SheaMediaAsset[] }) {
+export function ProductFilmCarousel({ films, children }: { films: SheaMediaAsset[]; children?: ReactNode }) {
   const ordered = prioritizeOwnerFilms(films);
   const rail = useRef<HTMLDivElement>(null);
   const [paused, setPaused] = useState(false);
@@ -65,12 +65,13 @@ export function ProductFilmCarousel({ films }: { films: SheaMediaAsset[] }) {
     return () => window.clearInterval(timer);
   }, [paused, interacting, inView, reducedMotion, ordered.length]);
   if (!ordered.length) return null;
-  return <div className="product-film-carousel" role="region" aria-roledescription="carousel" aria-label="Shea Wellness product video carousel" data-live-content
+  return <div className="product-film-carousel" role="region" aria-roledescription="carousel" aria-label="Shea Wellness product video carousel" data-live-content={children ? undefined : true}
     onMouseEnter={() => setInteracting(true)} onMouseLeave={() => setInteracting(false)} onFocusCapture={() => setInteracting(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setInteracting(false); }}>
     <div ref={rail} className="product-film-rail" tabIndex={0} aria-label="Slide through product videos" onScroll={updateRange} onKeyDown={event => { if (event.target !== event.currentTarget) return; if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); move(event.key === "ArrowRight" ? 1 : -1); } }}>
-      {ordered.map(film => <FilmCard key={film.src} film={film} paused={paused} />)}
+      {/* Existing editorial cards retain their saved text and video editor slots. */}
+      {children ?? ordered.map(film => <FilmCard key={film.src} film={film} paused={paused} />)}
     </div>
-    <div className="product-film-carousel-controls">
+    <div className="product-film-carousel-controls" data-cms-exclude={children ? true : undefined}>
       <span>{range.start}–{range.end} / {ordered.length} videos</span>
       <div><button type="button" onClick={() => move(-1)} aria-label="Previous videos"><ChevronLeft size={20} /></button>
         <button type="button" onClick={() => setPaused(value => !value)} aria-label={paused ? "Play video carousel" : "Pause video carousel"}>{paused ? <Play size={18} /> : <Pause size={18} />}</button>

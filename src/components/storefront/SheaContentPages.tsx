@@ -43,6 +43,7 @@ import { isSidewaysSheaProductAsset } from "@/lib/shea-media";
 import { useEffect, useMemo, useState } from "react";
 import { useStorefrontContent } from "./StorefrontContent";
 import { ClientCollectionGallery } from "./ClientCollectionGallery";
+import { ProductFilmCarousel } from "./ProductFilmCarousel";
 
 type SheaPageKind = "about" | "products" | "wholesale" | "sustainability" | "blog" | "quality" | "contact" | "catalogue";
 
@@ -639,14 +640,14 @@ function VideoShowcase({ title, body }: { title: string; body: string }) {
         <h2>{title}</h2>
         <p>{body}</p>
       </div>
-      <div className="shea-video-slider featured">
+      <ProductFilmCarousel films={ownerVideos.slice(0, 3).map(([title, file]) => ({ id: file, title, src: ownerAsset(file), type: "video" as const, tag: "Product motion" }))}>
         {ownerVideos.slice(0, 3).map(([title, file]) => (
-          <article key={file}>
+          <article key={file} className="product-film-card">
             <video src={ownerAsset(file)} poster={ownerAsset(file.replace(".mp4", "-poster.webp"))} controls playsInline preload="none" />
             <strong>{title}</strong>
           </article>
         ))}
-      </div>
+      </ProductFilmCarousel>
     </section>
   );
 }
