@@ -1,5 +1,5 @@
 /* Our Story keeps photographs in their natural proportions. */
-.shea-page-about { background: #f8f7f1; color: #173d35; }
+.shea-page-about { background: var(--shea-client-grey); color: #173d35; }
 .shea-page-about img[data-image-slot] { display: block; position: static; width: 100% !important; height: auto !important; min-height: 0; max-height: none !important; aspect-ratio: auto !important; object-fit: contain !important; object-position: center !important; margin: 0; padding: 0; transform: none !important; }
 .shea-page-about .shea-page-hero { width: min(1200px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); align-items: center; gap: 56px; min-height: 0; margin: 0 auto; padding-block: 56px !important; background: transparent; }
 .shea-page-about .shea-page-hero > div { min-width: 0; text-align: left; }
@@ -8,7 +8,7 @@
 .shea-page-about .shea-page-hero p { max-width: 48ch; margin: 0; color: #56665b; font-size: 16px; line-height: 1.75; }
 .shea-page-about .shea-hero-actions { justify-content: flex-start; gap: 10px; margin-top: 28px; }
 .shea-page-about .shea-hero-actions a { min-height: 46px; padding: 12px 20px; font-size: 13px; border-radius: 999px; }
-.shea-page-about :is(.shea-page-hero,.shea-living-section) figure { margin: 0; min-height: 0; height: auto; align-self: center; border: 1px solid #d8dfd1; border-radius: 16px; background: #fff; box-shadow: none; }
+.shea-page-about :is(.shea-page-hero,.shea-living-section) figure { margin: 0; min-height: 0; height: auto; align-self: center; border: 1px solid #d8dfd1; border-radius: 16px; background: var(--shea-client-grey); box-shadow: none; }
 .shea-page-about :is(.shea-page-hero,.shea-living-section) figure::before { display: none; }
 .shea-page-about :is(.shea-page-hero,.shea-living-section) figcaption { position: static; width: 100%; min-width: 0; padding: 16px 20px; border: 0; border-radius: 0; background: #173d35; color: #fff; box-shadow: none; backdrop-filter: none; font-size: 13px; }
 .shea-page-about :is(.shea-page-hero,.shea-living-section) figcaption:empty { display: none; }
@@ -18,7 +18,7 @@
 .shea-page-about .shea-complete-story > header { grid-column: 1/-1; max-width: 840px; margin: 16px auto 0; padding: 32px 0; text-align: center; }
 .shea-page-about .shea-complete-story :is(h2,h3) { font-family: Georgia,serif; font-weight: 400; font-style: normal; letter-spacing: -.025em; color: #173d35; text-wrap: balance; }
 .shea-page-about .shea-complete-story > header h2 { margin-top: 14px; font-size: clamp(30px,3.4vw,44px); line-height: 1.18; }
-.shea-page-about .shea-complete-story :is(p,li,blockquote) { font-weight: 400; font-style: normal; }
+.shea-page-about .shea-complete-story :is(p,li,blockquote) { font-weight: 700; font-style: italic; }
 .shea-page-about .shea-complete-story :is(header,article) span { display: block; color: #64754c; font-size: 10px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
 .shea-page-about .shea-story-opening { grid-column: 1/-1; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.15fr); align-items: center; gap: 48px; padding: 0 0 28px; border: 0; border-radius: 0; background: transparent; }
 .shea-story-opening-visual { overflow: hidden; border-radius: 16px; border: 1px solid #d8dfd1; }
@@ -26,20 +26,20 @@
 .shea-page-about .shea-complete-story :is(article p,.shea-story-opening p) { margin: 0; color: #526459; font-size: 16px; line-height: 1.8; text-align: left; }
 .shea-page-about .shea-complete-story p + p { margin-top: 18px; }
 .shea-page-about .shea-story-opening p:first-child { font-family: Georgia,serif; font-size: 21px; line-height: 1.55; color: #173d35; }
-.shea-page-about .shea-complete-story > article { width: 100%; max-width: none; margin: 0; padding: 32px; border: 1px solid #dce2d5; border-radius: 16px; background: #fff; }
+.shea-page-about .shea-complete-story > article { width: 100%; max-width: none; margin: 0; padding: 32px; border: 1px solid #dce2d5; border-radius: 16px; background: var(--shea-client-grey); }
 .shea-page-about .shea-complete-story article h3 { margin: 14px 0 22px; font-size: clamp(28px,2.8vw,36px); line-height: 1.16; }
 .shea-page-about .shea-complete-story :is(ul,blockquote) { max-width: none; }
 .shea-page-about .shea-complete-story article li { font-size: 14px; line-height: 1.6; padding: 12px 0; border-color: #d7dfce; }
 .shea-page-about .shea-complete-story article li svg { color: #667d4c; }
 .shea-page-about .shea-complete-story > :is(.shea-story-purpose,.shea-story-vision) { grid-column: 1/-1; display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1.2fr); gap: 56px; padding: 36px 0; border: 0; border-top: 1px solid #d5ddce; border-radius: 0; background: transparent; }
-.shea-page-about .shea-complete-story > .shea-story-collections { background: #fff; }
+.shea-page-about .shea-complete-story > .shea-story-collections { background: var(--shea-client-grey); }
 .shea-page-about .shea-story-collections ul { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 18px; }
-.shea-page-about .shea-complete-story > .shea-story-sustainability { background: #eaf0e2; }
+.shea-page-about .shea-complete-story > .shea-story-sustainability { background: var(--shea-client-grey); }
 .shea-page-about .shea-story-sustainability ul { display: grid; grid-template-columns: minmax(0,1fr); }
 .shea-page-about .shea-complete-story .client-collection-gallery { grid-column: 1/-1; width: 100%; margin: 12px 0; gap: 24px; align-items: start; }
-.shea-page-about .client-collection-gallery figure { border-radius: 16px; border: 1px solid #d8dfd1; background: #fff; }
+.shea-page-about .client-collection-gallery figure { border-radius: 16px; border: 1px solid #d8dfd1; background: var(--shea-client-grey); }
 .shea-page-about .client-collection-gallery figcaption { padding: 18px 22px; font-size: 18px; text-align: left; }
-.shea-page-about .shea-complete-story > .shea-story-partner { grid-column: 1/-1; padding: 36px; background: #f0eee3; }
+.shea-page-about .shea-complete-story > .shea-story-partner { grid-column: 1/-1; padding: 36px; background: var(--shea-client-grey); }
 .shea-page-about .shea-story-partner ul { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 28px; }
 .shea-page-about .shea-story-partner a { display: inline-flex; align-items: center; gap: 12px; min-height: 46px; margin-top: 24px; padding: 12px 22px; border-radius: 999px; background: #173d35; color: #fff; font-size: 13px; text-decoration: none; }
 .shea-page-about .shea-complete-story > .shea-story-promise { grid-column: 1/-1; padding: 48px 36px; border: 0; background: #173d35; text-align: center; }
@@ -48,7 +48,7 @@
 .shea-page-about .shea-story-promise p { max-width: 64ch; margin-inline: auto; }
 .shea-page-about .shea-story-promise strong { display: block; margin-top: 24px; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
 .shea-page-about .shea-story-promise blockquote { max-width: 34ch; margin: 22px auto 0; padding: 0; border: 0; font: 400 clamp(23px,2.8vw,32px)/1.45 Georgia,serif; }
-.shea-page-about .shea-living-section { width: min(1120px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,.65fr) minmax(0,1fr); gap: 48px; align-items: center; margin: 40px auto 20px; padding: 28px; border: 1px solid #d8dfd1; border-radius: 20px; background: #fff; }
+.shea-page-about .shea-living-section { width: min(1120px,calc(100% - 48px)); display: grid; grid-template-columns: minmax(0,.65fr) minmax(0,1fr); gap: 48px; align-items: center; margin: 40px auto 20px; padding: 28px; border: 1px solid #d8dfd1; border-radius: 20px; background: var(--shea-client-grey); }
 .shea-page-about .shea-living-section figure { max-width: 360px; }
 .shea-page-about .shea-living-section :is(h1,h2) { max-width: 20ch; margin: 16px 0 20px; font: 400 clamp(32px,3.7vw,50px)/1.12 Georgia,serif; letter-spacing: -.025em; color: #173d35; text-wrap: balance; }
 .shea-page-about .shea-living-section > div > span { color: #8a6c2f; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; }
@@ -115,3 +115,14 @@
   .shea-page-contact .shea-contact-card strong { grid-column: 2; }
   .shea-contact-map header,.shea-page-contact .shea-contact-form { padding: 24px; }
 }
+
+/* Client-approved story alignment, shared grey surfaces and leaf lists. */
+.shea-page-about .shea-complete-story :is(h2,h3) { font-weight: 700; font-style: italic; }
+.shea-page-about .shea-complete-story > :is(.shea-story-purpose,.shea-story-vision) { grid-template-columns: minmax(0,1fr); gap: 20px; justify-items: center; text-align: center; }
+.shea-page-about .shea-complete-story > :is(.shea-story-purpose,.shea-story-vision) > div { width: min(100%,78ch); }
+.shea-page-about .shea-complete-story :is(.shea-story-purpose,.shea-story-vision) p { text-align: center; }
+.shea-page-about .shea-story-promise :is(h3,p,strong,blockquote) { margin-inline: auto; }
+.shea-page-about .shea-story-promise blockquote { font-weight: 700; font-style: italic; }
+.shea-page-about .shea-living-section :is(p,small) { font-weight: 700; }
+.shea-page-about .shea-story-partner li { position: relative; display: block; padding-left: 30px !important; }
+.shea-page-about .shea-story-partner li::before { content: ""; position: absolute; top: 14px; left: 0; width: 18px; height: 18px; background: #667d4c; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M11 20A8 8 0 0 1 9.8 4.1C15.5 3 17 2.5 19 1c1 2 2 4.2 2 8 0 5.5-4.8 11-10 11ZM2 22c0-6 5-10 11-12'/%3E%3C/svg%3E") center / contain no-repeat; }

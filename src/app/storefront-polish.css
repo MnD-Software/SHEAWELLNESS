@@ -1,4 +1,11 @@
 /* Shared storefront rhythm and controls; the admin retains its own layout. */
+/* Every catalogue and recommendation section uses the same two-column grid. */
+.commerce-product-grid,
+.commerce-products-section.shop-only > .commerce-product-grid,
+.department-products > div,
+.shea-category-product-grid,
+.refined-recommendations > .commerce-product-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)) !important; }
+:is(.commerce-product-grid,.department-products > div,.shea-category-product-grid) > article { min-width: 0; }
 :where(.commerce-site,.shea-page,.shea-department-page,.shea-category-page,.shea-product-page,.shea-policy-page,.shea-account-page,.shea-faq-page) { color: #173d2b; }
 :is(.shea-page-hero,.department-hero,.shea-category-hero,.shea-policy-hero,.guide-hero,.shea-faq-hero,.shea-account-hero) h1 { font-size: clamp(34px,4.6vw,62px); line-height: 1.08; letter-spacing: -.025em; text-wrap: balance; }
 :is(.shea-page-hero,.department-hero,.shea-category-hero,.shea-policy-hero,.guide-hero,.shea-faq-hero,.shea-account-hero) p { max-width: 64ch; font-size: 16px; line-height: 1.75; }
@@ -43,18 +50,20 @@
  .commerce-products-section.shop-only > .commerce-product-grid,
  .department-products > div,
  .shea-category-product-grid,
- .refined-recommendations > .commerce-product-grid { grid-template-columns: minmax(0,1fr) !important; gap: 20px !important; }
- article.shop-product-card { height: auto; align-self: start; border-radius: 16px; }
- .shop-product-card .shop-card-photo { aspect-ratio: 4 / 3; }
- .shop-product-card .shop-card-content { padding: 20px; gap: 14px; }
- .shop-product-card h3 { font-size: 24px; line-height: 1.2; }
- .shop-product-card .shop-card-content > p { min-height: 0; font-size: 14px; }
- .shop-product-card .shop-card-price { font-size: 20px; }
- .shop-card-options > div { gap: 8px; }
+ .refined-recommendations > .commerce-product-grid { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap: 10px !important; }
+ article.shop-product-card { height: 100%; align-self: stretch; border-radius: 12px; }
+ .shop-product-card .shop-card-photo { aspect-ratio: 1 / 1; }
+ .shop-product-card .shop-card-content { min-width: 0; padding: 12px 10px; gap: 10px; }
+ .shop-product-card h3 { font-size: clamp(16px,4.2vw,20px); line-height: 1.25; overflow-wrap: anywhere; }
+ .shop-product-card .shop-card-content > p { min-height: 0; font-size: 12px; line-height: 1.6; }
+ .shop-product-card .shop-card-price { font-size: 16px; overflow-wrap: anywhere; }
+ .shop-card-options > div { flex-wrap: wrap; gap: 6px; }
+ .shop-card-options select { width: 100%; min-width: 0; max-width: 100%; font-size: 12px; }
+ .shop-card-options button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
  .shop-card-options button img { width: 28px; height: 34px; flex-basis: 28px; }
- .shop-product-card .shop-card-actions { flex-wrap: nowrap; gap: 14px; }
- .shop-product-card .shop-card-actions > button,.shop-product-card .shop-card-actions > .shop-card-enquire { flex: 1 1 auto; width: auto; font-size: 12px; }
- .shop-product-card .shop-card-actions > a:not(.shop-card-enquire) { width: auto; padding: 10px 0; font-size: 12px; }
+ .shop-product-card .shop-card-actions { flex-direction: column; align-items: stretch; flex-wrap: wrap; gap: 6px; }
+ .shop-product-card .shop-card-actions > button,.shop-product-card .shop-card-actions > .shop-card-enquire { flex: 1 1 auto; width: 100%; padding: 10px 6px; white-space: normal; font-size: 11px; }
+ .shop-product-card .shop-card-actions > a:not(.shop-card-enquire) { width: 100%; padding: 8px 0; font-size: 12px; }
  .shop-card-options .shop-card-variation-images { padding-bottom: 8px; }
 }
 

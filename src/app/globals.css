@@ -11352,7 +11352,7 @@ body {
 .shea-complete-story article li { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #edf0eb; color: #42554a; line-height: 1.5; }
 .shea-complete-story article li svg { flex: 0 0 auto; margin-top: 2px; color: #81904f; }
 .shea-story-collections ul, .shea-story-sustainability ul { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 22px; }
-.shea-story-partner { background: #eef1e9 !important; }
+.shea-story-partner { background: var(--shea-client-grey); }
 .shea-story-partner a { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 13px 17px; border-radius: 999px; background: #173d2b; color: #fff; font-size: 12px; font-weight: 850; }
 
 .shea-admin-setting-toggle { display:flex; align-items:center; justify-content:space-between; gap:24px; cursor:pointer; }
