@@ -1,7 +1,7 @@
 .section { padding: 24px clamp(12px, 3vw, 48px) 32px; background: #faf9f5; }
 .carousel { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 1320px; margin: auto; background: #eeeee6; color: #173d2b; overflow: hidden; touch-action: pan-y; border: 1px solid #e3e3d7; border-radius: 12px; }
 .media { grid-area: 1 / 1; position: relative; min-width: 0; width: 100%; height: 300px; background: #efeee6; }
-.media img, .media video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+.media img, .media video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }
 .copy { grid-area: 1 / 2; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding: 22px clamp(24px, 4vw, 56px); text-align: left; min-width: 0; background: #eeeee6; }
 .empty .media { min-height: 350px; aspect-ratio: auto; background: linear-gradient(115deg, #f0efe6, #faf9f2 60%, #e9eddf); }
 .empty .copy { grid-area: 1 / 1 / 2 / -1; align-self: center; z-index: 1; background: transparent; padding: 36px 70px; align-items: center; text-align: center; }

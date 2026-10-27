@@ -1,4 +1,5 @@
 "use client";
+import { CAROUSEL_INTERVAL_MS } from "@/lib/carousel-timing";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
@@ -61,7 +62,7 @@ export function ProductFilmCarousel({ films, children }: { films: SheaMediaAsset
   }, [ordered.length]);
   useEffect(() => {
     if (paused || interacting || !inView || ordered.length < 2) return;
-    const timer = window.setInterval(() => move(1), 8000);
+    const timer = window.setInterval(() => move(1), CAROUSEL_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [paused, interacting, inView, reducedMotion, ordered.length]);
   // Editorial cards keep their CMS-managed sources while sharing playback controls.

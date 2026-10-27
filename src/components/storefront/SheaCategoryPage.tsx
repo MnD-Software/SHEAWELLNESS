@@ -1,9 +1,9 @@
 "use client";
 
 import { StorefrontImage } from "./StorefrontImage";
-import { ArrowRight, Grid2X2, ShoppingCart, Star } from "lucide-react";
+import { ProductCard } from "./ProductCard";
+import { ArrowRight, Grid2X2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { formatMoney } from "@/lib/format";
 import { categoryToSlug } from "@/lib/product-routing";
 import { platformSnapshot } from "@/lib/platform-data";
 import { readStoredArray } from "@/lib/browser-storage";
@@ -55,26 +55,7 @@ export function SheaCategoryPage({ categorySlug, initialCategory }: { categorySl
           <h2>{categoryProducts.length ? `${categoryName} products` : "No active products in this category yet."}</h2>
         </div>
         <div className="shea-category-product-grid">
-          {categoryProducts.map((product) => (
-            <article key={product.id}>
-              <a className={isSidewaysSheaProductAsset(product.imageUrl) ? "is-rotated" : undefined} href={`/products/${encodeURIComponent(product.id)}`}>
-                <StorefrontImage className={isSidewaysSheaProductAsset(product.imageUrl) ? "shea-rotated-product-image" : undefined} src={product.imageUrl} alt={product.title} style={{ objectPosition: product.imagePosition }} />
-              </a>
-              <div>
-                <span>{product.category}</span>
-                <strong>{product.title}</strong>
-                <p>{product.description}</p>
-                <div>
-                  <small><Star size={14} fill="currentColor" /> {product.rating || "New"}</small>
-                  <b>{formatMoney(product.price, platformSnapshot.activeStore.currency)}</b>
-                </div>
-                <a href={`/products/${encodeURIComponent(product.id)}`}>
-                  <ShoppingCart size={17} />
-                  View product
-                </a>
-              </div>
-            </article>
-          ))}
+          {categoryProducts.map(product => <ProductCard key={product.id} product={product} currency={platformSnapshot.activeStore.currency} />)}
         </div>
       </section>
     </main>

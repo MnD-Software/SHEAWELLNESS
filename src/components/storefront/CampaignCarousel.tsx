@@ -1,4 +1,5 @@
 "use client";
+import { CAROUSEL_INTERVAL_MS } from "@/lib/carousel-timing";
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
@@ -22,7 +23,7 @@ export function CampaignCarousel({ slides }: { slides: SheaHeroSlide[] }) {
     if (slides.length < 2 || paused || interacting || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") setIndex((value) => (value + 1) % slides.length);
-    }, 8000);
+    }, CAROUSEL_INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, [slides.length, paused, interacting]);
   useEffect(() => {
@@ -53,7 +54,7 @@ export function CampaignCarousel({ slides }: { slides: SheaHeroSlide[] }) {
         }}>
         <div className={styles.media} data-testid="campaign-stage" role="group" aria-roledescription="slide" aria-label={`${current + 1} of ${slides.length}: ${slide.title}`}>
           {source ? slide.type === "video" ? <video ref={video} key={source} src={source} muted playsInline loop autoPlay={!paused} />
-            : <img key={source} src={source} alt={slide.alt || slide.tag || slide.title} fetchPriority="high" style={{ objectPosition: slide.objectPosition ?? "center", objectFit: slide.fit ?? "cover", transform: slide.rotation ? `rotate(${slide.rotation}deg)` : undefined }} /> : null}
+            : <img key={source} src={source} alt={slide.alt || slide.tag || slide.title} fetchPriority="high" style={{ objectPosition: slide.objectPosition ?? "center", objectFit: "cover", transform: slide.rotation ? `rotate(${slide.rotation}deg)` : undefined }} /> : null}
         </div>
         <div className={styles.copy} key={slide.id} aria-live={paused ? "polite" : "off"} aria-atomic="true">
           <span>{slide.kicker}</span><h1>{slide.title}</h1><p>{slide.body}</p>
