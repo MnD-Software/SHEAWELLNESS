@@ -23,7 +23,7 @@ export function CampaignCarousel({ slides }: { slides: SheaHeroSlide[] }) {
     if (slides.length < 2 || paused || interacting || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") setIndex((value) => (value + 1) % slides.length);
-    }, CAROUSEL_INTERVAL_MS);
+    }, CAROUSEL_INTERVAL_MS * 1.5);
     return () => window.clearInterval(timer);
   }, [slides.length, paused, interacting]);
   useEffect(() => {
